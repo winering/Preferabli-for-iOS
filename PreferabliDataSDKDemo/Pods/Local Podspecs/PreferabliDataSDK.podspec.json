@@ -1,0 +1,43 @@
+{
+  "name": "PreferabliDataSDK",
+  "version": "1.0.0",
+  "summary": "This is the private version of the Preferabli Data SDK for iOS.",
+  "homepage": "https://github.com/winering/Preferabli-for-iOS.git",
+  "license": {
+    "type": "RingIT, Inc.",
+    "text": "      Copyright 2023\n      Permission is granted to use this SDK to customers of RingIT, Inc.\n"
+  },
+  "authors": {
+    "RingIT, Inc.": "info@preferabli.com"
+  },
+  "platforms": {
+    "ios": "13.0"
+  },
+  "resources": "PreferabliDataSDK/assets/*.*",
+  "resource_bundles": {
+    "localization": [
+      "PreferabliDataSDK/assets/*.lproj/*.strings"
+    ]
+  },
+  "source": {
+    "git": "https://github.com/winering/preferabli-data-sdk-ios.git"
+  },
+  "source_files": "**/*.{h,m,swift}",
+  "dependencies": {
+    "Alamofire": [
+      "4.9.1"
+    ],
+    "MagicalRecord": [
+
+    ],
+    "SwiftEventBus": [
+
+    ],
+    "Mixpanel-swift": [
+
+    ]
+  },
+  "exclude_files": "Pods/**/*.{h,m,swift}",
+  "swift_versions": "5.0",
+  "swift_version": "5.0"
+}

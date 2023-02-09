@@ -1,0 +1,6 @@
+framework module PreferabliDataSDK {
+  umbrella header "PreferabliDataSDK-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,43 @@
+PODS:
+  - Alamofire (4.9.1)
+  - MagicalRecord (2.3.2):
+    - MagicalRecord/Core (= 2.3.2)
+  - MagicalRecord/Core (2.3.2)
+  - Mixpanel-swift (4.0.2):
+    - Mixpanel-swift/Complete (= 4.0.2)
+  - Mixpanel-swift/Complete (4.0.2)
+  - PreferabliDataSDK (1.0.0):
+    - Alamofire (= 4.9.1)
+    - MagicalRecord
+    - Mixpanel-swift
+    - SwiftEventBus
+  - SwiftEventBus (5.0.0)
+  - TTGSnackbar (1.11.1)
+
+DEPENDENCIES:
+  - PreferabliDataSDK (from `../../preferabli-data-sdk-ios`)
+  - TTGSnackbar
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - Alamofire
+    - MagicalRecord
+    - Mixpanel-swift
+    - SwiftEventBus
+    - TTGSnackbar
+
+EXTERNAL SOURCES:
+  PreferabliDataSDK:
+    :path: "../../preferabli-data-sdk-ios"
+
+SPEC CHECKSUMS:
+  Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
+  MagicalRecord: 53bed74b4323b930992a725be713e53b37d19755
+  Mixpanel-swift: 91fc28834402720682f4cce760e95571fbb388c3
+  PreferabliDataSDK: 435a647524f310cefee9da283aa972be416ca085
+  SwiftEventBus: b30f617a6aca5a9336464b4d3f5931034762f2d5
+  TTGSnackbar: fea91c62637b5662f808a4c3b55f7631cb7e1ef7
+
+PODFILE CHECKSUM: aa059ce0da23694cafe084a56e2fe9b828992c92
+
+COCOAPODS: 1.11.2
