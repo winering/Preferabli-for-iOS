@@ -20,7 +20,7 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 }
 ```
 
-You must have a Preferabli account to acquire an API token. To login / signup, visit https://www.winering.com/businesses. 
+You must have a Preferabli account to acquire an API token. To login / signup, visit https://preferabli.com. 
 
 Once logged in, head to the `Settings` page to find your API token.
 
