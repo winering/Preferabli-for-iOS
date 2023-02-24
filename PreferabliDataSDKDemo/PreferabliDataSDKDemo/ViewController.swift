@@ -10,30 +10,170 @@ import SwiftUI
 import PreferabliDataSDK
 import TTGSnackbar
 
-class ViewController : UIViewController {
+class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataSource, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak public var loginButton: UIButton!
+    @IBOutlet weak public var customerButton: UIButton!
+    @IBOutlet weak public var authenticatedButton: UIButton!
     @IBOutlet weak public var email: UITextField!
     @IBOutlet weak public var password: UITextField!
     @IBOutlet weak public var firstLabel: UILabel!
     @IBOutlet weak public var loadingView: UIView!
+    @IBOutlet weak public var tableView: UITableView!
+    @IBOutlet weak public var logo: UIImageView!
+
+    var customer = true
+    var picker : UIPickerView!
+    var picker2 : UIPickerView!
+    var toolBar : UIToolbar!
+    let pickerOptions = ["Search", "Label Rec", "Guided Rec", "Where To Buy", "Like That, Try This"]
+    let pickerOptions2 = ["Rate Product", "Wishlist Product", "Get Profile", "Get Recs", "Get Rated Products", "Get Wishlisted Products", "Get Purchased Products"]
+    var items = Array<String>()
     
     override func viewDidLoad() {
-        handleLogoutButton()
+        logo.image = Preferabli.getPoweredByPreferabliLogo(light_background: true)
+        handleViews()
     }
     
-    func handleLogoutButton() {
-        if (Preferabli.main.isUserLoggedIn()) {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return pickerView == picker ? pickerOptions.count : pickerOptions2.count
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return pickerView == picker ? pickerOptions[row] : pickerOptions2[row]
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
+        return NSAttributedString(string: (pickerView == picker ? pickerOptions[row] : pickerOptions2[row]), attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
+    }
+    
+    func handleViews() {
+        if (Preferabli.isPreferabliUserLoggedIn() || Preferabli.isCustomerLoggedIn()) {
             email.isHidden = true
             password.isHidden = true
             loginButton.setTitle("LOGOUT", for: .normal)
-            firstLabel.text = "You are now logged in. You can logout below."
+            firstLabel.text = "You are now browsing as an authenticated " + (Preferabli.isPreferabliUserLoggedIn() ? "Preferabli user" : "customer") +  ". You can log them out below."
+            customerButton.isHidden = true
+            authenticatedButton.isHidden = false
         } else {
             email.isHidden = false
-            password.isHidden = false
-            loginButton.setTitle("LOGIN", for: .normal)
-            firstLabel.text = "First make sure you initialize the SDK. Then try logging in..."
+            password.isHidden = customer
+            email.placeholder = customer ? "Customer ID (Email or Phone)" : "Preferabli User Email"
+            loginButton.setTitle("SUBMIT", for: .normal)
+            firstLabel.text = "To unlock additional actions, create / link a customer or signup / login an existing Preferabli user..."
+            customerButton.setTitle(customer ? "Create / Link a Customer" : "Preferabli User Login", for: .normal)
+            authenticatedButton.isHidden = true
         }
+    }
+    
+    @objc func dismissPicker() {
+        if (toolBar != nil) {
+            toolBar.removeFromSuperview()
+        }
+        if (picker != nil) {
+            picker.removeFromSuperview()
+        }
+        if (picker2 != nil) {
+            picker2.removeFromSuperview()
+        }
+    }
+    
+    @objc func runUnauthenticatedAction() {
+        let result = pickerOptions[picker.selectedRow(inComponent: 0)]
+        doAction(result: result)
+    }
+    
+    @objc func runAuthenticatedAction() {
+        let result = pickerOptions2[picker2.selectedRow(inComponent: 0)]
+        doAction(result: result)
+    }
+    
+    func doAction(result : String) {
+        if (result == "Search") {
+            searchProductsPressed()
+        } else if (result == "Label Rec") {
+            labelRecPressed()
+        } else if (result == "Guided Rec") {
+            guidedRecPressed()
+        } else if (result == "Where To Buy") {
+            whereToBuyPressed()
+        } else if (result == "Like That, Try This") {
+            ltttPressed()
+        } else if (result == "Get Profile") {
+            getProfilePressed()
+        } else if (result == "Get Recs") {
+            getRecPressed()
+        } else if (result == "Get Rated Products") {
+            getRatedProductsPressed()
+        } else if (result == "Get Wishlisted Products") {
+            getWishlistedProductsPressed()
+        } else if (result == "Get Purchased Products") {
+            getPurchasedProductsPressed()
+        } else if (result == "Rate Product") {
+            rateProductPressed()
+        } else if (result == "Wishlist Product") {
+            wishlistProductPressed()
+        }
+        dismissPicker()
+    }
+    
+    @IBAction func unauthenticatedPressed() {
+        dismissPicker()
+        picker = UIPickerView(frame: CGRect.init(x: 0.0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 300))
+        picker?.backgroundColor = .black
+        picker?.tintColor = .white
+        picker?.delegate = self
+        picker?.dataSource = self
+        view.addSubview(picker!)
+        
+        toolBar = UIToolbar.init(frame: CGRect.init(x: 0.0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 50))
+        toolBar?.barStyle = UIBarStyle.default
+        toolBar?.isTranslucent = false
+        toolBar?.barTintColor = .black
+        toolBar?.tintColor = .white
+        toolBar?.sizeToFit()
+        
+        let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
+        let doneButton = UIBarButtonItem(title: "RUN ACTION", style: UIBarButtonItem.Style.done, target: self, action: #selector(runUnauthenticatedAction))
+        let cancelButton = UIBarButtonItem(title: "CANCEL", style: UIBarButtonItem.Style.plain, target: self, action: #selector(dismissPicker))
+        
+        toolBar?.setItems([cancelButton, spaceButton, doneButton], animated: false)
+        toolBar?.isUserInteractionEnabled = true
+        view.addSubview(toolBar!)
+    }
+    
+    @IBAction func authenticatedPressed() {
+        dismissPicker()
+        picker2 = UIPickerView(frame: CGRect.init(x: 0.0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 300))
+        picker2?.backgroundColor = .black
+        picker2?.tintColor = .white
+        picker2?.delegate = self
+        picker2?.dataSource = self
+        view.addSubview(picker2!)
+        
+        toolBar = UIToolbar.init(frame: CGRect.init(x: 0.0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 50))
+        toolBar?.barStyle = UIBarStyle.default
+        toolBar?.isTranslucent = false
+        toolBar?.barTintColor = .black
+        toolBar?.tintColor = .white
+        toolBar?.sizeToFit()
+        
+        let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
+        let doneButton = UIBarButtonItem(title: "RUN ACTION", style: UIBarButtonItem.Style.done, target: self, action: #selector(runAuthenticatedAction))
+        let cancelButton = UIBarButtonItem(title: "CANCEL", style: UIBarButtonItem.Style.plain, target: self, action: #selector(dismissPicker))
+        
+        toolBar?.setItems([cancelButton, spaceButton, doneButton], animated: false)
+        toolBar?.isUserInteractionEnabled = true
+        view.addSubview(toolBar)
+    }
+    
+    @IBAction func customerPressed() {
+        customer = !customer
+        handleViews()
     }
     
     // Login before you can perform any actions associated with a user.
@@ -41,10 +181,24 @@ class ViewController : UIViewController {
         showLoadingView()
         hideKeyboard()
         
-        if (Preferabli.main.isUserLoggedIn()) {
+        if (Preferabli.isPreferabliUserLoggedIn() || Preferabli.isCustomerLoggedIn()) {
             Preferabli.async.logout() {
                 self.hideLoadingView()
-                self.handleLogoutButton()
+                self.handleViews()
+            } onFailure: { error in
+                self.hideLoadingView()
+                self.showSnackBar(message: error.getMessage())
+            }
+        } else if (customer) {
+            let emailString = email.text ?? ""
+            
+            Preferabli.async.loginCustomer(merchant_customer_identification: emailString, merchant_customer_verification: "123ABC") { customer in
+                self.items.removeAll()
+                self.items.append("Customer logged in.")
+                self.items.append("Display Name: " + customer.getName())
+                self.tableView.reloadData()
+                self.hideLoadingView()
+                self.handleViews()
             } onFailure: { error in
                 self.hideLoadingView()
                 self.showSnackBar(message: error.getMessage())
@@ -53,9 +207,9 @@ class ViewController : UIViewController {
             let emailString = email.text ?? ""
             let passwordString = password.text ?? ""
             
-            Preferabli.async.login(email: emailString, password: passwordString) { user in
+            Preferabli.async.loginUser(email: emailString, password: passwordString) { user in
                 self.hideLoadingView()
-                self.handleLogoutButton()
+                self.handleViews()
             } onFailure: { error in
                 self.hideLoadingView()
                 self.showSnackBar(message: error.getMessage())
@@ -66,6 +220,123 @@ class ViewController : UIViewController {
     @IBAction func searchProductsPressed() {
         showLoadingView()
         Preferabli.async.searchProducts(query: "wine") { products in
+            self.items = products.map { $0.name } as! [String]
+            self.tableView.reloadData()
+            self.hideLoadingView()
+        } onFailure: { error in
+            self.hideLoadingView()
+            self.showSnackBar(message: error.getMessage())
+        }
+    }
+    
+    @IBAction func labelRecPressed() {
+        showLoadingView()
+        Preferabli.async.labelRecognition(image: UIImage.init(named: "label_rec_example.png")!) { (media, products) in
+            self.items = products.map { $0.product.name } as! [String]
+            self.tableView.reloadData()
+            self.hideLoadingView()
+        } onFailure: { error in
+            self.hideLoadingView()
+            self.showSnackBar(message: error.getMessage())
+        }
+    }
+    
+    @IBAction func guidedRecPressed() {
+        showLoadingView()
+
+        Preferabli.async.getGuidedRec { guided_rec in
+            let questions = guided_rec.questions
+            var selected_choice_ids = Array<NSNumber>()
+            for question in questions {
+                if (question.choices.count > 0) {
+                    selected_choice_ids.append(question.choices.randomElement()!.id)
+                }
+            }
+            
+            Preferabli.async.getGuidedRecResults(selected_choice_ids: selected_choice_ids) { products in
+                self.items = products.map { $0.name } as! [String]
+                self.tableView.reloadData()
+                self.hideLoadingView()
+            } onFailure: { error in
+                self.hideLoadingView()
+                self.showSnackBar(message: error.getMessage())
+            }
+            
+        } onFailure: { error in
+            self.hideLoadingView()
+            self.showSnackBar(message: error.getMessage())
+        }
+    }
+    
+    @IBAction func whereToBuyPressed() {
+        showLoadingView()
+        Preferabli.async.whereToBuy(product_id: 11263) { where_to_buy in
+            if where_to_buy.lookups.count > 0 {
+                self.items = where_to_buy.lookups.map { $0.product_name } as! [String]
+            } else {
+                self.items = where_to_buy.venues.map { $0.name } as! [String]
+            }
+            self.tableView.reloadData()
+            self.hideLoadingView()
+        } onFailure: { error in
+            self.hideLoadingView()
+            self.showSnackBar(message: error.getMessage())
+        }
+    }
+    
+    @IBAction func ltttPressed() {
+        showLoadingView()
+        Preferabli.async.lttt(product_id: 11263) { products in
+            self.items = products.map { $0.name } as! [String]
+            self.tableView.reloadData()
+            self.hideLoadingView()
+        } onFailure: { error in
+            self.hideLoadingView()
+            self.showSnackBar(message: error.getMessage())
+        }
+    }
+    
+    @IBAction func rateProductPressed() {
+        showLoadingView()
+        Preferabli.async.rateProduct(product_id: 11263, year: Variant.CURRENT_VARIANT_YEAR, rating: RatingType.SOSO) { product in
+            self.items = [ product.name ]
+            self.tableView.reloadData()
+            self.hideLoadingView()
+        } onFailure: { error in
+            self.hideLoadingView()
+            self.showSnackBar(message: error.getMessage())
+        }
+    }
+    
+    @IBAction func wishlistProductPressed() {
+        showLoadingView()
+        Preferabli.async.wishlistProduct(product_id: 11263, year: Variant.CURRENT_VARIANT_YEAR) { product in
+            self.items = [ product.name ]
+            self.tableView.reloadData()
+            self.hideLoadingView()
+        } onFailure: { error in
+            self.hideLoadingView()
+            self.showSnackBar(message: error.getMessage())
+        }
+    }
+    
+    @IBAction func getProfilePressed() {
+        showLoadingView()
+        Preferabli.async.getProfile { profile in
+            self.items = profile.preference_styles.map { $0.style.name } as! [String]
+            self.tableView.reloadData()
+            self.hideLoadingView()
+        } onFailure: { error in
+            self.hideLoadingView()
+            self.showSnackBar(message: error.getMessage())
+        }
+    }
+    
+    @IBAction func getRecPressed() {
+        showLoadingView()
+        Preferabli.async.getRecs(product_type: ProductType.RED) { (message, products) in
+            self.items = products.map { $0.name } as! [String]
+            self.tableView.reloadData()
             self.hideLoadingView()
         } onFailure: { error in
             self.hideLoadingView()
@@ -75,7 +346,33 @@ class ViewController : UIViewController {
     
     @IBAction func getRatedProductsPressed() {
         showLoadingView()
-        Preferabli.async.getRatedProducts(force_refresh: false) { products in
+        Preferabli.async.getRatedProducts { products in
+            self.items = products.map { $0.name } as! [String]
+            self.tableView.reloadData()
+            self.hideLoadingView()
+        } onFailure: { error in
+            self.hideLoadingView()
+            self.showSnackBar(message: error.getMessage())
+        }
+    }
+    
+    @IBAction func getWishlistedProductsPressed() {
+        showLoadingView()
+        Preferabli.async.getWishlistProducts { products in
+            self.items = products.map { $0.name } as! [String]
+            self.tableView.reloadData()
+            self.hideLoadingView()
+        } onFailure: { error in
+            self.hideLoadingView()
+            self.showSnackBar(message: error.getMessage())
+        }
+    }
+    
+    @IBAction func getPurchasedProductsPressed() {
+        showLoadingView()
+        Preferabli.async.getPurchaseHistory { products in
+            self.items = products.map { $0.name } as! [String]
+            self.tableView.reloadData()
             self.hideLoadingView()
         } onFailure: { error in
             self.hideLoadingView()
@@ -98,5 +395,15 @@ class ViewController : UIViewController {
     public func showSnackBar(message: String) {
         let snackbar = TTGSnackbar.init(message: message, duration: .long)
         snackbar.show()
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return items.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell")!
+        cell.textLabel?.text = items[indexPath.row]
+        return cell
     }
 }
