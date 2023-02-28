@@ -21,7 +21,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     @IBOutlet weak public var loadingView: UIView!
     @IBOutlet weak public var tableView: UITableView!
     @IBOutlet weak public var logo: UIImageView!
-
+    
     var customer = true
     var picker : UIPickerView!
     var picker2 : UIPickerView!
@@ -29,6 +29,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     let pickerOptions = ["Search", "Label Rec", "Guided Rec", "Where To Buy", "Like That, Try This"]
     let pickerOptions2 = ["Rate Product", "Wishlist Product", "Get Profile", "Get Recs", "Get Rated Products", "Get Wishlisted Products", "Get Purchased Products"]
     var items = Array<String>()
+    var products = Array<Product>()
     
     override func viewDidLoad() {
         logo.image = Preferabli.getPoweredByPreferabliLogo(light_background: true)
@@ -194,6 +195,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
             
             Preferabli.async.loginCustomer(merchant_customer_identification: emailString, merchant_customer_verification: "123ABC") { customer in
                 self.items.removeAll()
+                self.products.removeAll()
                 self.items.append("Customer logged in.")
                 self.items.append("Display Name: " + customer.getName())
                 self.tableView.reloadData()
@@ -220,6 +222,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     @IBAction func searchProductsPressed() {
         showLoadingView()
         Preferabli.async.searchProducts(query: "wine") { products in
+            self.products = products
             self.items = products.map { $0.name } as! [String]
             self.tableView.reloadData()
             self.hideLoadingView()
@@ -232,6 +235,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     @IBAction func labelRecPressed() {
         showLoadingView()
         Preferabli.async.labelRecognition(image: UIImage.init(named: "label_rec_example.png")!) { (media, products) in
+            self.products = products.map { $0.product }
             self.items = products.map { $0.product.name } as! [String]
             self.tableView.reloadData()
             self.hideLoadingView()
@@ -243,7 +247,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     
     @IBAction func guidedRecPressed() {
         showLoadingView()
-
+        
         Preferabli.async.getGuidedRec { guided_rec in
             let questions = guided_rec.questions
             var selected_choice_ids = Array<NSNumber>()
@@ -254,6 +258,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
             }
             
             Preferabli.async.getGuidedRecResults(selected_choice_ids: selected_choice_ids) { products in
+                self.products = products
                 self.items = products.map { $0.name } as! [String]
                 self.tableView.reloadData()
                 self.hideLoadingView()
@@ -271,6 +276,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     @IBAction func whereToBuyPressed() {
         showLoadingView()
         Preferabli.async.whereToBuy(product_id: 11263) { where_to_buy in
+            self.products.removeAll()
             if where_to_buy.lookups.count > 0 {
                 self.items = where_to_buy.lookups.map { $0.product_name } as! [String]
             } else {
@@ -287,6 +293,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     @IBAction func ltttPressed() {
         showLoadingView()
         Preferabli.async.lttt(product_id: 11263) { products in
+            self.products = products
             self.items = products.map { $0.name } as! [String]
             self.tableView.reloadData()
             self.hideLoadingView()
@@ -299,6 +306,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     @IBAction func rateProductPressed() {
         showLoadingView()
         Preferabli.async.rateProduct(product_id: 11263, year: Variant.CURRENT_VARIANT_YEAR, rating: RatingType.SOSO) { product in
+            self.products = [product]
             self.items = [ product.name ]
             self.tableView.reloadData()
             self.hideLoadingView()
@@ -311,6 +319,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     @IBAction func wishlistProductPressed() {
         showLoadingView()
         Preferabli.async.wishlistProduct(product_id: 11263, year: Variant.CURRENT_VARIANT_YEAR) { product in
+            self.products = [product]
             self.items = [ product.name ]
             self.tableView.reloadData()
             self.hideLoadingView()
@@ -323,6 +332,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     @IBAction func getProfilePressed() {
         showLoadingView()
         Preferabli.async.getProfile { profile in
+            self.products.removeAll()
             self.items = profile.preference_styles.map { $0.style.name } as! [String]
             self.tableView.reloadData()
             self.hideLoadingView()
@@ -335,6 +345,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     @IBAction func getRecPressed() {
         showLoadingView()
         Preferabli.async.getRecs(product_type: ProductType.RED) { (message, products) in
+            self.products = products
             self.items = products.map { $0.name } as! [String]
             self.tableView.reloadData()
             self.hideLoadingView()
@@ -347,6 +358,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     @IBAction func getRatedProductsPressed() {
         showLoadingView()
         Preferabli.async.getRatedProducts { products in
+            self.products = products
             self.items = products.map { $0.name } as! [String]
             self.tableView.reloadData()
             self.hideLoadingView()
@@ -359,6 +371,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     @IBAction func getWishlistedProductsPressed() {
         showLoadingView()
         Preferabli.async.getWishlistProducts { products in
+            self.products = products
             self.items = products.map { $0.name } as! [String]
             self.tableView.reloadData()
             self.hideLoadingView()
@@ -371,6 +384,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     @IBAction func getPurchasedProductsPressed() {
         showLoadingView()
         Preferabli.async.getPurchaseHistory { products in
+            self.products = products
             self.items = products.map { $0.name } as! [String]
             self.tableView.reloadData()
             self.hideLoadingView()
@@ -405,5 +419,82 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell")!
         cell.textLabel?.text = items[indexPath.row]
         return cell
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        hideKeyboard()
+    }
+    
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        hideKeyboard()
+        if (products.count > 0 && products.count > indexPath.row) {
+            let wtb = UIAction(title: "Where To Buy") { _ in
+                self.showLoadingView()
+                self.products[indexPath.row].whereToBuy() { where_to_buy in
+                    self.products.removeAll()
+                    if where_to_buy.lookups.count > 0 {
+                        self.items = where_to_buy.lookups.map { $0.product_name } as! [String]
+                    } else {
+                        self.items = where_to_buy.venues.map { $0.name } as! [String]
+                    }
+                    self.tableView.reloadData()
+                    self.hideLoadingView()
+                } onFailure: { error in
+                    self.hideLoadingView()
+                    self.showSnackBar(message: error.getMessage())
+                }
+            }
+            let wishlist = UIAction(title: "Toggle Wishlist") { _ in
+                self.showLoadingView()
+                self.products[indexPath.row].toggleWishlist() { product in
+                    self.products = [product]
+                    self.items = [ product.name ]
+                    self.tableView.reloadData()
+                    self.hideLoadingView()
+                } onFailure: { error in
+                    self.hideLoadingView()
+                    self.showSnackBar(message: error.getMessage())
+                }
+            }
+            let rate = UIAction(title: "Rate") { _ in
+                self.showLoadingView()
+                self.products[indexPath.row].rate(rating: .LOVE) { product in
+                    self.products = [product]
+                    self.items = [ product.name ]
+                    self.tableView.reloadData()
+                    self.hideLoadingView()
+                } onFailure: { error in
+                    self.hideLoadingView()
+                    self.showSnackBar(message: error.getMessage())
+                }
+            }
+            let lttt = UIAction(title: "LTTT") { _ in
+                self.showLoadingView()
+                self.products[indexPath.row].lttt() { products in
+                    self.products = products
+                    self.items = products.map { $0.name } as! [String]
+                    self.tableView.reloadData()
+                    self.hideLoadingView()
+                } onFailure: { error in
+                    self.hideLoadingView()
+                    self.showSnackBar(message: error.getMessage())
+                }
+            }
+            let score = UIAction(title: "Get Preferabli Score") { _ in
+                self.showLoadingView()
+                self.products[indexPath.row].getPreferabliScore() { score in
+                    self.hideLoadingView()
+                } onFailure: { error in
+                    self.hideLoadingView()
+                    self.showSnackBar(message: error.getMessage())
+                }
+            }
+            
+            return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { _ in
+                let menu = UIMenu(title: self.items[indexPath.row], children: [wtb, wishlist, rate, lttt, score])
+                return menu
+            })
+        }
+        return nil
     }
 }
