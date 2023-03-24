@@ -13,6 +13,7 @@
 		A241EB9F24916AF500EBD66D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A241EB9E24916AF400EBD66D /* LaunchScreen.storyboard */; };
 		A241EBA124916B3800EBD66D /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A241EBA024916B3800EBD66D /* AppIcon.xcassets */; };
 		A25FE59D2481545000BBEB25 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A25FE59C2481545000BBEB25 /* Main.storyboard */; };
+		A2F908DE29BFB3FC00BFD89D /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2F908DD29BFB3FC00BFD89D /* CustomTableViewCell.swift */; };
 		A2FB46CE299C308B00653527 /* label_rec_example.png in Resources */ = {isa = PBXBuildFile; fileRef = A2FB46CD299C308B00653527 /* label_rec_example.png */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +30,7 @@
 		A241EB9E24916AF400EBD66D /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A241EBA024916B3800EBD66D /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		A25FE59C2481545000BBEB25 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		A2F908DD29BFB3FC00BFD89D /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
 		A2FB46CD299C308B00653527 /* label_rec_example.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = label_rec_example.png; sourceTree = "<group>"; };
 		C32EF545972ABC45F840410F /* Pods-WineRingSDKTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WineRingSDKTest.debug.xcconfig"; path = "Target Support Files/Pods-WineRingSDKTest/Pods-WineRingSDKTest.debug.xcconfig"; sourceTree = "<group>"; };
 		C6552C5AABBEE5A4ACBA6F39 /* Pods-WineRingSDKDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WineRingSDKDemo.debug.xcconfig"; path = "Target Support Files/Pods-WineRingSDKDemo/Pods-WineRingSDKDemo.debug.xcconfig"; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 				A241EB9E24916AF400EBD66D /* LaunchScreen.storyboard */,
 				A2056F29248141D100FBD6FC /* AppDelegate.swift */,
 				A2056F2D248141D100FBD6FC /* ViewController.swift */,
+				A2F908DD29BFB3FC00BFD89D /* CustomTableViewCell.swift */,
 				A25FE59C2481545000BBEB25 /* Main.storyboard */,
 				A2056F37248141D400FBD6FC /* Info.plist */,
 			);
@@ -220,6 +223,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A2056F2A248141D100FBD6FC /* AppDelegate.swift in Sources */,
+				A2F908DE29BFB3FC00BFD89D /* CustomTableViewCell.swift in Sources */,
 				A2056F2E248141D100FBD6FC /* ViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

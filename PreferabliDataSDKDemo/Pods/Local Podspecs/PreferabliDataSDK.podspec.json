@@ -14,11 +14,6 @@
     "ios": "13.0"
   },
   "resources": "PreferabliDataSDK/assets/*.*",
-  "resource_bundles": {
-    "localization": [
-      "PreferabliDataSDK/assets/*.lproj/*.strings"
-    ]
-  },
   "source": {
     "git": "https://github.com/winering/preferabli-data-sdk-ios.git"
   },

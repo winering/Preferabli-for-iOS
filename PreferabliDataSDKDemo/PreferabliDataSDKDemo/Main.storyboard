@@ -128,29 +128,30 @@
                                         <rect key="frame" x="0.0" y="724" width="374" height="50"/>
                                         <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                         <prototypes>
-                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="Is0-YX-HQJ">
-                                                <rect key="frame" x="0.0" y="50" width="374" height="44"/>
+                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="Is0-YX-HQJ" customClass="CustomTableViewCell" customModule="PreferabliSDKDemo" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="50" width="374" height="20.5"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Is0-YX-HQJ" id="W13-MW-gCm">
-                                                    <rect key="frame" x="0.0" y="0.0" width="374" height="44"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="374" height="20.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
-                                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="9E3-q7-i8X">
-                                                            <rect key="frame" x="0.0" y="10" width="374" height="24"/>
-                                                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                                            <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
-                                                            <color key="textColor" systemColor="labelColor"/>
-                                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                                        </textView>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oNC-1V-z4N">
+                                                            <rect key="frame" x="0.0" y="10" width="374" height="0.5"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
                                                     </subviews>
                                                     <constraints>
-                                                        <constraint firstItem="9E3-q7-i8X" firstAttribute="leading" secondItem="W13-MW-gCm" secondAttribute="leading" id="4Pa-Ja-2oA"/>
-                                                        <constraint firstItem="9E3-q7-i8X" firstAttribute="top" secondItem="W13-MW-gCm" secondAttribute="top" constant="10" id="Q6H-lT-M2j"/>
-                                                        <constraint firstAttribute="bottom" secondItem="9E3-q7-i8X" secondAttribute="bottom" constant="10" id="ZzJ-SZ-8sr"/>
-                                                        <constraint firstAttribute="trailing" secondItem="9E3-q7-i8X" secondAttribute="trailing" id="vlz-jY-9eI"/>
+                                                        <constraint firstAttribute="bottom" secondItem="oNC-1V-z4N" secondAttribute="bottom" constant="10" id="4tg-dW-xRQ"/>
+                                                        <constraint firstItem="oNC-1V-z4N" firstAttribute="leading" secondItem="W13-MW-gCm" secondAttribute="leading" id="Q0W-kJ-t5P"/>
+                                                        <constraint firstItem="oNC-1V-z4N" firstAttribute="top" secondItem="W13-MW-gCm" secondAttribute="top" constant="10" id="fE1-VS-t67"/>
+                                                        <constraint firstAttribute="trailing" secondItem="oNC-1V-z4N" secondAttribute="trailing" id="fpB-D1-DhO"/>
                                                     </constraints>
                                                 </tableViewCellContentView>
+                                                <connections>
+                                                    <outlet property="label" destination="oNC-1V-z4N" id="z5H-E5-nOG"/>
+                                                </connections>
                                             </tableViewCell>
                                         </prototypes>
                                         <connections>
@@ -207,9 +208,6 @@
         </scene>
     </scenes>
     <resources>
-        <systemColor name="labelColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
