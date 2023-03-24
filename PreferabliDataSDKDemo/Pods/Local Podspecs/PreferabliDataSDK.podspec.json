@@ -17,7 +17,7 @@
   "source": {
     "git": "https://github.com/winering/preferabli-data-sdk-ios.git"
   },
-  "source_files": "**/*.{h,m,swift}",
+  "source_files": "PreferabliDataSDK/**/*.{h,m,swift,md}",
   "dependencies": {
     "Alamofire": [
       "4.9.1"

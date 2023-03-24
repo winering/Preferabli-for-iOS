@@ -121,8 +121,11 @@ open class Mixpanel {
         if let instance = MixpanelManager.sharedInstance.getMainInstance() {
             return instance
         } else {
+            #if !targetEnvironment(simulator)
             assert(false, "You have to call initialize(token:trackAutomaticEvents:) before calling the main instance, " +
                    "or define a new main instance if removing the main one")
+            #endif
+            
 #if !os(OSX) && !os(watchOS)
             return Mixpanel.initialize(token: "", trackAutomaticEvents: true)
 #else
@@ -151,8 +154,8 @@ open class Mixpanel {
     }
 }
 
-class MixpanelManager {
-    
+final class MixpanelManager {
+
     static let sharedInstance = MixpanelManager()
     private var instances: [String: MixpanelInstance]
     private var mainInstance: MixpanelInstance?
@@ -163,7 +166,7 @@ class MixpanelManager {
         instances = [String: MixpanelInstance]()
         Logger.addLogging(PrintLogging())
         readWriteLock = ReadWriteLock(label: "com.mixpanel.instance.manager.lock")
-        instanceQueue = DispatchQueue(label: "com.mixpanel.instance.manager.instance", qos: .utility)
+        instanceQueue = DispatchQueue(label: "com.mixpanel.instance.manager.instance", qos: .utility, autoreleaseFrequency: .workItem)
     }
     
     func initialize(token apiToken: String,

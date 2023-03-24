@@ -20,6 +20,7 @@ import SystemConfiguration
 import CoreTelephony
 #endif // os(iOS)
 
+private let devicePrefix = "$device:"
 /**
  *  Delegate protocol for controlling the Mixpanel API's network behavior.
  */
@@ -45,6 +46,7 @@ protocol AppLifecycle {
 
 /// The class that represents the Mixpanel Instance
 open class MixpanelInstance: CustomDebugStringConvertible, FlushDelegate, AEDelegate {
+    
     /// apiToken string that identifies the project to track data to
     open var apiToken = ""
     
@@ -230,8 +232,8 @@ open class MixpanelInstance: CustomDebugStringConvertible, FlushDelegate, AEDele
         )
 #endif
         let label = "com.mixpanel.\(self.apiToken)"
-        trackingQueue = DispatchQueue(label: "\(label).tracking)", qos: .utility)
-        networkQueue = DispatchQueue(label: "\(label).network)", qos: .utility)
+        trackingQueue = DispatchQueue(label: "\(label).tracking)", qos: .utility, autoreleaseFrequency: .workItem)
+        networkQueue = DispatchQueue(label: "\(label).network)", qos: .utility, autoreleaseFrequency: .workItem)
         self.name = name
         
         mixpanelPersistence = MixpanelPersistence.init(instanceName: name)
@@ -267,7 +269,7 @@ open class MixpanelInstance: CustomDebugStringConvertible, FlushDelegate, AEDele
         }
 #endif
         flushInstance.delegate = self
-        distinctId = defaultDistinctId()
+        distinctId = devicePrefix + defaultDeviceId()
         people = People(apiToken: self.apiToken,
                         serialQueue: trackingQueue,
                         lock: self.readWriteLock,
@@ -409,7 +411,7 @@ open class MixpanelInstance: CustomDebugStringConvertible, FlushDelegate, AEDele
         taskId = sharedApplication.beginBackgroundTask(expirationHandler: completionHandler)
         
         if flushOnBackground {
-            flush(completion: completionHandler)
+            flush(performFullFlush: true, completion: completionHandler)
         }
     }
     
@@ -430,7 +432,14 @@ open class MixpanelInstance: CustomDebugStringConvertible, FlushDelegate, AEDele
     }
 #endif
     
-    func defaultDistinctId() -> String {
+    func addPrefixToDeviceId(deviceId: String?) -> String {
+        if let temp = deviceId {
+            return devicePrefix + temp
+        }
+        return ""
+    }
+    
+    func defaultDeviceId() -> String {
         let distinctId: String?
         if useUniqueDistinctId {
             distinctId = uniqueIdentifierForDevice()
@@ -612,7 +621,7 @@ extension MixpanelInstance {
      This should only be set to false if you wish to prevent people profile updates for that user.
      - parameter completion: an optional completion handler for when the identify has completed.
      */
-    open func identify(distinctId: String, usePeople: Bool = true, completion: (() -> Void)? = nil) {
+    public func identify(distinctId: String, usePeople: Bool = true, completion: (() -> Void)? = nil) {
         if hasOptedOutTracking() {
             if let completion = completion {
                 DispatchQueue.main.async(execute: completion)
@@ -704,7 +713,7 @@ extension MixpanelInstance {
      - parameter completion: an optional completion handler for when the createAlias has completed.
      This should only be set to false if you wish to prevent people profile updates for that user.
      */
-    open func createAlias(_ alias: String, distinctId: String, usePeople: Bool = true, andIdentify: Bool = true, completion: (() -> Void)? = nil) {
+    public func createAlias(_ alias: String, distinctId: String, usePeople: Bool = true, andIdentify: Bool = true, completion: (() -> Void)? = nil) {
         if hasOptedOutTracking() {
             if let completion = completion {
                 DispatchQueue.main.async(execute: completion)
@@ -787,7 +796,7 @@ extension MixpanelInstance {
      
      - parameter completion: an optional completion handler for when the reset has completed.
      */
-    open func reset(completion: (() -> Void)? = nil) {
+    public func reset(completion: (() -> Void)? = nil) {
         flush()
         trackingQueue.async { [weak self] in
             guard let self = self else {
@@ -797,8 +806,8 @@ extension MixpanelInstance {
             MixpanelPersistence.deleteMPUserDefaultsData(instanceName: self.name)
             self.readWriteLock.write {
                 self.timedEvents = InternalProperties()
-                self.distinctId = self.defaultDistinctId()
-                self.anonymousId = self.distinctId
+                self.anonymousId = self.defaultDeviceId()
+                self.distinctId = self.addPrefixToDeviceId(deviceId: self.anonymousId)
                 self.hadPersistedDistinctId = true
                 self.userId = nil
                 self.superProperties = InternalProperties()
@@ -818,7 +827,7 @@ extension MixpanelInstance {
 extension MixpanelInstance {
     // MARK: - Persistence
     
-    open func archive() {
+    public func archive() {
         self.readWriteLock.read {
             MixpanelPersistence.saveTimedEvents(timedEvents: timedEvents, instanceName: self.name)
             MixpanelPersistence.saveSuperProperties(superProperties: superProperties, instanceName: self.name)
@@ -847,8 +856,8 @@ extension MixpanelInstance {
                 mixpanelIdentity.hadPersistedDistinctId
             )
             if distinctId.isEmpty {
-                distinctId = defaultDistinctId()
-                anonymousId = distinctId
+                anonymousId = defaultDeviceId()
+                distinctId = addPrefixToDeviceId(deviceId: anonymousId)
                 hadPersistedDistinctId = true
                 userId = nil
                 MixpanelPersistence.saveIdentity(MixpanelIdentity.init(
@@ -891,9 +900,10 @@ extension MixpanelInstance {
      `flushOnBackground` is on by default). You only need to call this
      method manually if you want to force a flush at a particular moment.
      
+     - parameter performFullFlush: A optional boolean value indicating whether a full flush should be performed. If `true`, a full flush will be triggered, sending all events to the server. Default to `false`, a partial flush will be executed for reducing memory footprint.
      - parameter completion: an optional completion handler for when the flush has completed.
      */
-    open func flush(completion: (() -> Void)? = nil) {
+    public func flush(performFullFlush: Bool = false, completion: (() -> Void)? = nil) {
         if hasOptedOutTracking() {
             if let completion = completion {
                 DispatchQueue.main.async(execute: completion)
@@ -918,10 +928,17 @@ extension MixpanelInstance {
             // automatic events will NOT be flushed until one of the flags is non-nil
             let eventQueue = self.mixpanelPersistence.loadEntitiesInBatch(
                 type: self.persistenceTypeFromFlushType(.events),
+                batchSize: performFullFlush ? Int.max : APIConstants.flushSize,
                 excludeAutomaticEvents: !self.trackAutomaticEventsEnabled
             )
-            let peopleQueue = self.mixpanelPersistence.loadEntitiesInBatch(type: self.persistenceTypeFromFlushType(.people))
-            let groupsQueue = self.mixpanelPersistence.loadEntitiesInBatch(type: self.persistenceTypeFromFlushType(.groups))
+            let peopleQueue = self.mixpanelPersistence.loadEntitiesInBatch(
+                type: self.persistenceTypeFromFlushType(.people),
+                batchSize: performFullFlush ? Int.max : APIConstants.flushSize
+            )
+            let groupsQueue = self.mixpanelPersistence.loadEntitiesInBatch(
+                type: self.persistenceTypeFromFlushType(.groups),
+                batchSize: performFullFlush ? Int.max : APIConstants.flushSize
+            )
             
             self.networkQueue.async { [weak self, completion] in
                 guard let self = self else {
@@ -985,7 +1002,7 @@ extension MixpanelInstance {
      - parameter event:      event name
      - parameter properties: properties dictionary
      */
-    open func track(event: String?, properties: Properties? = nil) {
+    public func track(event: String?, properties: Properties? = nil) {
         if hasOptedOutTracking() {
             return
         }
@@ -1040,7 +1057,7 @@ extension MixpanelInstance {
      - parameter properties: properties dictionary
      - parameter groups:     groups dictionary
      */
-    open func trackWithGroups(event: String?, properties: Properties? = nil, groups: Properties?) {
+    public func trackWithGroups(event: String?, properties: Properties? = nil, groups: Properties?) {
         if hasOptedOutTracking() {
             return
         }
@@ -1062,7 +1079,7 @@ extension MixpanelInstance {
         self.track(event: event, properties: mergedProperties)
     }
     
-    open func getGroup(groupKey: String, groupID: MixpanelType) -> Group {
+    public func getGroup(groupKey: String, groupID: MixpanelType) -> Group {
         let key = makeMapKey(groupKey: groupKey, groupID: groupID)
         
         var groupsShadow: [String: Group] = [:]
@@ -1138,7 +1155,7 @@ extension MixpanelInstance {
      - parameter event: the event name to be timed
      
      */
-    open func time(event: String) {
+    public func time(event: String) {
         let startTime = Date().timeIntervalSince1970
         trackingQueue.async { [weak self, startTime, event] in
             guard let self = self else { return }
@@ -1155,8 +1172,13 @@ extension MixpanelInstance {
      
      - parameter event: the name of the event to be tracked that was passed to time(event:)
      */
-    open func eventElapsedTime(event: String) -> Double {
-        if let startTime = self.timedEvents[event] as? TimeInterval {
+    public func eventElapsedTime(event: String) -> Double {
+        var timedEvents = InternalProperties()
+        self.readWriteLock.read {
+            timedEvents = self.timedEvents
+        }
+        
+        if let startTime = timedEvents[event] as? TimeInterval {
             return Date().timeIntervalSince1970 - startTime
         }
         return 0
@@ -1165,7 +1187,7 @@ extension MixpanelInstance {
     /**
      Clears all current event timers.
      */
-    open func clearTimedEvents() {
+    public func clearTimedEvents() {
         trackingQueue.async { [weak self] in
             guard let self = self else { return }
             self.readWriteLock.write {
@@ -1180,7 +1202,7 @@ extension MixpanelInstance {
      
      - parameter event: the name of the event to clear the timer for
      */
-    open func clearTimedEvent(event: String) {
+    public func clearTimedEvent(event: String) {
         trackingQueue.async { [weak self, event] in
             guard let self = self else { return }
             
@@ -1194,7 +1216,7 @@ extension MixpanelInstance {
      
      - returns: the current super properties
      */
-    open func currentSuperProperties() -> [String: Any] {
+    public func currentSuperProperties() -> [String: Any] {
         var properties = InternalProperties()
         self.readWriteLock.read {
             properties = superProperties
@@ -1205,7 +1227,7 @@ extension MixpanelInstance {
     /**
      Clears all currently set super properties.
      */
-    open func clearSuperProperties() {
+    public func clearSuperProperties() {
         trackingQueue.async { [weak self] in
             guard let self = self else { return }
             self.superProperties = self.trackInstance.clearSuperProperties(self.superProperties)
@@ -1224,7 +1246,7 @@ extension MixpanelInstance {
      
      - parameter properties: properties dictionary
      */
-    open func registerSuperProperties(_ properties: Properties) {
+    public func registerSuperProperties(_ properties: Properties) {
         trackingQueue.async { [weak self] in
             guard let self = self else { return }
             let updatedSuperProperties = self.trackInstance.registerSuperProperties(properties,
@@ -1252,7 +1274,7 @@ extension MixpanelInstance {
      - parameter properties:   properties dictionary
      - parameter defaultValue: Optional. overwrite existing properties that have this value
      */
-    open func registerSuperPropertiesOnce(_ properties: Properties,
+    public func registerSuperPropertiesOnce(_ properties: Properties,
                                           defaultValue: MixpanelType? = nil) {
         trackingQueue.async { [weak self] in
             guard let self = self else { return }
@@ -1281,7 +1303,7 @@ extension MixpanelInstance {
      
      - parameter propertyName: array of property name strings to remove
      */
-    open func unregisterSuperProperty(_ propertyName: String) {
+    public func unregisterSuperProperty(_ propertyName: String) {
         trackingQueue.async { [weak self] in
             guard let self = self else { return }
             self.superProperties = self.trackInstance.unregisterSuperProperty(propertyName,
@@ -1312,7 +1334,7 @@ extension MixpanelInstance {
      - parameter groupKey: The property name associated with this group type (must already have been set up).
      - parameter groupID: The group the user belongs to.
      */
-    open func setGroup(groupKey: String, groupID: MixpanelType) {
+    public func setGroup(groupKey: String, groupID: MixpanelType) {
         if hasOptedOutTracking() {
             return
         }
@@ -1326,7 +1348,7 @@ extension MixpanelInstance {
      - parameter groupKey: The property name associated with this group type (must already have been set up).
      - parameter groupIDs: The list of groups the user belongs to.
      */
-    open func setGroup(groupKey: String, groupIDs: [MixpanelType]) {
+    public func setGroup(groupKey: String, groupIDs: [MixpanelType]) {
         if hasOptedOutTracking() {
             return
         }
@@ -1342,7 +1364,7 @@ extension MixpanelInstance {
      - parameter groupKey: The property name associated with this group type (must already have been set up).
      - parameter groupID: The new group the user belongs to.
      */
-    open func addGroup(groupKey: String, groupID: MixpanelType) {
+    public func addGroup(groupKey: String, groupID: MixpanelType) {
         if hasOptedOutTracking() {
             return
         }
@@ -1375,7 +1397,7 @@ extension MixpanelInstance {
      - parameter groupKey: The property name associated with this group type (must already have been set up).
      - parameter groupID: The group value to remove.
      */
-    open func removeGroup(groupKey: String, groupID: MixpanelType) {
+    public func removeGroup(groupKey: String, groupID: MixpanelType) {
         if hasOptedOutTracking() {
             return
         }
@@ -1408,7 +1430,7 @@ extension MixpanelInstance {
      This method is used to opt out tracking. This causes all events and people request no longer
      to be sent back to the Mixpanel server.
      */
-    open func optOutTracking() {
+    public func optOutTracking() {
         trackingQueue.async { [weak self] in
             guard let self = self else { return }
             if self.people.distinctId != nil {
@@ -1424,8 +1446,8 @@ extension MixpanelInstance {
                 self.alias = nil
                 self.people.distinctId = nil
                 self.userId = nil
-                self.distinctId = self.defaultDistinctId()
-                self.anonymousId = self.distinctId
+                self.anonymousId = self.defaultDeviceId()
+                self.distinctId = self.addPrefixToDeviceId(deviceId: self.anonymousId)
                 self.hadPersistedDistinctId = true
                 self.superProperties = InternalProperties()
                 MixpanelPersistence.saveTimedEvents(timedEvents: InternalProperties(), instanceName: self.name)
@@ -1453,7 +1475,7 @@ extension MixpanelInstance {
      - parameter properties: an optional properties dictionary that could be passed to add properties to the opt-in event
      that is sent to Mixpanel
      */
-    open func optInTracking(distinctId: String? = nil, properties: Properties? = nil) {
+    public func optInTracking(distinctId: String? = nil, properties: Properties? = nil) {
         trackingQueue.async { [weak self] in
             guard let self = self else { return }
             self.readWriteLock.write {
@@ -1476,7 +1498,7 @@ extension MixpanelInstance {
      
      - returns: the current super opted out tracking status
      */
-    open func hasOptedOutTracking() -> Bool {
+    public func hasOptedOutTracking() -> Bool {
         var optOutStatusShadow: Bool?
         readWriteLock.read {
             optOutStatusShadow = optOutStatus
