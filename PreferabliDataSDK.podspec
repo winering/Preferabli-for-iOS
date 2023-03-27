@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "PreferabliDataSDK"
-  spec.version      = "1.0.0"
+  spec.version      = "1.0.1	"
   spec.summary      = "Use this framework to integrate Preferabli's powerful preference technology into your applications."
   spec.homepage     = "https://github.com/winering/Preferabli-for-iOS"
   spec.license = { :type => 'RingIT, Inc.', :text => <<-LICENSE
