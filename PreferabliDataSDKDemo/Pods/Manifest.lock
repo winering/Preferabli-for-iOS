@@ -6,7 +6,7 @@ PODS:
   - Mixpanel-swift (4.1.0):
     - Mixpanel-swift/Complete (= 4.1.0)
   - Mixpanel-swift/Complete (4.1.0)
-  - PreferabliDataSDK (1.0.1):
+  - PreferabliDataSDK (1.0.0):
     - Alamofire (= 4.9.1)
     - MagicalRecord
     - Mixpanel-swift
@@ -15,7 +15,7 @@ PODS:
   - TTGSnackbar (1.11.1)
 
 DEPENDENCIES:
-  - PreferabliDataSDK
+  - PreferabliDataSDK (from `https://github.com/winering/Preferabli-for-iOS.git`)
   - TTGSnackbar
 
 SPEC REPOS:
@@ -23,18 +23,26 @@ SPEC REPOS:
     - Alamofire
     - MagicalRecord
     - Mixpanel-swift
-    - PreferabliDataSDK
     - SwiftEventBus
     - TTGSnackbar
+
+EXTERNAL SOURCES:
+  PreferabliDataSDK:
+    :git: https://github.com/winering/Preferabli-for-iOS.git
+
+CHECKOUT OPTIONS:
+  PreferabliDataSDK:
+    :commit: e3423669057302e9b4b77cb31a8230cf838339d6
+    :git: https://github.com/winering/Preferabli-for-iOS.git
 
 SPEC CHECKSUMS:
   Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
   MagicalRecord: 53bed74b4323b930992a725be713e53b37d19755
   Mixpanel-swift: 7b46c63259dec8398a7df9f8a1298fd00b6b3cb3
-  PreferabliDataSDK: 926c464fde611fe588dfc244598cb8a6ea62bfad
+  PreferabliDataSDK: d18578125f81fa55003dc2163cb77cadda1bcf57
   SwiftEventBus: b30f617a6aca5a9336464b4d3f5931034762f2d5
   TTGSnackbar: fea91c62637b5662f808a4c3b55f7631cb7e1ef7
 
-PODFILE CHECKSUM: a1196a44005bd02c983cab453cd27f4727211aa8
+PODFILE CHECKSUM: adf21609f4b7e339bbecbcd8289ba0c15245a179
 
 COCOAPODS: 1.12.0
