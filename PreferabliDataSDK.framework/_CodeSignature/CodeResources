@@ -10,23 +10,23 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		rxdTJDthxwUoruD53mSRc4RAIzQ=
+		tSJtiTq8Vi62K5gkAz6s4dSmXiU=
 		</data>
-		<key>Modules/PreferabliDataSDK.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo</key>
+		<key>Modules/PreferabliDataSDK.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo</key>
 		<data>
-		POrfP5x8wvf3adv1YVqmFoCVZck=
+		Pmnku22gzJzqO8vGcj1nFaBsQ18=
 		</data>
-		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.abi.json</key>
+		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios-simulator.abi.json</key>
 		<data>
 		FSPnLbho3G+LL9smI3XgVOqBIQ4=
 		</data>
-		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftdoc</key>
+		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		9zcELpGXgyOTAMOlztcc6M3CQsM=
+		fnxQyFPGx4g6Guj3D7fQGtX5ky8=
 		</data>
-		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftmodule</key>
+		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		FMTq/9ywNEy2btYAe+yufhqTgIs=
+		OAglHSlgky+nJv5I1UkEQ27S6+o=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -66,32 +66,32 @@
 			nlbksrzqwH/fFjOj44cOjaEgt3xBoOIY7GxfiNmt53s=
 			</data>
 		</dict>
-		<key>Modules/PreferabliDataSDK.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo</key>
+		<key>Modules/PreferabliDataSDK.swiftmodule/Project/arm64-apple-ios-simulator.swiftsourceinfo</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			Vup1uHhf+Ry6mguslgf6BONBBYSNqapMTFxmhSOo0cc=
+			1r0173vol3lHdaf5xm1dG/cFJK4wcjn0qsxXpDswoUA=
 			</data>
 		</dict>
-		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.abi.json</key>
+		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios-simulator.abi.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
 			KnRdWE4y6t4QM5zi5JDptPdHFgJy1Tku+7GLkZS2aNM=
 			</data>
 		</dict>
-		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftdoc</key>
+		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			eBcep7RuRwk+lWPuSg+TLr2MjeYhPObnOf8TgPiYjBg=
+			NAPUNUu5QPA5B/Gcqi4zEWeSRfZJQLcAcjoSA8LFrYg=
 			</data>
 		</dict>
-		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftmodule</key>
+		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			8TTwTexGeR6OdrQ4f0mWhAjK6BUckMPTpywxGQqZ12M=
+			x4dkL7Hmh2GYlVPmvJbmQpUXliGXi/6BG3bdDvcP7d8=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
