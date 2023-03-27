@@ -4,10 +4,6 @@
 <dict>
 	<key>files</key>
 	<dict>
-		<key>.DS_Store</key>
-		<data>
-		bAyZC6NXt5DYuYxCIHVhJqUw/L8=
-		</data>
 		<key>Headers/PreferabliDataSDK-Swift.h</key>
 		<data>
 		qYfSWpGGnqOmqsN9OgTGlGmjwYc=
@@ -18,27 +14,19 @@
 		</data>
 		<key>Modules/PreferabliDataSDK.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo</key>
 		<data>
-		9YgE88Qgm0dmaU8MuMxA78AbOeo=
+		POrfP5x8wvf3adv1YVqmFoCVZck=
 		</data>
 		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.abi.json</key>
 		<data>
-		fCTSX6vuyUCgwGxmc56cdayKQv0=
-		</data>
-		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
-		<data>
-		UR7aI4bgKWw1sjeBQ4qlFjU/jeo=
+		FSPnLbho3G+LL9smI3XgVOqBIQ4=
 		</data>
 		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftdoc</key>
 		<data>
-		RaJaRiOYbqjKHFQjJHhCYIZ41xg=
-		</data>
-		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftinterface</key>
-		<data>
-		UR7aI4bgKWw1sjeBQ4qlFjU/jeo=
+		9zcELpGXgyOTAMOlztcc6M3CQsM=
 		</data>
 		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftmodule</key>
 		<data>
-		TRt/kqEhdoF4b3vrLcj3lCNnYmM=
+		FMTq/9ywNEy2btYAe+yufhqTgIs=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -50,7 +38,7 @@
 		</data>
 		<key>Preferabli.momd/WineRing.mom</key>
 		<data>
-		XjiJCQU10GrkGcu3FTBca6eI7FE=
+		wxfLWvZ5OxAmu9cWgBv7yv0lqyQ=
 		</data>
 		<key>PreferabliDataSDK.podspec</key>
 		<data>
@@ -82,42 +70,28 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			I9D5HgBDMGo6TLGPkDpCSxezIbkGt8Dzq0Y7z7JffwI=
+			Vup1uHhf+Ry6mguslgf6BONBBYSNqapMTFxmhSOo0cc=
 			</data>
 		</dict>
 		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.abi.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			U9DoNDzS2UhnYe6N0rlIk+i0KXEYGsCHWp+wi+tXaJ8=
-			</data>
-		</dict>
-		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			fkYCOxZ9TykR3Dngq2ZpEPfALBSIwhH/SqTdTdJ5/L4=
+			KnRdWE4y6t4QM5zi5JDptPdHFgJy1Tku+7GLkZS2aNM=
 			</data>
 		</dict>
 		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			bDawOJpaWX1/am/0e6Rf+hn8H0Z10HxXRuGXB8jZ/Bg=
-			</data>
-		</dict>
-		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftinterface</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			fkYCOxZ9TykR3Dngq2ZpEPfALBSIwhH/SqTdTdJ5/L4=
+			eBcep7RuRwk+lWPuSg+TLr2MjeYhPObnOf8TgPiYjBg=
 			</data>
 		</dict>
 		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			+RDA0d8Ml9TUfNW8ELYTyiN4/IU3BNjc/inOX5isqSM=
+			8TTwTexGeR6OdrQ4f0mWhAjK6BUckMPTpywxGQqZ12M=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
@@ -138,7 +112,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Yiut6hKkAFOEZCRQd6j8wguqu799bPm+GPMac96hBh8=
+			jU1D3pZMZ6Q6/aKY9tOiG7T7ZoFlARi1cSsNaNE3f34=
 			</data>
 		</dict>
 		<key>PreferabliDataSDK.podspec</key>
