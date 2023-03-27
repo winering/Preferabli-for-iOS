@@ -22,15 +22,23 @@
 		</data>
 		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.abi.json</key>
 		<data>
-		FSPnLbho3G+LL9smI3XgVOqBIQ4=
+		fCTSX6vuyUCgwGxmc56cdayKQv0=
+		</data>
+		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
+		<data>
+		UR7aI4bgKWw1sjeBQ4qlFjU/jeo=
 		</data>
 		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftdoc</key>
 		<data>
 		RaJaRiOYbqjKHFQjJHhCYIZ41xg=
 		</data>
+		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftinterface</key>
+		<data>
+		UR7aI4bgKWw1sjeBQ4qlFjU/jeo=
+		</data>
 		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftmodule</key>
 		<data>
-		FMTq/9ywNEy2btYAe+yufhqTgIs=
+		TRt/kqEhdoF4b3vrLcj3lCNnYmM=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -81,7 +89,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			KnRdWE4y6t4QM5zi5JDptPdHFgJy1Tku+7GLkZS2aNM=
+			U9DoNDzS2UhnYe6N0rlIk+i0KXEYGsCHWp+wi+tXaJ8=
+			</data>
+		</dict>
+		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			fkYCOxZ9TykR3Dngq2ZpEPfALBSIwhH/SqTdTdJ5/L4=
 			</data>
 		</dict>
 		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftdoc</key>
@@ -91,11 +106,18 @@
 			bDawOJpaWX1/am/0e6Rf+hn8H0Z10HxXRuGXB8jZ/Bg=
 			</data>
 		</dict>
+		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftinterface</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			fkYCOxZ9TykR3Dngq2ZpEPfALBSIwhH/SqTdTdJ5/L4=
+			</data>
+		</dict>
 		<key>Modules/PreferabliDataSDK.swiftmodule/arm64-apple-ios.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			8TTwTexGeR6OdrQ4f0mWhAjK6BUckMPTpywxGQqZ12M=
+			+RDA0d8Ml9TUfNW8ELYTyiN4/IU3BNjc/inOX5isqSM=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
