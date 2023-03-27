@@ -3,8 +3,6 @@ platform :ios, '14.0'
 use_frameworks!
 
 target 'PreferabliDataSDKDemo' do
-    pod 'PreferabliDataSDK', :git => 'https://github.com/winering/Preferabli-for-iOS.git'
-#    pod 'PreferabliDataSDK', :path => '../../preferabli-data-sdk-ios'
+    pod 'PreferabliDataSDK'
     pod 'TTGSnackbar'
-#    pod 'DoccDemo', :git=> 'https://github.com/haifengkao/DoccDemo'
 end
