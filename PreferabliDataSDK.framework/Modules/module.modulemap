@@ -1,4 +1,0 @@
-framework module PreferabliDataSDK {
-  header "PreferabliDataSDK-Swift.h"
-  requires objc
-}

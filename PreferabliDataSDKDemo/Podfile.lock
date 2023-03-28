@@ -6,7 +6,7 @@ PODS:
   - Mixpanel-swift (4.1.0):
     - Mixpanel-swift/Complete (= 4.1.0)
   - Mixpanel-swift/Complete (4.1.0)
-  - PreferabliDataSDK (1.0.5):
+  - PreferabliDataSDK (1.0.6):
     - Alamofire (= 4.9.1)
     - MagicalRecord
     - Mixpanel-swift
@@ -32,14 +32,14 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   PreferabliDataSDK:
-    :commit: 5169eefb7d695e9c25065b520c4ac2d5fcdd0043
+    :commit: 421313b0be87d534b3b98eb9ab1ef138dc32060f
     :git: https://github.com/winering/Preferabli-for-iOS.git
 
 SPEC CHECKSUMS:
   Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
   MagicalRecord: 53bed74b4323b930992a725be713e53b37d19755
   Mixpanel-swift: 7b46c63259dec8398a7df9f8a1298fd00b6b3cb3
-  PreferabliDataSDK: 5e57afdd055c5591f65a23125ddf40635537359f
+  PreferabliDataSDK: 8579edc4eb61dcc6fcbdaabc5f53162823b647d3
   SwiftEventBus: b30f617a6aca5a9336464b4d3f5931034762f2d5
   TTGSnackbar: fea91c62637b5662f808a4c3b55f7631cb7e1ef7
 

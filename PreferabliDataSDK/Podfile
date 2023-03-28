@@ -1,0 +1,10 @@
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '13.0'
+use_frameworks!
+
+target 'PreferabliDataSDK' do
+    pod 'Alamofire', '~> 4.9.1'
+    pod 'MagicalRecord'
+    pod 'SwiftEventBus'
+    pod 'Mixpanel-swift'
+end

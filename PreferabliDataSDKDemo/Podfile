@@ -1,9 +1,8 @@
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '14.0'
+platform :ios, '13.0'
 use_frameworks!
 
 target 'PreferabliDataSDKDemo' do
-#    pod 'PreferabliDataSDK'
     pod 'PreferabliDataSDK', :git => 'https://github.com/winering/Preferabli-for-iOS.git'
     pod 'TTGSnackbar'
 end
