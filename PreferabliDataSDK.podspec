@@ -18,6 +18,6 @@ Pod::Spec.new do |spec|
   spec.dependency 'MagicalRecord'
   spec.dependency 'SwiftEventBus'
   spec.dependency 'Mixpanel-swift'
-  spec.exclude_files = "Pods/**/*.{h,m,swift}"
+  spec.exclude_files = "PreferabliDataSDK/Pods/**/*.{h,m,swift},PreferabliDataSDKDemo/**/*.{h,m,swift}"
   spec.swift_version = "5.0"
 end

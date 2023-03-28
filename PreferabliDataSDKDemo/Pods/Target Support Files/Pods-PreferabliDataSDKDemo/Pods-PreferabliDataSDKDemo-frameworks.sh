@@ -179,7 +179,7 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/MagicalRecord/MagicalRecord.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Mixpanel-swift/Mixpanel.framework"
-  install_framework "${PODS_ROOT}/PreferabliDataSDK/PreferabliDataSDK.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/PreferabliDataSDK/PreferabliDataSDK.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftEventBus/SwiftEventBus.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TTGSnackbar/TTGSnackbar.framework"
 fi
@@ -187,7 +187,7 @@ if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/MagicalRecord/MagicalRecord.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Mixpanel-swift/Mixpanel.framework"
-  install_framework "${PODS_ROOT}/PreferabliDataSDK/PreferabliDataSDK.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/PreferabliDataSDK/PreferabliDataSDK.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftEventBus/SwiftEventBus.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TTGSnackbar/TTGSnackbar.framework"
 fi
