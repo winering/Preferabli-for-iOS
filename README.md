@@ -6,4 +6,4 @@ You can use the Preferabli iOS SDK to integrate Preferabli's powerful preference
 
 Clone this repo to check out the demo application.
 
-For full documentation, including an installation tutorial, see https://nick-docs.preferabli.com/documentation/preferablidatasdk 
+[Click here for the full documentation, including an installation tutorial.](https://nick-docs.preferabli.com/documentation/preferablidatasdk)
