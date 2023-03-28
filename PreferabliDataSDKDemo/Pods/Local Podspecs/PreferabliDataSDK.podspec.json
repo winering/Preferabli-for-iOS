@@ -32,7 +32,7 @@
 
     ]
   },
-  "exclude_files": "Pods/**/*.{h,m,swift}",
+  "exclude_files": "PreferabliDataSDK/Pods/**/*.{h,m,swift},PreferabliDataSDKDemo/**/*.{h,m,swift}",
   "swift_versions": "5.0",
   "swift_version": "5.0"
 }

@@ -11,9 +11,9 @@ Pod::Spec.new do |spec|
   spec.author = { "RingIT, Inc." => "info@preferabli.com" }
   spec.platform = :ios, "13.0"
   spec.ios.deployment_target = '13.0'
-  spec.resources = 'PreferabliDataSDK/assets/*.*'
+  spec.resources = 'PreferabliDataSDK/PreferabliDataSDK/assets/*.*'
   spec.source = { :git => "https://github.com/winering/Preferabli-for-iOS.git"}
-  spec.source_files = 'PreferabliDataSDK/**/*.{h,m,swift,md}'
+  spec.source_files = 'PreferabliDataSDK/PreferabliDataSDK/**/*.{h,m,swift,md}'
   spec.dependency 'Alamofire', '4.9.1'
   spec.dependency 'MagicalRecord'
   spec.dependency 'SwiftEventBus'
