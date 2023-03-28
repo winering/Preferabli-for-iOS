@@ -32,14 +32,14 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   PreferabliDataSDK:
-    :commit: ae29f2ebec97ddf882ce429f1e17aaa744abee0a
+    :commit: a424aabbcb2a583bc3f4bb6e715470436a887996
     :git: https://github.com/winering/Preferabli-for-iOS.git
 
 SPEC CHECKSUMS:
   Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
   MagicalRecord: 53bed74b4323b930992a725be713e53b37d19755
   Mixpanel-swift: 7b46c63259dec8398a7df9f8a1298fd00b6b3cb3
-  PreferabliDataSDK: 0752cbca158a8be156bac5e16243ebda1a4e277b
+  PreferabliDataSDK: 256ddb6814332b499ab6356aa3ebf8f3a4aa7e32
   SwiftEventBus: b30f617a6aca5a9336464b4d3f5931034762f2d5
   TTGSnackbar: fea91c62637b5662f808a4c3b55f7631cb7e1ef7
 

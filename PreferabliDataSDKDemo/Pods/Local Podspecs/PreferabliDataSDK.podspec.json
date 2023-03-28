@@ -13,11 +13,11 @@
   "platforms": {
     "ios": "13.0"
   },
-  "resources": "PreferabliDataSDK/assets/*.*",
+  "resources": "PreferabliDataSDK/PreferabliDataSDK/assets/*.*",
   "source": {
     "git": "https://github.com/winering/Preferabli-for-iOS.git"
   },
-  "source_files": "PreferabliDataSDK/**/*.{h,m,swift,md}",
+  "source_files": "PreferabliDataSDK/PreferabliDataSDK/**/*.{h,m,swift,md}",
   "dependencies": {
     "Alamofire": [
       "4.9.1"

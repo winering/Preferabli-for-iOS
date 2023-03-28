@@ -121,7 +121,7 @@
 		A27F90F12476DF5100187B9D /* Sort.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sort.swift; sourceTree = "<group>"; };
 		A27F90F32476DF5100187B9D /* ProductType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductType.swift; sourceTree = "<group>"; };
 		A27F90F42476DF5200187B9D /* RatingType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingType.swift; sourceTree = "<group>"; };
-		A27F9102247805B500187B9D /* PreferabliDataSDK.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = PreferabliDataSDK.podspec; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		A27F9102247805B500187B9D /* PreferabliDataSDK.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; name = PreferabliDataSDK.podspec; path = ../PreferabliDataSDK.podspec; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		A2A61B8825B09F3800FDFEEA /* FulfillSort.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FulfillSort.swift; sourceTree = "<group>"; };
 		A2A90B5D24744BAD00493EA8 /* PreferabliDataSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PreferabliDataSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2A90B6124744BAD00493EA8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = PreferabliDataSDK/tools/Info.plist; sourceTree = SOURCE_ROOT; };
