@@ -12,12 +12,6 @@ import CoreData
 @objc(CoreData_CollectionGroup)
 internal class CoreData_CollectionGroup: NSManagedObject {
     
-    static internal func sortGroups(groups: [CoreData_CollectionGroup]) -> Array<CoreData_CollectionGroup> {
-        return groups.sorted {
-            return $0.order?.compare($1.order ?? NSNumber.init(value: 0)) == ComparisonResult.orderedAscending
-        }
-    }
-    
 }
 
 extension CoreData_CollectionGroup {

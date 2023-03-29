@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-/// Styles link products together by characteristics and geography - they help inform us of a user's preferences in certain types of products.
+/// Styles express how product characteristics synthesize in the context of human perception and define the nature of consumer taste preferences. These are *not* unique for each customer.
 public class Style : BaseObject {
     
     public var desc: String

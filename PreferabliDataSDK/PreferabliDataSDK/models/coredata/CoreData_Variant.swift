@@ -27,5 +27,4 @@ extension CoreData_Variant {
     @NSManaged internal var primary_image: CoreData_Media?
     @NSManaged internal var product: CoreData_Product
     @NSManaged internal var tags: NSSet
-    @NSManaged internal var collectionVintageOrders: NSSet
 }

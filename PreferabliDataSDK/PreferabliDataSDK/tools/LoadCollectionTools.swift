@@ -10,6 +10,7 @@ import Foundation
 import MagicalRecord
 import SwiftEventBus
 
+/// Contains methods that help load Collections.
 internal class LoadCollectionTools {
     
     internal static var sharedInstance = LoadCollectionTools()
@@ -45,7 +46,7 @@ internal class LoadCollectionTools {
     internal func getCollection(forceRefresh : Bool, collectionId : NSNumber, context : NSManagedObjectContext) throws -> CoreData_Collection {
         var collection = CoreData_Collection.mr_findFirst(byAttribute: "id", withValue: collectionId, in: context)
         if (forceRefresh || collection == nil) {
-            var getCollectionResponse = try Preferabli.api.getAlamo().get(APIEndpoints.getCollection(id: collectionId))
+            var getCollectionResponse = try Preferabli.api.getAlamo().get(APIEndpoints.collection(id: collectionId))
             getCollectionResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getCollectionResponse)
             PreferabliTools.saveCollectionEtag(response: getCollectionResponse, collectionId: collectionId)
             let collectionDictionary = try PreferabliTools.continueOrThrowJSONException(data: getCollectionResponse.data!)
@@ -79,7 +80,7 @@ internal class LoadCollectionTools {
 
                     let collection = CoreData_Collection.mr_findFirst(byAttribute: "id", withValue: collectionId, in: context)
 
-                    var getTagsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.getTags(id: collectionId.intValue), params: ["offset" : offsetForTagOperation, "limit" : limit])
+                    var getTagsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.tags(id: collectionId), params: ["offset" : offsetForTagOperation, "limit" : limit])
                     getTagsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getTagsResponse)
 
                     if (tagOperation.isCancelled || PreferabliTools.isLoggedOutOrLoggingOut()) {
@@ -111,16 +112,16 @@ internal class LoadCollectionTools {
                     }
 
                     if (tags.count != 0) {
-                        let vintageIds = tags.map { $0.variant_id }
-                        var getProductsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.products, params: ["variant_ids" : vintageIds])
+                        let variantIds = tags.map { $0.variant_id }
+                        var getProductsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.products, params: ["variant_ids" : variantIds])
                         getProductsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getProductsResponse)
                         let productDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getProductsResponse.data!) as! NSArray
                         for product in productDictionaries {
                             let wineObject = CoreData_Product.mr_import(from: product, in: context)
-                            for vintage in wineObject.variants.allObjects as! [CoreData_Variant] {
-                                if let tagArray = tagMap[vintage.id] {
+                            for variant in wineObject.variants.allObjects as! [CoreData_Variant] {
+                                if let tagArray = tagMap[variant.id] {
                                     for tag in tagArray {
-                                        tag.variant = vintage
+                                        tag.variant = variant
                                     }
                                 }
                             }
@@ -179,11 +180,11 @@ internal class LoadCollectionTools {
         let predicate1 = NSPredicate(format: "collection_id == %d", collectionId)
         let predicate2 = NSPredicate(format: "dirty = %d || dirty == nil", false)
         let predicateCompound = NSCompoundPredicate.init(type: .and, subpredicates: [predicate1,predicate2])
-        let oldTags = CoreData_Tag.mr_findAll(with: predicateCompound, in: context) as! [Tag]
+        let oldTags = CoreData_Tag.mr_findAll(with: predicateCompound, in: context) as! [CoreData_Tag]
 
         let version = collection.getFirstVersion(context: context)
 
-        let collectionGroups = CoreData_CollectionGroup.sortGroups(groups: version.groups.allObjects as! [CoreData_CollectionGroup])
+        let collectionGroups = version.groups.allObjects as! [CoreData_CollectionGroup]
         let limit = 50
         var noErrors = true
         var errors = Array<PreferabliException>()
@@ -240,9 +241,11 @@ internal class LoadCollectionTools {
 
         for tag in oldTags {
             if (!tagIds.contains(tag.id)) {
-                tag.collection_id = NSNumber.init(value: 0)
+                tag.mr_deleteEntity(in: context)
             }
         }
+        
+        context.mr_saveToPersistentStoreAndWait()
 
         PreferabliTools.getKeyStore().set(Date.init(), forKey: "lastCalled" + collectionId.stringValue)
         PreferabliTools.getKeyStore().set(true, forKey: "hasLoaded" + collectionId.stringValue)
@@ -252,15 +255,15 @@ internal class LoadCollectionTools {
         do {
             let collectionId = collection.id
 
-            var getOrderingsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.getOrderings(collectionId: collectionId, versionId: versionId, groupId: group.id), params: ["limit" : limit, "offset" : offset])
+            var getOrderingsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.orderings(collectionId: collectionId, versionId: versionId, groupId: group.id), params: ["limit" : limit, "offset" : offset])
             getOrderingsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getOrderingsResponse)
             PreferabliTools.saveCollectionEtag(response: getOrderingsResponse, collectionId: collectionId)
             let orderingDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getOrderingsResponse.data!) as! Array<[String : Any]>
             var orderings = Array<CoreData_CollectionOrder>()
             for order in orderingDictionaries {
-                let collectionVintageOrder = CoreData_CollectionOrder.mr_import(from: order, in: context)
-                orderings.append(collectionVintageOrder)
-                collectionVintageOrder.group = group
+                let collectionOrder = CoreData_CollectionOrder.mr_import(from: order, in: context)
+                orderings.append(collectionOrder)
+                collectionOrder.group = group
             }
 
             if (operation.isCancelled || PreferabliTools.isLoggedOutOrLoggingOut()) {
@@ -269,7 +272,7 @@ internal class LoadCollectionTools {
 
             let tagIdsHere = orderingDictionaries.map { $0["tag_id"] }
             if (tagIdsHere.count != 0) {
-                var getTagsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.getTags(id: collectionId.intValue), params: ["tag_ids" : tagIdsHere])
+                var getTagsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.tags(id: collectionId), params: ["tag_ids" : tagIdsHere])
                 getTagsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getTagsResponse)
                 PreferabliTools.saveCollectionEtag(response: getTagsResponse, collectionId: collectionId)
                 let tagDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getTagsResponse.data!) as! Array<[String : Any]>
@@ -288,8 +291,8 @@ internal class LoadCollectionTools {
                     return
                 }
 
-                let vintageIds = tagDictionaries.map { $0["variant_id"] }
-                var getProductsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.products, params: ["variant_ids" : vintageIds])
+                let variantIds = tagDictionaries.map { $0["variant_id"] }
+                var getProductsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.products, params: ["variant_ids" : variantIds])
                 getProductsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getProductsResponse)
                 let productDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getProductsResponse.data!) as! NSArray
                 for product in productDictionaries {

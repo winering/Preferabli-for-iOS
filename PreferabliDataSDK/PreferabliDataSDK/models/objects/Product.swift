@@ -69,8 +69,8 @@ public class Product : BaseObject {
     
     /// The first instance within the product of tag type ``TagType/WISHLIST`` for the current user.
     var wishlist_tag : Tag? {
-        for vintage in variants {
-            for tag in vintage.tags {
+        for variant in variants {
+            for tag in variant.tags {
                 if (tag.tag_type == .WISHLIST) {
                     return tag
                 }
@@ -83,8 +83,8 @@ public class Product : BaseObject {
     /// All the product's tags of type ``TagType/PURCHASE`` for the current user.
     var purchase_tags: Set<Tag> {
         var purchaseTags = Set<Tag>()
-        for vintage in variants {
-            for tag in vintage.tags {
+        for variant in variants {
+            for tag in variant.tags {
                 if (tag.tag_type == .PURCHASE) {
                     purchaseTags.insert(tag)
                 }
@@ -98,8 +98,8 @@ public class Product : BaseObject {
     var cellar_tags: Set<Tag> {
         let cellarIds = (CoreData_UserCollection.mr_find(byAttribute: "relationship_type", withValue: "mycellar") as! [CoreData_UserCollection]).map() { $0.collection_id }
         var cellarTags = Set<Tag>()
-        for vintage in variants {
-            for tag in vintage.tags {
+        for variant in variants {
+            for tag in variant.tags {
                 if (tag.tag_type == .CELLAR && cellarIds.contains(tag.collection_id)) {
                     cellarTags.insert(tag)
                 }
@@ -144,8 +144,8 @@ public class Product : BaseObject {
     /// All the product's tags of type ``TagType/RATING`` for the current user.
     var ratings_tags: Set<Tag> {
         var ratingsTags = Set<Tag>()
-        for vintage in variants {
-            for tag in vintage.ratings_tags {
+        for variant in variants {
+            for tag in variant.ratings_tags {
                 ratingsTags.insert(tag)
             }
         }
@@ -176,11 +176,11 @@ public class Product : BaseObject {
     /// - Returns: path as a string.
     public func getImage() -> String {
         if (primary_image == nil || PreferabliTools.isNullOrWhitespace(string: primary_image!.path) || primary_image!.path.contains("placeholder")) {
-            for vintage in variants {
-                if (vintage.primary_image == nil || PreferabliTools.isNullOrWhitespace(string: vintage.primary_image!.path) || vintage.primary_image!.path.contains("placeholder")) {
+            for variant in variants {
+                if (variant.primary_image == nil || PreferabliTools.isNullOrWhitespace(string: variant.primary_image!.path) || variant.primary_image!.path.contains("placeholder")) {
                     continue
                 }
-                return vintage.getImage()
+                return variant.getImage()
             }
         }
         return primary_image?.path ?? ""
@@ -222,10 +222,10 @@ public class Product : BaseObject {
     var most_recent_variant: Variant {
         var mostRecentYear = NSNumber(integerLiteral: -2)
         var mostRecentVariant : Variant?
-        for vintage in variants {
-            if (vintage.year.intValue  > mostRecentYear.intValue && vintage.id.intValue > 0) {
-                mostRecentYear = vintage.year
-                mostRecentVariant = vintage
+        for variant in variants {
+            if (variant.year.intValue  > mostRecentYear.intValue && variant.id.intValue > 0) {
+                mostRecentYear = variant.year
+                mostRecentVariant = variant
             }
         }
         
@@ -242,9 +242,9 @@ public class Product : BaseObject {
     /// - Parameter id: a variant id.
     /// - Returns: the corresponding variant. Returns *nil* if this product does not contain the variant.
     public func getVariantWithId(id : NSNumber) -> Variant? {
-        for vintage in variants {
-            if (vintage.id == id) {
-                return vintage
+        for variant in variants {
+            if (variant.id == id) {
+                return variant
             }
         }
         
@@ -255,9 +255,9 @@ public class Product : BaseObject {
     /// - Parameter year: a variant year.
     /// - Returns: the corresponding variant. Returns *nil* if this product does not contain the variant.
     public func getVariantWithYear(year : NSNumber) -> Variant? {
-        for vintage in variants {
-            if (vintage.year == year) {
-                return vintage
+        for variant in variants {
+            if (variant.year == year) {
+                return variant
             }
         }
         

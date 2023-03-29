@@ -16,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
                 
-        Preferabli.initialize(client_interface: "YOUR_CLIENT_INTERFACE_HERE", integration_id: 630)
+        Preferabli.initialize(client_interface: "YOUR_CLIENT_INTERFACE_HERE", integration_id: 6301)
         
         return true
     }

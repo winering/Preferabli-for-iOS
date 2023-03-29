@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-/// The preference style object links a ``Style`` to a user's ``Profile``.
+/// The preference style object links a ``Style`` to a user's ``Profile``. Unique for each customer.
 public class PreferenceStyle : BaseObject {
     
     public var conflict: Bool
