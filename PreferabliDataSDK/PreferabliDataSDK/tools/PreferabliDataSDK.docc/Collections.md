@@ -3,7 +3,7 @@
 Collections are essentially groups of products. 
 
 
-Collections are structured as follows: a ``Collection`` has one or more ``CollectionVersion``. Each version can have one or multiple ``CollectionGroup``. Each group can contain any amount of ``CollectionOrder``, which link directly to a ``Tag`` and thus a ``Product``.
+Collections are structured as follows: a ``Collection`` has one or more ``CollectionVersion``. Each version can have one or more ``CollectionGroup``s. Each group can contain any number of ``CollectionOrder``s, which link directly to a ``Tag`` and thus a ``Product``.
 
 ## Topics
 
