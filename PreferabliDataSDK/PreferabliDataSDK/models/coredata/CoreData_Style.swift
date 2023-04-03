@@ -23,6 +23,6 @@ extension CoreData_Style {
     @NSManaged internal var primary_image_url: String?
     @NSManaged internal var product_category: String
     @NSManaged internal var foods: NSSet
-    @NSManaged internal var preference_style: NSSet?
+    @NSManaged internal var profile_style: NSSet?
     @NSManaged internal var locations: NSSet
 }

@@ -34,10 +34,14 @@ public class Style : BaseObject {
         }
     }
     
-    /// Get the path of the style's primary image.
-    /// - Returns: a string path.
-    public func getImage() -> String {
-        return primary_image_url ?? ""
+    /// Get the style image.
+    /// - Parameters:
+    ///   - width: returns an image with the specified width in pixels.
+    ///   - height: returns an image with the specified height in pixels.
+    ///   - quality: returns an image with the specified quality. Scales from 0 - 100.
+    /// - Returns: the URL of the requested image.
+    public func getImage(width : CGFloat, height : CGFloat, quality : Int = 80) -> URL? {
+        return PreferabliTools.getImageUrl(image: primary_image_url, width: width, height: height, quality: quality)
     }
     
     /// Get product type.

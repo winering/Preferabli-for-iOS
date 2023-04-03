@@ -128,16 +128,20 @@ public class Variant : BaseObject {
         return purchaseTags
     }
     
-    /// Get the variant's primary image path.
-    /// - Returns: path as a string.
-     public func getImage() -> String {
+    /// Get the variant image.
+    /// - Parameters:
+    ///   - width: returns an image with the specified width in pixels.
+    ///   - height: returns an image with the specified height in pixels.
+    ///   - quality: returns an image with the specified quality. Scales from 0 - 100.
+    /// - Returns: the URL of the requested image.
+    public func getImage(width : CGFloat, height : CGFloat, quality : Int = 80) -> URL? {
         if (primary_image == nil || PreferabliTools.isNullOrWhitespace(string: primary_image!.path) || primary_image!.path.contains("placeholder")) {
             if (product.primary_image == nil || PreferabliTools.isNullOrWhitespace(string: product.primary_image!.path) || product.primary_image!.path.contains("placeholder")) {
-                return ""
+                return nil
             }
-            return product.getImage()
+            return product.getImage(width: width, height: height, quality: quality)
         }
-        return primary_image?.path ?? ""
+        return PreferabliTools.getImageUrl(image: primary_image?.path, width: width, height: height, quality: quality)
     }
     
     /// All the variant's tags of type ``TagType/RATING`` for the current user.

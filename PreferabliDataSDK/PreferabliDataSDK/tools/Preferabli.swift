@@ -1140,7 +1140,7 @@ public class Preferabli {
         var getPreferencesResponse = try Preferabli.api.getAlamo().get(Preferabli.isCustomerLoggedIn() ? APIEndpoints.customerProfile(id: PreferabliTools.getChannelId(), and: PreferabliTools.getCustomerId()) : APIEndpoints.profile(id: PreferabliTools.getUserId()))
         getPreferencesResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getPreferencesResponse)
         
-        let styles = CoreData_PreferenceStyle.mr_findAll(in: context) as! [CoreData_PreferenceStyle]
+        let styles = CoreData_ProfileStyle.mr_findAll(in: context) as! [CoreData_ProfileStyle]
         let otherProfile = CoreData_Profile.mr_createEntity(in: context)!
         for style in styles {
             style.profile = otherProfile
@@ -1152,8 +1152,8 @@ public class Preferabli {
         profile.user_id = PreferabliTools.getUserId()
         
         var style_ids = Array<NSNumber>()
-        var preferenceMap = [NSNumber : CoreData_PreferenceStyle]()
-        for preferenceStyle in profile.preference_styles.allObjects as! [CoreData_PreferenceStyle] {
+        var preferenceMap = [NSNumber : CoreData_ProfileStyle]()
+        for preferenceStyle in profile.preference_styles.allObjects as! [CoreData_ProfileStyle] {
             if (force_refresh) {
                 style_ids.append(preferenceStyle.style_id)
                 preferenceMap[preferenceStyle.style_id] = preferenceStyle

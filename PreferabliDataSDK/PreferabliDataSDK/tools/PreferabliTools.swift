@@ -635,4 +635,33 @@ internal class PreferabliTools {
     internal class func sortStringsByLength(list: [String]) -> [String] {
         return list.sorted(by: { $0.count < $1.count })
     }
+    
+    internal class func getImageUrl(image : String?, width : CGFloat, height : CGFloat, quality : Int) -> URL? {
+        if (isNullOrWhitespace(string: image)) {
+            return nil
+        }
+        
+        var image = image!
+        if (image.contains("placeholder")) {
+            return nil
+        } else if (image.contains("winering.com")) {
+            return URL.init(string: image)
+        } else if (image.contains("s3.amazonaws.com/winering-production")) {
+            let index = image.range(of: "/", options: .backwards, range: nil, locale: nil)!.upperBound
+            if (image.containsIgnoreCase("/avatars")) {
+                image = "avatars/" + image.substring(from: index)
+            } else {
+                image = image.substring(from: index)
+            }
+        } else {
+            return URL.init(string: image)
+        }
+        
+        let cloudfrontAppId = "ios_sdk/fit-in/"
+        let sizeString = String(Int(width * UIScreen.main.scale)) + "x" + String(Int(height * UIScreen.main.scale)) + "/"
+        let qualityString = "filters:quality(" + String(quality) + ")/"
+        let pngString = image.containsIgnoreCase("png") ? "filters:format(png)/"  : ""
+        var cloudFrontURL = "https://dxlu3le4zp2pd.cloudfront.net/wineringlabel/" + cloudfrontAppId + sizeString + qualityString + pngString + image
+        return URL.init(string: cloudFrontURL)
+    }
 }

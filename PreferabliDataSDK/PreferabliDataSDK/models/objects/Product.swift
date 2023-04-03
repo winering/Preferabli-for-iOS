@@ -172,18 +172,22 @@ public class Product : BaseObject {
         return brand.lowercased().containsIgnoreCase("identified")
     }
     
-    /// Get the product's primary image path.
-    /// - Returns: path as a string.
-    public func getImage() -> String {
+    /// Get the product image.
+    /// - Parameters:
+    ///   - width: returns an image with the specified width in pixels.
+    ///   - height: returns an image with the specified height in pixels.
+    ///   - quality: returns an image with the specified quality. Scales from 0 - 100.
+    /// - Returns: the URL of the requested image.
+    public func getImage(width : CGFloat, height : CGFloat, quality : Int = 80) -> URL? {
         if (primary_image == nil || PreferabliTools.isNullOrWhitespace(string: primary_image!.path) || primary_image!.path.contains("placeholder")) {
             for variant in variants {
                 if (variant.primary_image == nil || PreferabliTools.isNullOrWhitespace(string: variant.primary_image!.path) || variant.primary_image!.path.contains("placeholder")) {
                     continue
                 }
-                return variant.getImage()
+                return variant.getImage(width: width, height: height, quality: quality)
             }
         }
-        return primary_image?.path ?? ""
+        return PreferabliTools.getImageUrl(image: primary_image?.path, width: width, height: height, quality: quality)
     }
     
     /// The type of a product. Only for wines.

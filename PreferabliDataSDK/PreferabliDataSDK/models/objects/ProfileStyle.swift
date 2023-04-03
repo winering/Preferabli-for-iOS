@@ -9,8 +9,8 @@
 import Foundation
 import CoreData
 
-/// The preference style object links a ``Style`` to a user's ``Profile``. Unique for each customer.
-public class PreferenceStyle : BaseObject {
+/// The profile style object links a ``Style`` to a user's ``Profile``. Unique for each customer.
+public class ProfileStyle : BaseObject {
     
     public var conflict: Bool
     public var order_profile: NSNumber
@@ -25,75 +25,75 @@ public class PreferenceStyle : BaseObject {
     public var created_at: Date
     public var profile: Profile
     
-    internal init(preference_style : CoreData_PreferenceStyle, holding_profile : Profile) {
-        conflict = preference_style.conflict
-        order_profile = preference_style.order_profile
-        order_recommend = preference_style.order_recommend
-        rating = preference_style.rating
-        strength = preference_style.strength
-        style_id = preference_style.style_id
-        recommend = preference_style.recommend
-        refine = preference_style.refine
-        style = Style.init(style: preference_style.style)
-        keywords = preference_style.keywords
-        created_at = preference_style.created_at
+    internal init(profile_style : CoreData_ProfileStyle, holding_profile : Profile) {
+        conflict = profile_style.conflict
+        order_profile = profile_style.order_profile
+        order_recommend = profile_style.order_recommend
+        rating = profile_style.rating
+        strength = profile_style.strength
+        style_id = profile_style.style_id
+        recommend = profile_style.recommend
+        refine = profile_style.refine
+        style = Style.init(style: profile_style.style)
+        keywords = profile_style.keywords
+        created_at = profile_style.created_at
         profile = holding_profile
-        super.init(id: preference_style.id)
+        super.init(id: profile_style.id)
     }
     
-    /// Get the level of appeal of a preference style.
+    /// Get the level of appeal of a profile style.
     /// - Returns: ``RatingType`` of the preference.
     public func getRatingType() -> RatingType {
         return RatingType.getRatingTypeBasedOffTagValue(value: rating.stringValue)
     }
     
-    /// Is a preference style unappealing?
+    /// Is a profile style unappealing?
     /// - Returns: true if unappealing.
     public func isUnappealing() -> Bool {
         return getRatingType() == RatingType.DISLIKE || getRatingType() == RatingType.SOSO
     }
     
-    /// Is a preference style appealing?
+    /// Is a profile style appealing?
     /// - Returns: true if appealing.
     public func isAppealing() -> Bool {
         return getRatingType() == RatingType.LOVE || getRatingType() == RatingType.LIKE
     }
     
-    /// Sort preference styles by created at date.
+    /// Sort profile styles by created at date.
     /// - Parameters:
-    ///   - preference_styles: an array of preference styles to be sorted.
+    ///   - profile_styles: an array of profile styles to be sorted.
     ///   - comparison_result: can be ascending or descending. Defaults to *descending*.
-    /// - Returns: a sorted array of preference styles.
-    static public func sortPreferenceStylesByDate(preference_styles: [PreferenceStyle], comparison_result: ComparisonResult = .orderedDescending) -> Array<PreferenceStyle> {
-        return preference_styles.sorted {
+    /// - Returns: a sorted array of profile styles.
+    static public func sortProfileStylesByDate(profile_styles: [ProfileStyle], comparison_result: ComparisonResult = .orderedDescending) -> Array<ProfileStyle> {
+        return profile_styles.sorted {
             return $0.created_at.compare($1.created_at) == comparison_result
             
         }
     }
     
-    /// Sort preference styles alphabetically.
+    /// Sort profile styles alphabetically.
     /// - Parameters:
-    ///   - preference_styles: an array of preference styles to be sorted.
+    ///   - profile_styles: an array of profile styles to be sorted.
     ///   - comparison_result: can be ascending or descending. Defaults to *descending*.
-    /// - Returns: a sorted array of preference styles.
-    static public func sortPreferenceStylesAlpha(preference_styles: [PreferenceStyle], comparison_result: ComparisonResult) -> Array<PreferenceStyle> {
-        return preference_styles.sorted {
+    /// - Returns: a sorted array of profile styles.
+    static public func sortProfileeStylesAlpha(profile_styles: [ProfileStyle], comparison_result: ComparisonResult) -> Array<ProfileStyle> {
+        return profile_styles.sorted {
             return PreferabliTools.alphaSortIgnoreThe(x: $0.style.name, y: $1.style.name, comparisonResult: comparison_result)
         }
     }
     
-    /// Filter preference styles by some search term(s).
+    /// Filter profile styles by some search term(s).
     /// - Parameters:
-    ///   - preference_styles: an array of preference styles to be filtered.
+    ///   - profile_styles: an array of profile styles to be filtered.
     ///   - search_text: a search term string.
-    /// - Returns: a filtered array of preference styles.
-    static public func filterPreferenceStyles(preference_styles : Array<PreferenceStyle>, search_text : String) -> Array<PreferenceStyle> {
-        var filteredPreferenceStyles = Array<PreferenceStyle>()
+    /// - Returns: a filtered array of profile styles.
+    static public func filterPreferenceStyles(profile_styles : Array<ProfileStyle>, search_text : String) -> Array<ProfileStyle> {
+        var filteredProfileStyles = Array<ProfileStyle>()
         if (search_text.isEmptyOrWhitespace()) {
-            filteredPreferenceStyles = preference_styles
+            filteredProfileStyles = profile_styles
         } else {
             let searchTerms = search_text.components(separatedBy: " ")
-            filteredPreferenceStyles = preference_styles.filter() {
+            filteredProfileStyles = profile_styles.filter() {
             innerloop:
                 for searchTerm in searchTerms {
                     if ($0.filterPreferenceStyle(search_term: searchTerm)) {
@@ -105,7 +105,7 @@ public class PreferenceStyle : BaseObject {
                 return true
             }
         }
-        return filteredPreferenceStyles
+        return filteredProfileStyles
     }
     
     internal func filterPreferenceStyle(search_term : String) -> Bool {

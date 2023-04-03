@@ -9,12 +9,12 @@
 import Foundation
 import CoreData
 
-@objc(CoreData_PreferenceStyle)
-internal class CoreData_PreferenceStyle: NSManagedObject {
+@objc(CoreData_ProfileStyle)
+internal class CoreData_ProfileStyle: NSManagedObject {
     
 }
 
-extension CoreData_PreferenceStyle {
+extension CoreData_ProfileStyle {
     @NSManaged internal var conflict: Bool
     @NSManaged internal var id: NSNumber
     @NSManaged internal var order_profile: NSNumber
