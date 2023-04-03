@@ -706,7 +706,7 @@
 				);
 				MARKETING_VERSION = 3.1.1;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ringit.sdk;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ringit.datasdk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				RUN_DOCUMENTATION_COMPILER = YES;
 				SKIP_INSTALL = YES;
@@ -741,7 +741,7 @@
 				);
 				MARKETING_VERSION = 3.1.1;
 				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ringit.sdk;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ringit.datasdk;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				RUN_DOCUMENTATION_COMPILER = YES;
 				SKIP_INSTALL = YES;

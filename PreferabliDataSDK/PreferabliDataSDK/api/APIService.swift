@@ -102,7 +102,7 @@ private class LoggingAdapter: RequestAdapter {
 
 /// These are our API routes.
 internal struct APIEndpoints {
-    internal static let baseUrl = "https://api.preferabli.com/api/6.1/"
+    internal static let baseUrl = "https://api.preferabli.com/api/6.2/"
     internal static let postSession = baseUrl + "sessions"
     internal static let getRec = baseUrl + "recs"
     internal static let styles = baseUrl + "styles"
