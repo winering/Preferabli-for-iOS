@@ -12,51 +12,63 @@ import CoreData
 /// The profile style object links a ``Style`` to a user's ``Profile``. Unique for each customer.
 public class ProfileStyle : BaseObject {
     
+    /// Indicates if there is any ambiguity in the user's affinity for this style.
     public var conflict: Bool
+    
+    /// A ranking of 1..n which indicates where this style fits within its ``RatingType`` and ``ProductType`` where 1 indicates the highest level of appeal and n indicates the lowest.
     public var order_profile: NSNumber
+    
+    /// A ranking of 1..n which indicates where this style fits within its ``ProductType`` where 1 indicates the most recommendable and n indicates the least recommendable. 0 means the style is not recommendable.
     public var order_recommend: NSNumber
-    public var rating: NSNumber
-    public var strength: NSNumber
     public var style_id: NSNumber
+    
+    /// True if this style is recommendable for this user.
     public var recommend: Bool
+    /// True if we could use some additional data from the user to better understand their affinity for this style.
     public var refine: Bool
     public var style: Style
     public var keywords: String?
     public var created_at: Date
+    public var updated_at: Date
+
+    /// The profile of the user where this profile style resides.
     public var profile: Profile
+    
+    /// Use this to compute ``RatingType``.
+    internal var rating: NSNumber
+    
     
     internal init(profile_style : CoreData_ProfileStyle, holding_profile : Profile) {
         conflict = profile_style.conflict
         order_profile = profile_style.order_profile
         order_recommend = profile_style.order_recommend
         rating = profile_style.rating
-        strength = profile_style.strength
         style_id = profile_style.style_id
         recommend = profile_style.recommend
         refine = profile_style.refine
         style = Style.init(style: profile_style.style)
         keywords = profile_style.keywords
         created_at = profile_style.created_at
+        updated_at = profile_style.updated_at
         profile = holding_profile
         super.init(id: profile_style.id)
     }
     
-    /// Get the level of appeal of a profile style.
-    /// - Returns: ``RatingType`` of the preference.
-    public func getRatingType() -> RatingType {
+    /// The ``RatingType`` of this profile style.
+    var rating_type : RatingType {
         return RatingType.getRatingTypeBasedOffTagValue(value: rating.stringValue)
     }
     
     /// Is a profile style unappealing?
     /// - Returns: true if unappealing.
     public func isUnappealing() -> Bool {
-        return getRatingType() == RatingType.DISLIKE || getRatingType() == RatingType.SOSO
+        return rating_type == RatingType.DISLIKE || rating_type == RatingType.SOSO
     }
     
     /// Is a profile style appealing?
     /// - Returns: true if appealing.
     public func isAppealing() -> Bool {
-        return getRatingType() == RatingType.LOVE || getRatingType() == RatingType.LIKE
+        return rating_type == RatingType.LOVE || rating_type == RatingType.LIKE
     }
     
     /// Sort profile styles by created at date.

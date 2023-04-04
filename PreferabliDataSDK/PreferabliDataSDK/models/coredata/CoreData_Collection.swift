@@ -52,6 +52,7 @@ extension CoreData_Collection {
     @NSManaged internal var display_group_headings: Bool
     @NSManaged internal var is_blind: Bool
     @NSManaged internal var start_date: Date?
+    @NSManaged internal var created_at: Date
     @NSManaged internal var venue_id: NSNumber?
     @NSManaged internal var primary_image: CoreData_Media?
     @NSManaged internal var venue: CoreData_Venue?

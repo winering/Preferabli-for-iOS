@@ -6,6 +6,7 @@
         <attribute name="badge_method" optional="YES" attributeType="String"/>
         <attribute name="channel_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="code" optional="YES" attributeType="String"/>
+        <attribute name="created_at" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="currency" optional="YES" attributeType="String"/>
         <attribute name="desc" optional="YES" attributeType="String">
             <userInfo>
@@ -406,6 +407,7 @@
         <attribute name="refine" optional="YES" attributeType="Boolean" usesScalarValueType="NO"/>
         <attribute name="strength" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="style_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="updated_at" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="profile" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CoreData_Profile" inverseName="preference_styles" inverseEntity="CoreData_Profile"/>
         <relationship name="style" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="CoreData_Style" inverseName="profile_style" inverseEntity="CoreData_Style">
             <userInfo>

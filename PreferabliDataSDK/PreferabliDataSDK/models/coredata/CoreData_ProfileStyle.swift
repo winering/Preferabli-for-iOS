@@ -27,5 +27,6 @@ extension CoreData_ProfileStyle {
     @NSManaged internal var style: CoreData_Style
     @NSManaged internal var keywords: String?
     @NSManaged internal var created_at: Date
+    @NSManaged internal var updated_at: Date
     @NSManaged internal var profile: CoreData_Profile
 }
