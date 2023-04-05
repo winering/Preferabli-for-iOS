@@ -16,6 +16,7 @@ public enum ProductType {
     case ROSE
     case SPARKLING
     case FORTIFIED
+    /// Use other if product is a whiskey, tequila, or beer.
     case OTHER
 
     internal func getTypeName() -> String {
