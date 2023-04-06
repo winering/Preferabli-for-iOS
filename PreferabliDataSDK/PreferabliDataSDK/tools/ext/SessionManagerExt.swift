@@ -116,8 +116,8 @@ extension SessionManager {
         
         self.upload(multipartFormData: { multipartFormData in
             multipartFormData.append(data, withName: "file", fileName: "file.jpg", mimeType: "image/jpeg")
-            if (PreferabliTools.isUserLoggedIn()) {
-                multipartFormData.append(PreferabliTools.getUserId().stringValue.data(using: String.Encoding.utf8, allowLossyConversion: false)!, withName: "user_id")
+            if (PreferabliTools.isPreferabliUserLoggedIn()) {
+                multipartFormData.append(PreferabliTools.getPreferabliUserId().stringValue.data(using: String.Encoding.utf8, allowLossyConversion: false)!, withName: "user_id")
             }
         }, with: request) { result in
             switch result {

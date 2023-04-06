@@ -198,7 +198,7 @@ internal class PreferabliUserTools {
                     context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
                     
                     let params = ["offset" : offsetInside, "limit" : limit]
-                    var getUserCollectionsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.userCollections(id: PreferabliTools.getUserId()), params: params)
+                    var getUserCollectionsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.userCollections(id: PreferabliTools.getPreferabliUserId()), params: params)
                     getUserCollectionsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getUserCollectionsResponse)
                     let userCollectionDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getUserCollectionsResponse.data!) as! NSArray
                     var channelIds = Array<NSNumber>()
