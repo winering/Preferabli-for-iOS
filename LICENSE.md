@@ -1,6 +1,8 @@
 *Copyright © 2023 RingIT, Inc. dba Preferabli.  All rights reserved.*
 
-###PREFERABLI SDK LICENSE TERMS
+PDF Copy to Download:  [PDF](https://preferabli.box.com/v/preferabli-sdk-license)
+
+**PREFERABLI SDK LICENSE TERMS**
 
 These Preferabli SDK License Terms (the "Agreement") are an agreement between you ("you", "Licensee") and RingIT, Inc., d/b/a Preferabli, with offices at 202 Walton Street, Suite 401, Syracuse, NY 13202 ("Preferabli"). This Agreement applies to the Preferabli Software Development Kit (“SDK”) referred to as ‘Preferabli-for-iOS’ and ‘Preferabli-for-Android’, as the case may be. This Agreement also applies to any updates, supplements, Internet-based services, and support service for this SDK, unless otherwise specified by Preferabli.
 
