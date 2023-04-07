@@ -1,4 +1,5 @@
 *Copyright © 2023 RingIT, Inc. dba Preferabli.  All rights reserved.*
+PDF Copy to Download:  [PDF](https://preferabli.box.com/v/preferabli-sdk-license)
 
 **PREFERABLI SDK LICENSE TERMS**
 
