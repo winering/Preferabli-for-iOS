@@ -1,179 +1,43 @@
 Copyright © 2023 RingIT, Inc. All rights reserved.
 
+PREFERABLI SDK LICENSE TERMS
 
-                                 Apache License
-                           Version 2.0, January 2004
-                        https://www.apache.org/licenses/
+These Preferabli SDK License Terms (the "Agreement") are an agreement between you ("you", "Licensee") and RingIT, Inc., d/b/a Preferabli, with offices at 202 Walton Street, Suite 401, Syracuse, NY 13202 ("Preferabli"). This Agreement applies to the Preferabli Software Development Kit (“SDK”) referred to as ‘Preferabli-for-iOS’ and ‘Preferabli-for-Android’, as the case may be. This Agreement also applies to any updates, supplements, Internet-based services, and support service for this SDK, unless otherwise specified by Preferabli.
 
-   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+1	REQUIREMENTS AND USE.
 
-   1. Definitions.
+1.1	REQUIREMENTS.   To use this SDK, you must (a) have a separate agreement with Prefarabli which incorporates the current Preferabli Terms and Conditions ("Master Preferabli Agreement"); and (b) accept this Agreement. If you do not meet conditions (a) and (b), you may not use the SDK.   
 
-      "License" shall mean the terms and conditions for use, reproduction,
-      and distribution as defined by Sections 1 through 9 of this document.
+1.2	USE. Subject to your compliance with the Limited Scope (as defined in the Master Preferabli Agreement) and the other terms set forth in your Master Preferabli Agreement (which may, among other things limit your incorporation of the SDK into a specified application and/or access to specified functionalities), you may use the SDK in your application that runs on the iOS platform and/or Android platform, as the case may be ("Authorized Application") during the Term (as defined in your Master Preferabli Agreement).  The SDK may include third-party frameworks that Preferabli sublicenses to you under this Agreement. Notices, if any, for such third-party frameworks are included for your information only.  
 
-      "Licensor" shall mean the copyright owner or entity authorized by
-      the copyright owner that is granting the License.
+1.3	ADDITONAL REQUIREMENTS.  The SDK contains code that you are permitted to distribute in your Authorized Application.  To distribute SDK code you must: (a) comply with your Master Preferabli Agreement, (b) comply with the applicable rules and policies regarding applications in the iOS, Mac and/or Android stores; (c) require distributors and external end users to agree to terms that protect the SDK code at least as much as this Agreement; and (d) indemnify, defend, and hold harmless Preferabli from any claims, including attorneys’ fees, related to the distribution or use of your applications.  You may not: (A) alter any copyright, trademark or patent notice in the SDK; (B) use Preferabli Materials (as defined in your Master Preferabli Agreement) other than as specified in the Master Preferabli Agreement or the SDK; (C) include SDK code in malicious, deceptive or unlawful applications; or (D) modify or distribute the source code of the SDK so that any part of it becomes subject to an Excluded License. An "Excluded License" is one that requires, as a condition of use, modification or distribution, that the code be disclosed or distributed in source code form or others have the right to modify it.  If you give feedback about the SDK to Preferabli, you give to Preferabli, without charge, the irrevocable right to use, share and commercialize your feedback in any way and for any purpose.
 
-      "Legal Entity" shall mean the union of the acting entity and all
-      other entities that control, are controlled by, or are under common
-      control with that entity. For the purposes of this definition,
-      "control" means (i) the power, direct or indirect, to cause the
-      direction or management of such entity, whether by contract or
-      otherwise, or (ii) ownership of fifty percent (50%) or more of the
-      outstanding shares, or (iii) beneficial ownership of such entity.
+2	LICENSE RESTRICTIONS. The SDK is licensed, not sold. This Agreement only grants, during the Term, certain rights to use the SDK. Preferabli reserves all other rights. You may use the SDK during the Term only as expressly permitted in this Agreement. In doing so, you must comply with any technical limitations in the SDK that only allow you to use it in certain ways. You may not: (a) work around any technical limitations in the SDK; (b) reverse engineer, decompile or disassemble the SDK, except and only to the extent that applicable law expressly permits, despite this limitation; (c) make more copies of the SDK than specified in this Agreement or allowed by applicable law, despite this limitation; (d) publish the SDK for others to copy;  (e) rent, lease or lend the SDK or otherwise use it in a service-bureau basis; (f) transfer the SDK or this Agreement to any third party; or (g) use the SDK for any purposes in violation of this Agreement or the Master Preferabli Agreement.
 
-      "You" (or "Your") shall mean an individual or Legal Entity
-      exercising permissions granted by this License.
+3	DOCUMENTATION. Included in the SDK is certain documentation and technical limitations.  Your use of the documentation is solely for your internal, reference purposes and you must comply with all technical limitations set forth in the documentation.
 
-      "Source" form shall mean the preferred form for making modifications,
-      including but not limited to software source code, documentation
-      source, and configuration files.
+4	SUPPORT SERVICES.  Due to the fact that you will be incorporating the SDK into your Authorized Application, Preferabli is not obligated to provide any support services with respect to the SDK unless otherwise provided for in a separate agreement with Preferabli.
 
-      "Object" form shall mean any form resulting from mechanical
-      transformation or translation of a Source form, including but
-      not limited to compiled object code, generated documentation,
-      and conversions to other media types.
+5	COMPLIANCE WITH LAWS. Each party shall comply with all applicable import and export laws, restrictions and regulations of any United States or foreign agency or authority and agrees not to export or re-export, or allow the export or re-export of any product, technology or information it obtains or learns pursuant to this Agreement (or any direct product thereof) in violation of any such laws, restrictions or regulations.
 
-      "Work" shall mean the work of authorship, whether in Source or
-      Object form, made available under the License, as indicated by a
-      copyright notice that is included in or attached to the work
-      (an example is provided in the Appendix below).
+6	DISCLAIMER OF WARRANTY. THE SDK IS LICENSED “AS-IS.” YOU BEAR ALL THE RISK OF USING IT. DUE TO THE FACT THAT YOU WILL BE RESPONSIBLE FOR ALL CODING OF THE SDK INCORPORATED INTO YOUR AUTHORIZED APPLICATION, PREFERABLI ASSUMES NO RESPONSIBILITY AND MAKES NO WARRANTY AS TO SUCH INCORPORATION OR THE SDK PERFORMANCE WITHIN YOUR AUTHORIZED APPLICATION.  TO THE EXTENT ALLOWED BY APPLICABLE LAW, PREFERABLI HEREBY DISCLAIMS ALL OTHER WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY OR OTHERWISE, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR USE OR PURPOSE AND NON-INFRINGEMENT, AND THOSE ARISING FROM A COURSE OF DEALING OR USAGE OF TRADE. PREFERABLI DOES NOT WARRANT, GUARANTEE OR MAKE ANY REPRESENTATIONS THAT THE SDK AND/OR SERVICES PROVIDED BY PREFERABLI UNDER THIS AGREEMENT WILL BE ERROR-FREE OR PROVIDE UNINTERRUPTED USE.  PREFERABLI DOES NOT WARRANT ANY CONTINUING FUNCTIONALITY IN THE SDK AND SHALL HAVE NO LIABILITY HEREUNDER FOR ANY FAILURE OF ANY FUNCTIONALITY IN THE SDK WHICH REQUIRES YOU TO UPDATE INTEGRATION OF THE SDK INTO YOUR AUTHORIZED APPLICATION. 
 
-      "Derivative Works" shall mean any work, whether in Source or Object
-      form, that is based on (or derived from) the Work and for which the
-      editorial revisions, annotations, elaborations, or other modifications
-      represent, as a whole, an original work of authorship. For the purposes
-      of this License, Derivative Works shall not include works that remain
-      separable from, or merely link (or bind by name) to the interfaces of,
-      the Work and Derivative Works thereof.
+7	ENTIRE AGREEMENT. This Agreement, as amended from time to time, together with your Master Preferabli Agreement, represent the entire agreement with respect to the SDK. In the case of a conflict between this Agreement and the Master Preferabli Agreement, the terms of this Agreement shall control.  
 
-      "Contribution" shall mean any work of authorship, including
-      the original version of the Work and any modifications or additions
-      to that Work or Derivative Works thereof, that is intentionally
-      submitted to Licensor for inclusion in the Work by the copyright owner
-      or by an individual or Legal Entity authorized to submit on behalf of
-      the copyright owner. For the purposes of this definition, "submitted"
-      means any form of electronic, verbal, or written communication sent
-      to the Licensor or its representatives, including but not limited to
-      communication on electronic mailing lists, source code control systems,
-      and issue tracking systems that are managed by, or on behalf of, the
-      Licensor for the purpose of discussing and improving the Work, but
-      excluding communication that is conspicuously marked or otherwise
-      designated in writing by the copyright owner as "Not a Contribution."
+8	CONTROLLING LAW. This Agreement shall be governed by, and construed in accordance with, the laws of the State of Delaware, without giving effect to its conflict of law rules.
 
-      "Contributor" shall mean Licensor and any individual or Legal Entity
-      on behalf of whom a Contribution has been received by Licensor and
-      subsequently incorporated within the Work.
+9	LIMITATION ON AND EXCLUSION OF REMEDIES AND DAMAGES. YOU CAN RECOVER FROM PREFERABLI AND ITS SUPPLIERS ONLY DIRECT DAMAGES UP TO U.S. $5.00. YOU CANNOT RECOVER ANY OTHER DAMAGES, INCLUDING CONSEQUENTIAL, LOST PROFITS, SPECIAL, INDIRECT OR INCIDENTAL DAMAGES. THIS LIMITATION APPLIES TO ANYTHING, WHETHER PREFERABLI KNEW OR SHOULD HAVE KNOWN ABOUT THE POSSIBILITY OF THE DAMAGES, RELATED TO THE SDK AND/OR CLAIMS FOR BREACH OF CONTRACT, BREACH OF WARRANTY, GUARANTEE OR CONDITION, STRICT LIABILITY, NEGLIGENCE, OR OTHER TORT TO THE EXTENT PERMITTED BY APPLICABLE LAW. 
 
-   2. Grant of Copyright License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      copyright license to reproduce, prepare Derivative Works of,
-      publicly display, publicly perform, sublicense, and distribute the
-      Work and such Derivative Works in Source or Object form.
+10	TERMINATION. Preferabli may immediately terminate this Agreement upon written notice if you breach any of your obligations or any license provision herein.  Licensee may terminate its rights under this Agreement at any time upon written notice to Preferabli. This Agreement shall immediately terminate upon termination of the Master Preferabli Agreement.  Any accrued payment obligations to Preferabli (whether under the Master Preferabli Agreement or otherwise), the provisions of Sections 2, 5, 6, 7, 8, 9, 10 and 11, and any cause of action for breach of this Agreement prior to termination, shall survive any expiration or termination of this Agreement.
 
-   3. Grant of Patent License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      (except as stated in this section) patent license to make, have made,
-      use, offer to sell, sell, import, and otherwise transfer the Work,
-      where such license applies only to those patent claims licensable
-      by such Contributor that are necessarily infringed by their
-      Contribution(s) alone or by combination of their Contribution(s)
-      with the Work to which such Contribution(s) was submitted. If You
-      institute patent litigation against any entity (including a
-      cross-claim or counterclaim in a lawsuit) alleging that the Work
-      or a Contribution incorporated within the Work constitutes direct
-      or contributory patent infringement, then any patent licenses
-      granted to You under this License for that Work shall terminate
-      as of the date such litigation is filed.
+11	GENERAL
 
-   4. Redistribution. You may reproduce and distribute copies of the
-      Work or Derivative Works thereof in any medium, with or without
-      modifications, and in Source or Object form, provided that You
-      meet the following conditions:
+11.1	ASSIGNMENT. This Agreement shall be binding and shall inure to the benefit of the parties hereto and their respective successors and permitted assigns. Neither this Agreement nor the licenses granted herein are transferable by Licensee without the prior written consent of Preferabli, which consent shall not be unreasonably withheld, and any attempt to do so shall be void and of no force and effect.  For the avoidance of any doubt and not by way of limitation, in addition to any other reasons reasonably applicable, Licensee acknowledges and agrees that it is reasonable for Preferabli to withhold consent if an assignment by Licensee (i) is to a competitor of Preferabli; (ii) is to a former licensee terminated by Preferabli; and/or (iii) would materially alter the circumstances or scope of the license or the Master Preferabli Agreement such that different pricing terms may be applicable.
 
-      (a) You must give any other recipients of the Work or
-          Derivative Works a copy of this License; and
+11.2	NOTICES AND REQUESTS. Except as set forth otherwise herein, all notices, requests and other communications hereunder shall be in writing and shall be delivered in person or sent by nationally recognized overnight courier service or by facsimile transmission (with confirmation of receipt) to the address or facsimile number designated in writing by the receiving party. Unless otherwise provided, notice shall be effective on the date it is officially recorded as delivered, as evidenced by delivery receipt or equivalent.
 
-      (b) You must cause any modified files to carry prominent notices
-          stating that You changed the files; and
+11.3	RELATIONSHIP OF THE PARTIES. Nothing in this Agreement will be construed to constitute either party as the agent, employee or representative of the other party and no joint venture or partnership will be created hereby. Neither party will make or have the power or authority to act for, bind or otherwise create or assume any obligation on behalf of the other party for any purpose whatsoever.
 
-      (c) You must retain, in the Source form of any Derivative Works
-          that You distribute, all copyright, patent, trademark, and
-          attribution notices from the Source form of the Work,
-          excluding those notices that do not pertain to any part of
-          the Derivative Works; and
+11.4	AMENDMENT AND WAIVER.  Except as set forth below, (i) no amendment, change, waiver or discharge hereof shall be valid unless in writing and signed by both parties, (ii) any waiver or consent by either party to any variation from any provision of this Agreement shall be valid only in the specific instance in which it is given, and (iii) no such waiver or consent shall be construed as a waiver of any other provision of this Agreement or with respect to any similar instance or circumstance.  Notwithstanding the foregoing, Preferabli may change the SDK (and this Agreement as it applies to such changed SDK) from time to time by posting such amended SDK to any code repository utilized by Preferabli; provided however, that Preferabli shall use commercially reasonable efforts to provide advance notice to you of the posting of a revised SDK (such notice may be via general posting to Preferabli's website or email to your point of contact under the Master Preferabli Agreement).  You understand and agree that the failure to install an update to the SDK in your Authorized Application may impact the ongoing functionality of the SDK.   
 
-      (d) If the Work includes a "NOTICE" text file as part of its
-          distribution, then any Derivative Works that You distribute must
-          include a readable copy of the attribution notices contained
-          within such NOTICE file, excluding those notices that do not
-          pertain to any part of the Derivative Works, in at least one
-          of the following places: within a NOTICE text file distributed
-          as part of the Derivative Works; within the Source form or
-          documentation, if provided along with the Derivative Works; or,
-          within a display generated by the Derivative Works, if and
-          wherever such third-party notices normally appear. The contents
-          of the NOTICE file are for informational purposes only and
-          do not modify the License. You may add Your own attribution
-          notices within Derivative Works that You distribute, alongside
-          or as an addendum to the NOTICE text from the Work, provided
-          that such additional attribution notices cannot be construed
-          as modifying the License.
-
-      You may add Your own copyright statement to Your modifications and
-      may provide additional or different license terms and conditions
-      for use, reproduction, or distribution of Your modifications, or
-      for any such Derivative Works as a whole, provided Your use,
-      reproduction, and distribution of the Work otherwise complies with
-      the conditions stated in this License.
-
-   5. Submission of Contributions. Unless You explicitly state otherwise,
-      any Contribution intentionally submitted for inclusion in the Work
-      by You to the Licensor shall be under the terms and conditions of
-      this License, without any additional terms or conditions.
-      Notwithstanding the above, nothing herein shall supersede or modify
-      the terms of any separate license agreement you may have executed
-      with Licensor regarding such Contributions.
-
-   6. Trademarks. This License does not grant permission to use the trade
-      names, trademarks, service marks, or product names of the Licensor,
-      except as required for reasonable and customary use in describing the
-      origin of the Work and reproducing the content of the NOTICE file.
-
-   7. Disclaimer of Warranty. Unless required by applicable law or
-      agreed to in writing, Licensor provides the Work (and each
-      Contributor provides its Contributions) on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-      implied, including, without limitation, any warranties or conditions
-      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
-      PARTICULAR PURPOSE. You are solely responsible for determining the
-      appropriateness of using or redistributing the Work and assume any
-      risks associated with Your exercise of permissions under this License.
-
-   8. Limitation of Liability. In no event and under no legal theory,
-      whether in tort (including negligence), contract, or otherwise,
-      unless required by applicable law (such as deliberate and grossly
-      negligent acts) or agreed to in writing, shall any Contributor be
-      liable to You for damages, including any direct, indirect, special,
-      incidental, or consequential damages of any character arising as a
-      result of this License or out of the use or inability to use the
-      Work (including but not limited to damages for loss of goodwill,
-      work stoppage, computer failure or malfunction, or any and all
-      other commercial damages or losses), even if such Contributor
-      has been advised of the possibility of such damages.
-
-   9. Accepting Warranty or Additional Liability. While redistributing
-      the Work or Derivative Works thereof, You may choose to offer,
-      and charge a fee for, acceptance of support, warranty, indemnity,
-      or other liability obligations and/or rights consistent with this
-      License. However, in accepting such obligations, You may act only
-      on Your own behalf and on Your sole responsibility, not on behalf
-      of any other Contributor, and only if You agree to indemnify,
-      defend, and hold each Contributor harmless for any liability
-      incurred by, or claims asserted against, such Contributor by reason
-      of your accepting any such warranty or additional liability.
-
-   END OF TERMS AND CONDITIONS
+11.5	SAVINGS CLAUSE. In the event any provision of this Agreement, or the application thereof, becomes or is declared by a tribunal of competent jurisdiction to be illegal, void or unenforceable, that provision shall be limited, eliminated or modified to achieve, to the maximum extent possible, the economic, business and other purposes of the original provision, and the remainder of this Agreement will continue in full force and effect.
