@@ -128,7 +128,7 @@ public class Preferabli {
     /// Will let you know if a customer is logged in or not.
     /// - Returns: bool
     static public func isCustomerLoggedIn() -> Bool {
-        return PreferabliTools.isCustomerLoggedIn()
+            return PreferabliTools.isCustomerLoggedIn()
     }
     
     /// Will get you the collection id of your integration's primary inventory.
@@ -535,7 +535,6 @@ public class Preferabli {
                     variant.id = tagDictionary["variant_id"] as! NSNumber
                     variant.price = tagDictionary["price"] as! Double
                     variant.num_dollar_signs = tagDictionary["num_dollar_signs"] as! NSNumber
-                    variant.id = tagDictionary["variant_id"] as! NSNumber
                     variant.product = product
                     
                     productsToReturn.append(Product.init(product: product))

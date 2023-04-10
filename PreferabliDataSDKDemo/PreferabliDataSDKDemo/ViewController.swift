@@ -27,7 +27,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     var picker2 : UIPickerView!
     var toolBar : UIToolbar!
     let pickerOptions = ["Search", "Label Rec", "Guided Rec", "Where To Buy", "Like That, Try This"]
-    let pickerOptions2 = ["Rate Product", "Wishlist Product", "Get Profile", "Get Foods", "Get Recs", "Get Rated Products", "Get Wishlisted Products", "Get Purchased Products"]
+    let pickerOptions2 = ["Rate Product", "Wishlist Product", "Get Profile", "Get Recs", "Get Foods", "Get Rated Products", "Get Wishlisted Products", "Get Purchased Products"]
     var items = Array<String>()
     var products = Array<Product>()
     
@@ -65,8 +65,9 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
             password.isHidden = customer
             email.placeholder = customer ? "Customer ID (Email or Phone)" : "Preferabli User Email"
             loginButton.setTitle("SUBMIT", for: .normal)
-            firstLabel.text = "To unlock additional actions, create / link a customer or signup / login an existing Preferabli user..."
-            customerButton.setTitle(customer ? "Create / Link a Customer" : "Preferabli User Login", for: .normal)
+            firstLabel.text = "To unlock additional actions, link a customer or login an existing Preferabli user..."
+            customerButton.setTitle(customer ? "Link a Customer" : "Preferabli User Login", for: .normal)
+            customerButton.isHidden = false
             authenticatedButton.isHidden = true
         }
     }
@@ -213,6 +214,9 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
             let passwordString = password.text ?? ""
             
             Preferabli.main.loginPreferabliUser(email: emailString, password: passwordString) { user in
+                self.products.removeAll()
+                self.items = ["Preferabli User logged in.", "Display Name: " + (user.display_name ?? "")]
+                self.tableView.reloadData()
                 self.hideLoadingView()
                 self.handleViews()
             } onFailure: { error in
