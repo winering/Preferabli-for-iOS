@@ -779,18 +779,18 @@ public class Preferabli {
         PreferabliTools.getKeyStore().set(true, forKey: "hasLoaded" + (tag_type ?? "AllCustomerTags"))
     }
     
-    /// Get all the questions and choices needed to run a Guided Rec. Present the quiz to the user, then pass the answers to ``Preferabli/getGuidedRecResults(selected_choice_ids:price_min:price_max:collection_id:include_merchant_links:onCompletion:onFailure:)`` to get results.
+    /// Get all the questions and choices needed to run a Guided Rec. Present the questions to the user, then pass the answers to ``Preferabli/getGuidedRecResults(guided_rec_id:selected_choice_ids:price_min:price_max:collection_id:include_merchant_links:onCompletion:onFailure:)`` to get results.
     /// - Parameters:
-    ///   - guided_rec_id:  id of the Guided Rec you wish to run. Defaults to the Preferabli standard wine based Guided Rec. See ``GuidedRec`` for other default Guided Rec options. Defaults to ``GuidedRec/WINE_DEFAULT``.
+    ///   - guided_rec_id: id of the Guided Rec you wish to run. See ``GuidedRec`` for all the default Guided Rec options. Defaults to ``GuidedRec/WINE_DEFAULT``.
     ///   - onCompletion: returns ``GuidedRec`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func getGuidedRec(guided_rec_id: Int = GuidedRec.WINE_DEFAULT, onCompletion: @escaping (GuidedRec) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func getGuidedRec(guided_rec_id: NSNumber = GuidedRec.WINE_DEFAULT, onCompletion: @escaping (GuidedRec) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
             self.getGuidedRecActual(guided_rec_id: guided_rec_id, onCompletion: onCompletion, onFailure: onFailure)
         })
     }
     
-    private func getGuidedRecActual(guided_rec_id: Int, onCompletion: @escaping (GuidedRec) -> (), onFailure: @escaping (PreferabliException) -> ()) {
+    private func getGuidedRecActual(guided_rec_id: NSNumber, onCompletion: @escaping (GuidedRec) -> (), onFailure: @escaping (PreferabliException) -> ()) {
         do {
             try canWeContinue(needsToBeLoggedIn: false)
             
@@ -812,6 +812,7 @@ public class Preferabli {
     
     /// Get Guided Rec results based on the selected ``GuidedRecChoice``.
     /// - Parameters:
+    ///   - guided_rec_id: id of the Guided Rec you wish to run.
     ///   - selected_choice_ids: an array of selected ``GuidedRecChoice`` ids.
     ///   - price_min: pass if you want to lock results to a minimum price. Defaults to *nil*.
     ///   - price_max: pass if you want to lock results to a maximum price. Defaults to *nil*.
@@ -819,13 +820,13 @@ public class Preferabli {
     ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` that connect Preferabli products to your own. Defaults to *true*.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func getGuidedRecResults(selected_choice_ids : Array<NSNumber>, price_min : Int? = nil, price_max : Int? = nil, collection_id : NSNumber? = Preferabli.getPrimaryInventoryId(), include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func getGuidedRecResults(guided_rec_id: NSNumber, selected_choice_ids : Array<NSNumber>, price_min : Int? = nil, price_max : Int? = nil, collection_id : NSNumber? = Preferabli.getPrimaryInventoryId(), include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
-            self.getGuidedRecResultsActual(selected_choice_ids: selected_choice_ids, price_min: price_min, price_max: price_max, collection_id: collection_id, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
+            self.getGuidedRecResultsActual(guided_rec_id: guided_rec_id, selected_choice_ids: selected_choice_ids, price_min: price_min, price_max: price_max, collection_id: collection_id, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
         })
     }
     
-    private func getGuidedRecResultsActual(selected_choice_ids : Array<NSNumber>, price_min : Int?, price_max : Int?, collection_id : NSNumber?, include_merchant_links: Bool, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    private func getGuidedRecResultsActual(guided_rec_id: NSNumber, selected_choice_ids : Array<NSNumber>, price_min : Int?, price_max : Int?, collection_id : NSNumber?, include_merchant_links: Bool, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         do {
             try canWeContinue(needsToBeLoggedIn: false)
             
@@ -834,7 +835,7 @@ public class Preferabli {
             var dictionary = [String : Any]()
             dictionary["limit"] = 8
             dictionary["sort_by"] = "preference"
-            dictionary["questionnaire_id"] = 1
+            dictionary["questionnaire_id"] = guided_rec_id
             dictionary["offset"] = 0
             dictionary["questionnaire_choice_ids"] = selected_choice_ids
             
@@ -858,7 +859,7 @@ public class Preferabli {
             let context = NSManagedObjectContext.mr_()
             context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
             
-            var recResponse = try Preferabli.api.getAlamo().post(collection_id == nil ? APIEndpoints.guidedRecResults() : APIEndpoints.guidedRecResults(id: collection_id!.intValue), json: dictionary)
+            var recResponse = try Preferabli.api.getAlamo().post(collection_id == nil ? APIEndpoints.guidedRecResults() : APIEndpoints.guidedRecResults(id: collection_id!), json: dictionary)
             recResponse = try PreferabliTools.continueOrThrowPreferabliException(response: recResponse)
             let recDictionary = try PreferabliTools.continueOrThrowJSONException(data: recResponse.data!) as! [String : Any]
             let types = recDictionary["types"] as! Array<[String : Any]>

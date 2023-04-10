@@ -133,7 +133,7 @@ internal struct APIEndpoints {
         return baseUrl + "channels/\(id)/customers/\(customerId)"
     }
 
-    internal static func guidedRec(id : Int) -> String {
+    internal static func guidedRec(id : NSNumber) -> String {
         return baseUrl + "questionnaire/\(id)"
     }
     
@@ -141,7 +141,7 @@ internal struct APIEndpoints {
         return baseUrl + "query"
     }
     
-    internal static func guidedRecResults(id : Int) -> String {
+    internal static func guidedRecResults(id : NSNumber) -> String {
         return baseUrl + "query?override_collection_ids[]=\(id)"
     }
     
