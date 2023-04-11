@@ -59,10 +59,14 @@ public class PreferabliUser : BaseObject {
         PreferabliTools.setUserProperties(user: self)
     }
     
-    /// Get the path to the user's avatar.
-    /// - Returns: a string path.
-    public func getImage() -> String {
-        return avatar?.path ?? ""
+    /// Get the user's avatar.
+    /// - Parameters:
+    ///   - width: returns an image with the specified width in pixels.
+    ///   - height: returns an image with the specified height in pixels.
+    ///   - quality: returns an image with the specified quality. Scales from 0 - 100.
+    /// - Returns: the URL of the requested image.
+    public func getImage(width : CGFloat, height : CGFloat, quality : Int = 80) -> URL? {
+        return PreferabliTools.getImageUrl(image: avatar?.path, width: width, height: height, quality: quality)
     }
     
     /// Is the user an admin?

@@ -1,4 +1,4 @@
-![Preferabli logo](https://s3.amazonaws.com/winering-production/1ba338a299a0f489e9ceee6bc61bcac4)
+![Preferabli logo](https://s3.amazonaws.com/winering-production/d28520ba508d1031df8e5458fd6bc224)
 
 ## Overview
 

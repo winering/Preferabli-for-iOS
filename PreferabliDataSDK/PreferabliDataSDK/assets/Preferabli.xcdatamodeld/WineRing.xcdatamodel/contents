@@ -6,6 +6,7 @@
         <attribute name="badge_method" optional="YES" attributeType="String"/>
         <attribute name="channel_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="code" optional="YES" attributeType="String"/>
+        <attribute name="created_at" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="currency" optional="YES" attributeType="String"/>
         <attribute name="desc" optional="YES" attributeType="String">
             <userInfo>
@@ -320,33 +321,6 @@
             <entry key="relatedByAttribute" value="id"/>
         </userInfo>
     </entity>
-    <entity name="CoreData_PreferenceStyle" representedClassName="CoreData_PreferenceStyle" syncable="YES">
-        <attribute name="conflict" optional="YES" attributeType="Boolean" usesScalarValueType="NO"/>
-        <attribute name="created_at" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="keywords" optional="YES" attributeType="String"/>
-        <attribute name="order_profile" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO"/>
-        <attribute name="order_recommend" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO"/>
-        <attribute name="rating" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="recommend" optional="YES" attributeType="Boolean" usesScalarValueType="NO"/>
-        <attribute name="refine" optional="YES" attributeType="Boolean" usesScalarValueType="NO"/>
-        <attribute name="strength" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="style_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="profile" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CoreData_Profile" inverseName="preference_styles" inverseEntity="CoreData_Profile"/>
-        <relationship name="style" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="CoreData_Style" inverseName="preference_style" inverseEntity="CoreData_Style">
-            <userInfo>
-                <entry key="relatedByAttribute" value="id"/>
-            </userInfo>
-        </relationship>
-        <uniquenessConstraints>
-            <uniquenessConstraint>
-                <constraint value="id"/>
-            </uniquenessConstraint>
-        </uniquenessConstraints>
-        <userInfo>
-            <entry key="relatedByAttribute" value="id"/>
-        </userInfo>
-    </entity>
     <entity name="CoreData_Product" representedClassName="CoreData_Product" syncable="YES">
         <attribute name="back_image" optional="YES" attributeType="Binary"/>
         <attribute name="brand" optional="YES" attributeType="String"/>
@@ -407,7 +381,35 @@
                 <entry key="relatedByAttribute" value="id"/>
             </userInfo>
         </relationship>
-        <relationship name="preference_styles" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CoreData_PreferenceStyle" inverseName="profile" inverseEntity="CoreData_PreferenceStyle">
+        <relationship name="preference_styles" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CoreData_ProfileStyle" inverseName="profile" inverseEntity="CoreData_ProfileStyle">
+            <userInfo>
+                <entry key="relatedByAttribute" value="id"/>
+            </userInfo>
+        </relationship>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+        <userInfo>
+            <entry key="relatedByAttribute" value="id"/>
+        </userInfo>
+    </entity>
+    <entity name="CoreData_ProfileStyle" representedClassName="CoreData_ProfileStyle" syncable="YES">
+        <attribute name="conflict" optional="YES" attributeType="Boolean" usesScalarValueType="NO"/>
+        <attribute name="created_at" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="keywords" optional="YES" attributeType="String"/>
+        <attribute name="order_profile" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO"/>
+        <attribute name="order_recommend" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO"/>
+        <attribute name="rating" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="recommend" optional="YES" attributeType="Boolean" usesScalarValueType="NO"/>
+        <attribute name="refine" optional="YES" attributeType="Boolean" usesScalarValueType="NO"/>
+        <attribute name="strength" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="style_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="updated_at" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="profile" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CoreData_Profile" inverseName="preference_styles" inverseEntity="CoreData_Profile"/>
+        <relationship name="style" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="CoreData_Style" inverseName="profile_style" inverseEntity="CoreData_Style">
             <userInfo>
                 <entry key="relatedByAttribute" value="id"/>
             </userInfo>
@@ -453,7 +455,7 @@
                 <entry key="relatedByAttribute" value="id"/>
             </userInfo>
         </relationship>
-        <relationship name="preference_style" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CoreData_PreferenceStyle" inverseName="style" inverseEntity="CoreData_PreferenceStyle">
+        <relationship name="profile_style" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CoreData_ProfileStyle" inverseName="style" inverseEntity="CoreData_ProfileStyle">
             <userInfo>
                 <entry key="relatedByAttribute" value="id"/>
             </userInfo>

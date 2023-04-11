@@ -11,7 +11,7 @@ To begin installation you will need CocoaPods. CocoaPods is a dependency manager
 To integrate the SDK into your Xcode project using CocoaPods, specify it in your Podfile:
 
 ```
-pod 'PreferabliDataSDK'
+pod 'PreferabliDataSDK', :git => 'https://github.com/winering/Preferabli-for-iOS.git'
 ```
 
 ## Step 3. Initialize the SDK.

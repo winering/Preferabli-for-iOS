@@ -95,11 +95,14 @@ public class Collection : BaseObject {
         }
     }
     
-    
-    /// Get the collection's primary image.
-    /// - Returns: the image location as a string.
-    public func getImage() -> String {
-        return primary_image?.path ?? ""
+    /// Get the collection image.
+    /// - Parameters:
+    ///   - width: returns an image with the specified width in pixels.
+    ///   - height: returns an image with the specified height in pixels.
+    ///   - quality: returns an image with the specified quality. Scales from 0 - 100.
+    /// - Returns: the URL of the requested image.
+    public func getImage(width : CGFloat, height : CGFloat, quality : Int = 80) -> URL? {
+        return PreferabliTools.getImageUrl(image: primary_image?.path, width: width, height: height, quality: quality)
     }
     
     /// Get the start date of the collection. Start dates are useful for collections of type Event.

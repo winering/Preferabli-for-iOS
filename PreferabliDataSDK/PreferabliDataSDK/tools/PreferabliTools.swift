@@ -29,7 +29,7 @@ internal class PreferabliTools {
     private static let apiOperationQueue = OperationQueue()
         
     internal class func isLoggedOutOrLoggingOut() -> Bool {
-        return loggingOut || (!isUserLoggedIn() && !isCustomerLoggedIn())
+        return loggingOut || (!isPreferabliUserLoggedIn() && !isCustomerLoggedIn())
     }
     
     internal class func startNewWorkThread(_ block: @escaping @convention(block) () -> Void, priority : Operation.QueuePriority) {
@@ -126,7 +126,7 @@ internal class PreferabliTools {
             return response
         } else if (response.response != nil && response.data != nil) {
             if (response.response!.statusCode == 401) {
-                let parameters = ["user_id": getUserId(), "token_refresh" : PreferabliTools.getKeyStore().string(forKey: "refresh_token") ?? ""] as [String : Any]
+                let parameters = ["user_id": getPreferabliUserId(), "token_refresh" : PreferabliTools.getKeyStore().string(forKey: "refresh_token") ?? ""] as [String : Any]
                 do {
                     let sessionResponse = try Preferabli.api.getAlamo().post(APIEndpoints.postSession, jsonObject: parameters)
                     if (sessionResponse.error == nil && sessionResponse.response != nil && sessionResponse.response!.statusCode < 400) {
@@ -229,7 +229,7 @@ internal class PreferabliTools {
     }
     
     internal class func addSDKProperties() {
-        let id = PreferabliTools.isUserLoggedIn() ? PreferabliTools.getUserId() : PreferabliTools.getCustomerId()
+        let id = PreferabliTools.isPreferabliUserLoggedIn() ? PreferabliTools.getPreferabliUserId() : PreferabliTools.getCustomerId()
         let email = PreferabliTools.getKeyStore().object(forKey: "email") as? String
         let phone = PreferabliTools.getKeyStore().object(forKey: "phone") as? String
         let display_name = PreferabliTools.getKeyStore().object(forKey: "displayName") as? String
@@ -237,7 +237,7 @@ internal class PreferabliTools {
         
         if (id.intValue != 0) {
             Mixpanel.mainInstance().identify(distinctId: id.stringValue)
-            Mixpanel.mainInstance().people.set(properties: [(PreferabliTools.isUserLoggedIn() ? "user_id" : "customer_id") : id, "is_team_ringit" : isTeamRingIt])
+            Mixpanel.mainInstance().people.set(properties: [(PreferabliTools.isPreferabliUserLoggedIn() ? "user_id" : "customer_id") : id, "is_team_ringit" : isTeamRingIt])
             
             if (!PreferabliTools.isNullOrWhitespace(string: email)) {
                 Mixpanel.mainInstance().people.set(properties: ["$email": email!])
@@ -265,7 +265,7 @@ internal class PreferabliTools {
         return Int(distanceInMiles)
     }
     
-    internal class func getUserId() -> NSNumber {
+    internal class func getPreferabliUserId() -> NSNumber {
         return NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "user_id"))
     }
     
@@ -293,11 +293,6 @@ internal class PreferabliTools {
         PreferabliTools.getKeyStore().set(user.fname, forKey: "firstName")
         PreferabliTools.getKeyStore().set(user.lname, forKey: "lastName")
         PreferabliTools.getKeyStore().set(user.display_name, forKey: "displayName")
-        var displayNameShort = user.display_name
-        if (!PreferabliTools.isNullOrWhitespace(string: user.fname)) {
-            displayNameShort = user.fname
-        }
-        PreferabliTools.getKeyStore().set(displayNameShort, forKey: "displayNameShort")
         PreferabliTools.getKeyStore().set(user.account_level, forKey: "accountLevel")
         PreferabliTools.getKeyStore().set(user.birthyear, forKey: "birthYear")
         PreferabliTools.getKeyStore().set(user.country, forKey: "country")
@@ -477,9 +472,9 @@ internal class PreferabliTools {
         return symbol
     }
     
-    internal class func isUserLoggedIn() -> Bool {
+    internal class func isPreferabliUserLoggedIn() -> Bool {
         let accessToken = PreferabliTools.getKeyStore().string(forKey: "access_token")
-        let userId = getUserId()
+        let userId = getPreferabliUserId()
         return accessToken != nil && userId != 0
     }
     
@@ -556,14 +551,6 @@ internal class PreferabliTools {
         }
     }
     
-    internal class func getIntegrationId() -> NSNumber {
-        return NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "INTEGRATION_ID"))
-    }
-    
-    internal class func getChannelId() -> NSNumber {
-        return NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "CHANNEL_ID"))
-    }
-    
     internal class func alphaSortIgnoreThe(x : String, y : String) -> Bool {
         return alphaSortIgnoreThe(x: x, y: y, comparisonResult: ComparisonResult.orderedAscending)
     }
@@ -600,7 +587,7 @@ internal class PreferabliTools {
         clearDatabase()
                 
         // going to do this on the main thread since it shouldn't take long
-        if (isUserLoggedIn()) {
+        if (isPreferabliUserLoggedIn()) {
             let context = NSManagedObjectContext.mr_default()
             _ = createUserFromUserDefaults(context: context)
             context.mr_saveToPersistentStoreAndWait()
@@ -634,5 +621,34 @@ internal class PreferabliTools {
     
     internal class func sortStringsByLength(list: [String]) -> [String] {
         return list.sorted(by: { $0.count < $1.count })
+    }
+    
+    internal class func getImageUrl(image : String?, width : CGFloat, height : CGFloat, quality : Int) -> URL? {
+        if (isNullOrWhitespace(string: image)) {
+            return nil
+        }
+        
+        var image = image!
+        if (image.contains("placeholder")) {
+            return nil
+        } else if (image.contains("winering.com")) {
+            return URL.init(string: image)
+        } else if (image.contains("s3.amazonaws.com/winering-production")) {
+            let index = image.range(of: "/", options: .backwards, range: nil, locale: nil)!.upperBound
+            if (image.containsIgnoreCase("/avatars")) {
+                image = "avatars/" + image.substring(from: index)
+            } else {
+                image = image.substring(from: index)
+            }
+        } else {
+            return URL.init(string: image)
+        }
+        
+        let cloudfrontAppId = "ios_sdk/fit-in/"
+        let sizeString = String(Int(width * UIScreen.main.scale)) + "x" + String(Int(height * UIScreen.main.scale)) + "/"
+        let qualityString = "filters:quality(" + String(quality) + ")/"
+        let pngString = image.containsIgnoreCase("png") ? "filters:format(png)/"  : ""
+        var cloudFrontURL = "https://dxlu3le4zp2pd.cloudfront.net/wineringlabel/" + cloudfrontAppId + sizeString + qualityString + pngString + image
+        return URL.init(string: cloudFrontURL)
     }
 }

@@ -12,7 +12,7 @@ import Foundation
 public class GuidedRec : BaseObject {
     
     /// The default wine quiz.
-    public static let WINE_DEFAULT = 1
+    public static let WINE_DEFAULT : NSNumber = 1
     
     public var name : String?
     public var default_currency : String?
