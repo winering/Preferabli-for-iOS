@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 import UIKit
 
-/// A group of products.
+/// A Collection is a selection of Products, organized into one or more groupings.  For example, a Collection can represent an inventory for a store or just a subset, such as selection of wines that are currently on sale.
 public class Collection : BaseObject {
     
     public var channel_id: NSNumber?

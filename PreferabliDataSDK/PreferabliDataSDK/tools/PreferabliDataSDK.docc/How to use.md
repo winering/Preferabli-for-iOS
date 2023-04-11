@@ -1,6 +1,6 @@
 # How to use
 
-After installation, continue on here for information on how to use the SDK.
+After <doc:Installation> of the SDK, read the following to familiarize yourself with how to use the SDK.
 
 ## Overview
 
@@ -12,9 +12,9 @@ Grab the instance ``Preferabli/main`` to get started. This will unlock all of Pr
 Preferabli.main.logout()
 ```
 
-By default, when the SDK is initialized an anonymous session is created. This anonymous session allows immediate access to any of the <doc:How-to-use#Unauthenticated-Actions>. These functions *do not* return personalized results.
+By default, when the SDK is initialized, an anonymous session is created. This anonymous session allows immediate access to any of the <doc:How-to-use#Unauthenticated-Actions>. These functions *do not* return personalized results that are based on a customer's ``Profile``.
 
-You do not need to authenticate a user to use the SDK. However, once a user is authenticated, you are able to unlock several user centric functions.
+You do not need to authenticate a user to use the SDK. However, once a user is authenticated, you are able to unlock several user-centric functions.
 
 The SDK supports two different types of users:
 
