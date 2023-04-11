@@ -12,19 +12,19 @@ Grab the instance ``Preferabli/main`` to get started. This will unlock all of Pr
 Preferabli.main.logout()
 ```
 
-By default, when the SDK is initialized, an anonymous session is created. This anonymous session allows immediate access to any of the <doc:How-to-use#Unauthenticated-Actions>. These functions *do not* return personalized results that are based on a customer's ``Profile``.
+By default, when the SDK is initialized, an anonymous session is created. This anonymous session allows immediate access to any of the <doc:How-to-Use#Unauthenticated-Actions>. These functions *do not* return personalized results that are based on a customer's ``Profile``.
 
 You do not need to authenticate a user to use the SDK. However, once a user is authenticated, you are able to unlock several user-centric functions.
 
 The SDK supports two different types of users:
 
-- ``Customer``: authenticate your customers as you usually do, then pass us their identifier (usually email or phone) and the verification hash provided by your API. See <doc:How-to-use#Customer-Management>.
+- ``Customer``: authenticate your customers as you usually do, then pass us their identifier (usually email or phone) and the verification hash provided by your API. See <doc:How-to-Use#Customer-Management>.
 
-- ``PreferabliUser``: pass us a user's Preferabli account email / password and we handle the authentication process. See <doc:How-to-use#Preferabli-User-Management>.
+- ``PreferabliUser``: pass us a user's Preferabli account email / password and we handle the authentication process. See <doc:How-to-Use#Preferabli-User-Management>.
 
-Once a user is authenticated, you can immediately start using any of <doc:How-to-use#Authenticated-Actions>. These functions return personalized results for your user.
+Once a user is authenticated, you can immediately start using any of <doc:How-to-Use#Authenticated-Actions>. These functions return personalized results for your ``Customer``.
 
-Please note that once a user has been identified, that user persists across sessions until you call ``Preferabli/logout(onCompletion:onFailure:)``.
+Please note that once a user has been authenticated as a ``Customer``, that ``Customer`` state persists across sessions until you call ``Preferabli/logout(onCompletion:onFailure:)``.
 
 All of our functions are thread safe and return results through a completion block:
 
