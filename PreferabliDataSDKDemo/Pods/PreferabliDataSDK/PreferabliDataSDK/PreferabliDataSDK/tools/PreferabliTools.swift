@@ -19,6 +19,7 @@ import Contacts
 import Photos
 import Mixpanel
 
+/// Contains lots of helper methods for private use within Preferabli's projects.
 internal class PreferabliTools {
     
     private static let logoutDispatchGroup = DispatchGroup()
@@ -28,7 +29,7 @@ internal class PreferabliTools {
     private static let apiOperationQueue = OperationQueue()
         
     internal class func isLoggedOutOrLoggingOut() -> Bool {
-        return loggingOut || (!isUserLoggedIn() && !isCustomerLoggedIn())
+        return loggingOut || (!isPreferabliUserLoggedIn() && !isCustomerLoggedIn())
     }
     
     internal class func startNewWorkThread(_ block: @escaping @convention(block) () -> Void, priority : Operation.QueuePriority) {
@@ -63,20 +64,6 @@ internal class PreferabliTools {
         apiOperationQueue.addOperation(operation)
     }
     
-    internal class func saveImportEtag(response : DataResponse<Data>, importId : NSNumber) {
-        if (response.response != nil) {
-            let headers = response.response!.allHeaderFields
-            if (!PreferabliTools.isNullOrWhitespace(string: headers["import_etag"] as? String)) {
-                var importEtags = PreferabliTools.getKeyStore().stringArray(forKey: "import_etags_" + importId.stringValue) ?? Array<String>()
-                if (!importEtags.contains(headers["import_etag"] as! String)) {
-                    importEtags.append(headers["import_etag"] as! String)
-                    PreferabliTools.getKeyStore().set(importEtags, forKey: "import_etags_" + importId.stringValue)
-                    PreferabliTools.getKeyStore().set(headers["import_etag"], forKey: "import_etag_" + importId.stringValue)
-                }
-            }
-        }
-    }
-    
     internal class func saveCollectionEtag(response : DataResponse<Data>, collectionId : NSNumber) {
         if (response.response != nil) {
             let headers = response.response!.allHeaderFields
@@ -94,7 +81,7 @@ internal class PreferabliTools {
         if (response.response != nil && PreferabliTools.getKeyStore().bool(forKey: "hasLoaded" + collectionId.stringValue)) {
             let headers = response.response!.allHeaderFields
             if (!isNullOrWhitespace(string: headers["collection_etag"] as? String)) {
-                var collectionEtags = PreferabliTools.getKeyStore().stringArray(forKey: "collection_etags_" + collectionId.stringValue) ?? Array<String>()
+                let collectionEtags = PreferabliTools.getKeyStore().stringArray(forKey: "collection_etags_" + collectionId.stringValue) ?? Array<String>()
                 if (collectionEtags.contains(headers["collection_etag"] as! String)) {
                     return true
                 }
@@ -102,14 +89,6 @@ internal class PreferabliTools {
         }
         
         return false
-    }
-    
-    internal class func getPriceFromCount(num_dollar_signs : Int) -> String {
-        var dollarSigns = ""
-        for _ in (0..<num_dollar_signs){
-            dollarSigns = dollarSigns + "$"
-        }
-        return dollarSigns
     }
     
     internal class func getTimezoneWithOffset(identifier : String) -> String {
@@ -140,7 +119,6 @@ internal class PreferabliTools {
     internal class func continueOrThrowPreferabliException(response : DataResponse<Data>) throws -> DataResponse<Data> {
         if (response.error == nil && response.response != nil && response.response!.statusCode >= 200 && response.response!.statusCode < 300) {
             if (Preferabli.loggingEnabled) {
-//                print(response.response)
                 if let data = response.data, let utf8Text = String(data: data, encoding: .utf8) {
                     print("Data: \(utf8Text)")
                 }
@@ -148,16 +126,16 @@ internal class PreferabliTools {
             return response
         } else if (response.response != nil && response.data != nil) {
             if (response.response!.statusCode == 401) {
-                let parameters = ["user_id": getUserId(), "token_refresh" : PreferabliTools.getKeyStore().string(forKey: "refresh_token") ?? ""] as [String : Any]
+                let parameters = ["user_id": getPreferabliUserId(), "token_refresh" : PreferabliTools.getKeyStore().string(forKey: "refresh_token") ?? ""] as [String : Any]
                 do {
                     let sessionResponse = try Preferabli.api.getAlamo().post(APIEndpoints.postSession, jsonObject: parameters)
                     if (sessionResponse.error == nil && sessionResponse.response != nil && sessionResponse.response!.statusCode < 400) {
-                        let session = SessionData(map: try continueOrThrowJSONException(data: sessionResponse.data!) as! [String : Any])
+                        _ = SessionData(map: try continueOrThrowJSONException(data: sessionResponse.data!) as! [String : Any])
                         
                         if (response.request!.httpMethod!.lowercased() == "get" || response.request!.httpMethod!.lowercased() == "delete") {
                             return try Preferabli.api.getAlamo().syncRequest(url: response.request!.url!, method: HTTPMethod(rawValue: response.request!.httpMethod!)!, parameters: nil, encoding: URLEncoding.default, headers: response.request!.allHTTPHeaderFields)
-                        } else {
-                            return try Preferabli.api.getAlamo().syncRequest(urlString: response.request!.url!.absoluteString, method: response.request!.httpMethod!, jsonObject: response.request!.httpBody)
+                        } else if (response.request!.httpBody != nil) {
+                            return try Preferabli.api.getAlamo().syncRequest(urlString: response.request!.url!.absoluteString, method: response.request!.httpMethod!, jsonObject: response.request!.httpBody!)
                         }
                     } else {
                         throw PreferabliException.init(type: .APIError, code: response.response!.statusCode)
@@ -251,7 +229,7 @@ internal class PreferabliTools {
     }
     
     internal class func addSDKProperties() {
-        let id = PreferabliTools.isUserLoggedIn() ? PreferabliTools.getUserId() : PreferabliTools.getCustomerId()
+        let id = PreferabliTools.isPreferabliUserLoggedIn() ? PreferabliTools.getPreferabliUserId() : PreferabliTools.getCustomerId()
         let email = PreferabliTools.getKeyStore().object(forKey: "email") as? String
         let phone = PreferabliTools.getKeyStore().object(forKey: "phone") as? String
         let display_name = PreferabliTools.getKeyStore().object(forKey: "displayName") as? String
@@ -259,7 +237,7 @@ internal class PreferabliTools {
         
         if (id.intValue != 0) {
             Mixpanel.mainInstance().identify(distinctId: id.stringValue)
-            Mixpanel.mainInstance().people.set(properties: [(PreferabliTools.isUserLoggedIn() ? "user_id" : "customer_id") : id, "is_team_ringit" : isTeamRingIt])
+            Mixpanel.mainInstance().people.set(properties: [(PreferabliTools.isPreferabliUserLoggedIn() ? "user_id" : "customer_id") : id, "is_team_ringit" : isTeamRingIt])
             
             if (!PreferabliTools.isNullOrWhitespace(string: email)) {
                 Mixpanel.mainInstance().people.set(properties: ["$email": email!])
@@ -287,7 +265,7 @@ internal class PreferabliTools {
         return Int(distanceInMiles)
     }
     
-    internal class func getUserId() -> NSNumber {
+    internal class func getPreferabliUserId() -> NSNumber {
         return NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "user_id"))
     }
     
@@ -310,18 +288,11 @@ internal class PreferabliTools {
     }
     
     internal class func setUserProperties(user : PreferabliUser) {
-        PreferabliTools.getKeyStore().set(Date.init(), forKey: "lastGrabbedUser")
-        
         // set user properties to defaults
         PreferabliTools.getKeyStore().set(user.id, forKey: "user_id")
         PreferabliTools.getKeyStore().set(user.fname, forKey: "firstName")
         PreferabliTools.getKeyStore().set(user.lname, forKey: "lastName")
         PreferabliTools.getKeyStore().set(user.display_name, forKey: "displayName")
-        var displayNameShort = user.display_name
-        if (!PreferabliTools.isNullOrWhitespace(string: user.fname)) {
-            displayNameShort = user.fname
-        }
-        PreferabliTools.getKeyStore().set(displayNameShort, forKey: "displayNameShort")
         PreferabliTools.getKeyStore().set(user.account_level, forKey: "accountLevel")
         PreferabliTools.getKeyStore().set(user.birthyear, forKey: "birthYear")
         PreferabliTools.getKeyStore().set(user.country, forKey: "country")
@@ -456,7 +427,7 @@ internal class PreferabliTools {
             }
             candidates.append(symbol)
         }
-        let sorted = sortAscByLength(list: candidates)
+        let sorted = sortStringsByLength(list: candidates)
         if sorted.count < 1 {
             return ""
         }
@@ -480,7 +451,7 @@ internal class PreferabliTools {
             }
             candidates.append(localeID)
         }
-        let sorted = sortAscByLength(list: candidates)
+        let sorted = sortStringsByLength(list: candidates)
         if sorted.count < 1 {
             return Locale.current
         }
@@ -501,9 +472,9 @@ internal class PreferabliTools {
         return symbol
     }
     
-    internal class func isUserLoggedIn() -> Bool {
+    internal class func isPreferabliUserLoggedIn() -> Bool {
         let accessToken = PreferabliTools.getKeyStore().string(forKey: "access_token")
-        let userId = getUserId()
+        let userId = getPreferabliUserId()
         return accessToken != nil && userId != 0
     }
     
@@ -558,81 +529,26 @@ internal class PreferabliTools {
         return -Int32(arc4random() % 28147497)
     }
     
-    internal class func has2DaysPassed(startDate: Date?) -> Bool {
+    internal class func hasDaysPassed(days: Int, startDate: Date?) -> Bool {
         if let startDate = startDate {
             let calendar = NSCalendar.current
             let components = calendar.dateComponents([Calendar.Component.day], from: startDate, to: Date.init())
-            return components.day! > 1
+            return components.day! > (days - 1)
         } else {
             // never called API before!
             return true
         }
     }
     
-    internal class func has5DaysPassed(startDate: Date?) -> Bool {
-        if let startDate = startDate {
-            let calendar = NSCalendar.current
-            let components = calendar.dateComponents([Calendar.Component.day], from: startDate, to: Date.init())
-            return components.day! > 4
-        } else {
-            // never called API before!
-            return true
-        }
-    }
-    
-    internal class func has5MinutesPassed(startDate: Date?) -> Bool {
-        // actually waiting 60
+    internal class func hasMinutesPassed(minutes: Int, startDate: Date?) -> Bool {
         if let startDate = startDate {
             let calendar = NSCalendar.current
             let components = calendar.dateComponents([Calendar.Component.minute], from: startDate, to: Date.init())
-            return components.minute! > 4
+            return components.minute! > (minutes - 1)
         } else {
             // never called API before!
             return true
         }
-    }
-    
-    internal class func has60MinutesPassed(startDate: Date?) -> Bool {
-        // actually waiting 60
-        if let startDate = startDate {
-            let calendar = NSCalendar.current
-            let components = calendar.dateComponents([Calendar.Component.minute], from: startDate, to: Date.init())
-            return components.minute! > 59
-        } else {
-            // never called API before!
-            return true
-        }
-    }
-    
-    internal class func has60SecondsPassed(startDate: Date?) -> Bool {
-        // actually waiting 60
-        if let startDate = startDate {
-            let calendar = NSCalendar.current
-            let components = calendar.dateComponents([Calendar.Component.second], from: startDate, to: Date.init())
-            return components.second! > 59
-        } else {
-            // never called API before!
-            return true
-        }
-    }
-    
-    internal class func shouldWeTimeout(seconds : Int,  startDate: Date?) -> Bool {
-        if let startDate = startDate {
-            let calendar = NSCalendar.current
-            let components = calendar.dateComponents([Calendar.Component.second], from: startDate, to: Date.init())
-            return components.second! > seconds
-        } else {
-            // never called API before!
-            return true
-        }
-    }
-    
-    internal class func getIntegrationId() -> NSNumber {
-        return NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "INTEGRATION_ID"))
-    }
-    
-    internal class func getChannelId() -> NSNumber {
-        return NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "CHANNEL_ID"))
     }
     
     internal class func alphaSortIgnoreThe(x : String, y : String) -> Bool {
@@ -648,10 +564,10 @@ internal class PreferabliTools {
             return true
         }
         if (x.hasPrefix("The ")) {
-            x = x.substring(from: x.index(x.startIndex, offsetBy: 4))
+            x = String(x[x.index(x.startIndex, offsetBy: 4)...])
         }
         if (y.hasPrefix("The ")) {
-            y = y.substring(from: y.index(y.startIndex, offsetBy: 4))
+            y = String(y[y.index(x.startIndex, offsetBy: 4)...])
         }
         
         return x.caseInsensitiveCompare(y) == comparisonResult
@@ -669,26 +585,22 @@ internal class PreferabliTools {
     
     internal class func databaseUpgraded() {
         clearDatabase()
-        
-        PreferabliTools.getKeyStore().setValue(false, forKey: "hasMovedJumpstart")
-        
+                
         // going to do this on the main thread since it shouldn't take long
-        if (isUserLoggedIn()) {
+        if (isPreferabliUserLoggedIn()) {
             let context = NSManagedObjectContext.mr_default()
-            createUserFromUserDefaults(context: context)
+            _ = createUserFromUserDefaults(context: context)
             context.mr_saveToPersistentStoreAndWait()
         }
         
         for key in PreferabliTools.getKeyStore().dictionaryRepresentation().keys {
-            if key.starts(with: "hasCalled") || key.starts(with: "hasLoaded") {
+            if key.starts(with: "hasLoaded") {
                 PreferabliTools.getKeyStore().set(false, forKey: key)
             }
-            if key.starts(with: "collection_etags") || key.starts(with: "lastGrabbed") {
+            if key.starts(with: "collection_etags") || key.starts(with: "lastCalled") {
                 PreferabliTools.getKeyStore().set(nil, forKey: key)
             }
         }
-        
-        PreferabliTools.getKeyStore().set(false, forKey: "hasPerformedWineRingAction")
     }
     
     internal class func handleUpgrade() {
@@ -707,7 +619,36 @@ internal class PreferabliTools {
         }
     }
     
-    internal class func sortAscByLength(list: [String]) -> [String] {
+    internal class func sortStringsByLength(list: [String]) -> [String] {
         return list.sorted(by: { $0.count < $1.count })
+    }
+    
+    internal class func getImageUrl(image : String?, width : CGFloat, height : CGFloat, quality : Int) -> URL? {
+        if (isNullOrWhitespace(string: image)) {
+            return nil
+        }
+        
+        var image = image!
+        if (image.contains("placeholder")) {
+            return nil
+        } else if (image.contains("winering.com")) {
+            return URL.init(string: image)
+        } else if (image.contains("s3.amazonaws.com/winering-production")) {
+            let index = image.range(of: "/", options: .backwards, range: nil, locale: nil)!.upperBound
+            if (image.containsIgnoreCase("/avatars")) {
+                image = "avatars/" + image.substring(from: index)
+            } else {
+                image = image.substring(from: index)
+            }
+        } else {
+            return URL.init(string: image)
+        }
+        
+        let cloudfrontAppId = "ios_sdk/fit-in/"
+        let sizeString = String(Int(width * UIScreen.main.scale)) + "x" + String(Int(height * UIScreen.main.scale)) + "/"
+        let qualityString = "filters:quality(" + String(quality) + ")/"
+        let pngString = image.containsIgnoreCase("png") ? "filters:format(png)/"  : ""
+        var cloudFrontURL = "https://dxlu3le4zp2pd.cloudfront.net/wineringlabel/" + cloudfrontAppId + sizeString + qualityString + pngString + image
+        return URL.init(string: cloudFrontURL)
     }
 }

@@ -31,6 +31,8 @@ public class Preferabli {
     public static var PRIMARY_INVENTORY_ID : NSNumber = NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "PRIMARY_INVENTORY_ID"))
     /// The channel id of your integration.
     public static var CHANNEL_ID : NSNumber = NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "CHANNEL_ID"))
+    /// The  id of your integration.
+    public static var INTEGRATION_ID : NSNumber = NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "INTEGRATION_ID"))
     
     private init() {} // This prevents others from using the default '()' initializer for this class.
     
@@ -42,7 +44,9 @@ public class Preferabli {
     static public func initialize(client_interface: String, integration_id : NSNumber, logging_enabled : Bool = false) {
         hasBeenInitialized = true
         loggingEnabled = logging_enabled
-                
+        
+        INTEGRATION_ID = integration_id
+        
         PreferabliTools.getKeyStore().set(integration_id, forKey: "INTEGRATION_ID")
         PreferabliTools.getKeyStore().set(client_interface, forKey: "CLIENT_INTERFACE")
         api.createAlamo()
@@ -57,17 +61,21 @@ public class Preferabli {
         PreferabliTools.addSDKProperties()
         
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
-            do {
-                startupThreadRunning = true
-                try createAnonymousSession()
-                try getIntegration()
-                startupThreadRunning = false
-                Preferabli.main.loadUserData()
-            } catch {
-                // don't worry about it here but it will be checked and run before any calls to SDK can be made.
-                startupThreadRunning = false
-            }
+            handleStartupActions()
         })
+    }
+    
+    private static func handleStartupActions() {
+        do {
+            startupThreadRunning = true
+            try createAnonymousSession()
+            try getIntegration()
+            startupThreadRunning = false
+            Preferabli.main.loadUserData()
+        } catch {
+            // Don't worry about it here but it will be checked and run before any calls to SDK can be made.
+            startupThreadRunning = false
+        }
     }
     
     private func loadUserData() {
@@ -86,20 +94,20 @@ public class Preferabli {
             let sessionParameters =  ["login_as_anonymous" : true]
             var sessionResponse = try Preferabli.api.getAlamo(requiresAccessToken: false).post(APIEndpoints.postSession, json: sessionParameters)
             sessionResponse = try PreferabliTools.continueOrThrowPreferabliException(response: sessionResponse)
-            SessionData(map: try PreferabliTools.continueOrThrowJSONException(data: sessionResponse.data!) as! [String : Any])
+            _ = SessionData(map: try PreferabliTools.continueOrThrowJSONException(data: sessionResponse.data!) as! [String : Any])
         }
     }
     
     private static func getIntegration() throws {
         do {
-            let integration_id = PreferabliTools.getIntegrationId()
-            var integrationResponse = try Preferabli.api.getAlamo().get(APIEndpoints.getIntegration(id: integration_id))
+            let integration_id = Preferabli.INTEGRATION_ID
+            var integrationResponse = try Preferabli.api.getAlamo().get(APIEndpoints.integration(id: integration_id))
             integrationResponse = try PreferabliTools.continueOrThrowPreferabliException(response: integrationResponse)
             let integrationDictionary = try PreferabliTools.continueOrThrowJSONException(data: integrationResponse.data!) as! [String : Any]
-            let channel_id = integrationDictionary["channel_id"] as! NSNumber
-            let primary_inventory_id = integrationDictionary["primary_collection_id"] as! NSNumber
-            PreferabliTools.getKeyStore().set(channel_id, forKey: "CHANNEL_ID")
-            PreferabliTools.getKeyStore().set(primary_inventory_id, forKey: "PRIMARY_INVENTORY_ID")
+            CHANNEL_ID = integrationDictionary["channel_id"] as! NSNumber
+            PRIMARY_INVENTORY_ID = integrationDictionary["primary_collection_id"] as! NSNumber
+            PreferabliTools.getKeyStore().set(CHANNEL_ID, forKey: "CHANNEL_ID")
+            PreferabliTools.getKeyStore().set(PRIMARY_INVENTORY_ID, forKey: "PRIMARY_INVENTORY_ID")
             
         } catch {
             if let PreferabliException = error as? PreferabliException {
@@ -114,7 +122,7 @@ public class Preferabli {
     /// Will let you know if a user is logged in or not.
     /// - Returns: bool
     static public func isPreferabliUserLoggedIn() -> Bool {
-        return PreferabliTools.isUserLoggedIn()
+        return PreferabliTools.isPreferabliUserLoggedIn()
     }
     
     /// Will let you know if a customer is logged in or not.
@@ -140,18 +148,18 @@ public class Preferabli {
         if (!Preferabli.hasBeenInitialized) {
             throw PreferabliException.init(type: .InvalidClientInterface)
         } else if (!PreferabliTools.isKeyPresentInKeyStore(key: "access_token") && !Preferabli.startupThreadRunning) {
-            try Preferabli.createAnonymousSession()
+            Preferabli.handleStartupActions()
             try canWeContinue(needsToBeLoggedIn: needsToBeLoggedIn)
         } else if (!PreferabliTools.isKeyPresentInKeyStore(key: "access_token")) {
             Thread.sleep(forTimeInterval: 1)
             try canWeContinue(needsToBeLoggedIn: needsToBeLoggedIn)
         } else if (!PreferabliTools.isKeyPresentInKeyStore(key: "CHANNEL_ID") && !Preferabli.startupThreadRunning) {
-            try Preferabli.getIntegration()
+            Preferabli.handleStartupActions()
             try canWeContinue(needsToBeLoggedIn: needsToBeLoggedIn)
         } else if (!PreferabliTools.isKeyPresentInKeyStore(key: "CHANNEL_ID")) {
             Thread.sleep(forTimeInterval: 1)
             try canWeContinue(needsToBeLoggedIn: needsToBeLoggedIn)
-        } else if (needsToBeLoggedIn && !PreferabliTools.isUserLoggedIn() && !PreferabliTools.isCustomerLoggedIn()) {
+        } else if (needsToBeLoggedIn && !PreferabliTools.isPreferabliUserLoggedIn() && !PreferabliTools.isCustomerLoggedIn()) {
             throw PreferabliException.init(type: .InvalidAccessToken)
         } else if (needsToBeLoggedIn && PreferabliTools.isLoggedOutOrLoggingOut()) {
             throw PreferabliException.init(type: .InvalidAccessToken)
@@ -185,15 +193,15 @@ public class Preferabli {
         do {
             try canWeContinue(needsToBeLoggedIn: false)
             
-            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "login"])
+            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "login_customer"])
             
-            let parameters = ["merchant_customer_identification": merchant_customer_identification, "merchant_customer_verification" : merchant_customer_verification, "merchant_channel_id" : PreferabliTools.getKeyStore().integer(forKey: "CHANNEL_ID")] as [String : Any]
+            let parameters = ["merchant_customer_identification": merchant_customer_identification, "merchant_customer_verification" : merchant_customer_verification, "merchant_channel_id" : Preferabli.CHANNEL_ID] as [String : Any]
             
             var sessionResponse = try Preferabli.api.getAlamo(requiresAccessToken: false).post(APIEndpoints.postSession, json: parameters)
             sessionResponse = try PreferabliTools.continueOrThrowPreferabliException(response: sessionResponse)
             let session = SessionData(map: try PreferabliTools.continueOrThrowJSONException(data: sessionResponse.data!) as! [String : Any])
             
-            var customerResponse = try Preferabli.api.getAlamo().get(APIEndpoints.getCustomer(id: PreferabliTools.getKeyStore().integer(forKey: "CHANNEL_ID"), customerId: session.customer_id!.intValue))
+            var customerResponse = try Preferabli.api.getAlamo().get(APIEndpoints.customer(id: Preferabli.CHANNEL_ID, customerId: session.customer_id!))
             customerResponse = try PreferabliTools.continueOrThrowPreferabliException(response: customerResponse)
             let customerDictionary = try PreferabliTools.continueOrThrowJSONException(data: customerResponse.data!) as! [String : Any]
             let customerData = Customer(map: customerDictionary)
@@ -225,7 +233,7 @@ public class Preferabli {
         do {
             try canWeContinue(needsToBeLoggedIn: false)
             
-            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "login"])
+            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "login_user"])
             
             let context = NSManagedObjectContext.mr_()
             context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
@@ -236,12 +244,12 @@ public class Preferabli {
             sessionResponse = try PreferabliTools.continueOrThrowPreferabliException(response: sessionResponse)
             let session = SessionData(map: try PreferabliTools.continueOrThrowJSONException(data: sessionResponse.data!) as! [String : Any])
             
-            var userResponse = try Preferabli.api.getAlamo().get(APIEndpoints.getUser(id: session.user_id!))
+            var userResponse = try Preferabli.api.getAlamo().get(APIEndpoints.user(id: session.user_id!))
             userResponse = try PreferabliTools.continueOrThrowPreferabliException(response: userResponse)
             let userDictionary = try PreferabliTools.continueOrThrowJSONException(data: userResponse.data!) as! [String : Any]
             
             let userData = PreferabliUser(map: userDictionary)
-            let user = CoreData_PreferabliUser.mr_import(from: userDictionary, in: context)
+            _ = CoreData_PreferabliUser.mr_import(from: userDictionary, in: context)
             
             context.mr_saveToPersistentStoreAndWait()
             
@@ -274,12 +282,10 @@ public class Preferabli {
         do {
             try canWeContinue(needsToBeLoggedIn: false)
             
-            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "signup"])
+            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "signup_user"])
             
             let context = NSManagedObjectContext.mr_()
             context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-            
-            let sessionParameters =  ["login_as_anonymous" : true]
             
             var parameters = ["email": email, "password" : password, "subscribed" : 1] as [String : Any]
             if (!PreferabliTools.isNullOrWhitespace(string: user_claim_code)) {
@@ -289,12 +295,12 @@ public class Preferabli {
                 parameters["cellar_name"] = cellar_name
             }
             
-            var userResponse = try Preferabli.api.getAlamo().post(APIEndpoints.createUser, json: parameters)
+            var userResponse = try Preferabli.api.getAlamo().post(APIEndpoints.users, json: parameters)
             userResponse = try PreferabliTools.continueOrThrowPreferabliException(response: userResponse)
             let userDictionary = try PreferabliTools.continueOrThrowJSONException(data: userResponse.data!) as! [String : Any]
             
             let userData = PreferabliUser(map: userDictionary)
-            let user = CoreData_PreferabliUser.mr_import(from: userDictionary, in: context)
+            _ = CoreData_PreferabliUser.mr_import(from: userDictionary, in: context)
             
             context.mr_saveToPersistentStoreAndWait()
             
@@ -445,7 +451,7 @@ public class Preferabli {
             
             var dictionary: [String : Any] = ["search" : query , "search_types" : ["products"]]
             if (lock_to_integration) {
-                dictionary["channel_id"] = PreferabliTools.getKeyStore().integer(forKey: "CHANNEL_ID")
+                dictionary["channel_id"] = Preferabli.CHANNEL_ID
                 dictionary["search_types"] = ["tags"]
             }
             
@@ -490,7 +496,7 @@ public class Preferabli {
             context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
             var searchResponse = try Preferabli.api.getAlamo().get(APIEndpoints.search, params: dictionary)
             searchResponse = try PreferabliTools.continueOrThrowPreferabliException(response: searchResponse)
-            var searchDictionary = try PreferabliTools.continueOrThrowJSONException(data: searchResponse.data!) as! [String : Any]
+            let searchDictionary = try PreferabliTools.continueOrThrowJSONException(data: searchResponse.data!) as! [String : Any]
             
             var search = CoreData_Search.mr_findFirst(byAttribute: "text", withValue: query, in: context)
             if (search == nil) {
@@ -505,7 +511,7 @@ public class Preferabli {
             var productsToReturn = Array<Product>()
             if let products = searchDictionary["products"] as? Array<[String : Any]> {
                 for productDictionary in products {
-                    let product = CoreData_Product.mr_findFirst(byAttribute: "id", withValue: productDictionary["id"], in: context) ?? CoreData_Product.mr_import(from: productDictionary, in: context)
+                    let product = CoreData_Product.mr_findFirst(byAttribute: "id", withValue: productDictionary["id"]!, in: context) ?? CoreData_Product.mr_import(from: productDictionary, in: context)
                     if (product.variants.count == 0) {
                         let variant = CoreData_Variant.mr_createEntity(in: context)!
                         variant.id = NSNumber.init(value: PreferabliTools.generateRandomLongId())
@@ -519,17 +525,16 @@ public class Preferabli {
             
             if let tags = searchDictionary["tags"] as? Array<[String : Any]> {
                 for tagDictionary in tags {
-                    let product = CoreData_Product.mr_findFirst(byAttribute: "id", withValue: tagDictionary["product_id"], in: context) ?? CoreData_Product.mr_import(from: tagDictionary, in: context)
+                    let product = CoreData_Product.mr_findFirst(byAttribute: "id", withValue: tagDictionary["product_id"]!, in: context) ?? CoreData_Product.mr_import(from: tagDictionary, in: context)
                     product.type = tagDictionary["product_type"] as! String
                     product.name = tagDictionary["product_name"] as! String
                     product.category = tagDictionary["product_category"] as! String
                     product.id = tagDictionary["product_id"] as! NSNumber
                     
-                    let variant = CoreData_Variant.mr_findFirst(byAttribute: "id", withValue: tagDictionary["variant_id"], in: context) ?? CoreData_Variant.mr_createEntity(in: context)!
+                    let variant = CoreData_Variant.mr_findFirst(byAttribute: "id", withValue: tagDictionary["variant_id"]!, in: context) ?? CoreData_Variant.mr_createEntity(in: context)!
                     variant.id = tagDictionary["variant_id"] as! NSNumber
                     variant.price = tagDictionary["price"] as! Double
                     variant.num_dollar_signs = tagDictionary["num_dollar_signs"] as! NSNumber
-                    variant.id = tagDictionary["variant_id"] as! NSNumber
                     variant.product = product
                     
                     productsToReturn.append(Product.init(product: product))
@@ -631,7 +636,7 @@ public class Preferabli {
             
             if (force_refresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoaded\(collection_id)")) {
                 try LoadCollectionTools.sharedInstance.loadCollectionViaTags(in: context, priority: .normal, with: collection_id)
-            } else if (PreferabliTools.has5MinutesPassed(startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalled\(collection_id)") as? Date)) {
+            } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalled\(collection_id)") as? Date)) {
                 PreferabliTools.startNewWorkThread(priority: .low) {
                     do {
                         let context = NSManagedObjectContext.mr_()
@@ -684,7 +689,7 @@ public class Preferabli {
             
             if (force_refresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoaded" + (tag_type ?? "AllCustomerTags"))) {
                 try self.actuallyGetCustomerTags(context: context, tag_type: tag_type)
-            } else if (PreferabliTools.has5MinutesPassed(startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalled" + (tag_type ?? "AllCustomerTags")) as? Date)) {
+            } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalled" + (tag_type ?? "AllCustomerTags")) as? Date)) {
                 PreferabliTools.startNewWorkThread(priority: .low) {
                     do {
                         let context = NSManagedObjectContext.mr_()
@@ -733,7 +738,7 @@ public class Preferabli {
         if (tag_type != nil) {
             params["tag_type"] = tag_type!
         }
-        var getTagsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.customerTags(id: PreferabliTools.getChannelId(), and: PreferabliTools.getCustomerId()), params: params)
+        var getTagsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.customerTags(id: Preferabli.CHANNEL_ID, and: PreferabliTools.getCustomerId()), params: params)
         getTagsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getTagsResponse)
         
         let tagDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getTagsResponse.data!) as! NSArray
@@ -754,16 +759,16 @@ public class Preferabli {
             }
         }
         
-        let vintageIds = tags.map { $0.variant_id }
-        var getWinesResponse = try Preferabli.api.getAlamo().get(APIEndpoints.products, params: ["variant_ids" : vintageIds])
-        getWinesResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getWinesResponse)
-        let wineDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getWinesResponse.data!) as! NSArray
-        for wine in wineDictionaries {
-            let wineObject = CoreData_Product.mr_import(from: wine, in: context)
-            for vintage in wineObject.variants.allObjects as! [CoreData_Variant] {
-                if let tagArray = tagMap[vintage.id] {
+        let variantIds = tags.map { $0.variant_id }
+        var getProductsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.products, params: ["variant_ids" : variantIds])
+        getProductsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getProductsResponse)
+        let productDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getProductsResponse.data!) as! NSArray
+        for product in productDictionaries {
+            let productObject = CoreData_Product.mr_import(from: product, in: context)
+            for variant in productObject.variants.allObjects as! [CoreData_Variant] {
+                if let tagArray = tagMap[variant.id] {
                     for tag in tagArray {
-                        tag.variant = vintage
+                        tag.variant = variant
                     }
                 }
             }
@@ -774,24 +779,24 @@ public class Preferabli {
         PreferabliTools.getKeyStore().set(true, forKey: "hasLoaded" + (tag_type ?? "AllCustomerTags"))
     }
     
-    /// Get all the questions and choices needed to run a Guided Rec. Present the quiz to the user, then pass the answers to ``Preferabli/getGuidedRecResults(selected_choice_ids:price_min:price_max:collection_id:include_merchant_links:onCompletion:onFailure:)`` to get results.
+    /// Get all the questions and choices needed to run a Guided Rec. Present the questions to the user, then pass the answers to ``Preferabli/getGuidedRecResults(guided_rec_id:selected_choice_ids:price_min:price_max:collection_id:include_merchant_links:onCompletion:onFailure:)`` to get results.
     /// - Parameters:
-    ///   - guided_rec_id:  id of the Guided Rec you wish to run. Defaults to the Preferabli standard wine based Guided Rec. See ``GuidedRec`` for other default Guided Rec options. Defaults to ``GuidedRec/WINE_DEFAULT``.
+    ///   - guided_rec_id: id of the Guided Rec you wish to run. See ``GuidedRec`` for all the default Guided Rec options. Defaults to ``GuidedRec/WINE_DEFAULT``.
     ///   - onCompletion: returns ``GuidedRec`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func getGuidedRec(guided_rec_id: Int = GuidedRec.WINE_DEFAULT, onCompletion: @escaping (GuidedRec) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func getGuidedRec(guided_rec_id: NSNumber = GuidedRec.WINE_DEFAULT, onCompletion: @escaping (GuidedRec) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
             self.getGuidedRecActual(guided_rec_id: guided_rec_id, onCompletion: onCompletion, onFailure: onFailure)
         })
     }
     
-    private func getGuidedRecActual(guided_rec_id: Int, onCompletion: @escaping (GuidedRec) -> (), onFailure: @escaping (PreferabliException) -> ()) {
+    private func getGuidedRecActual(guided_rec_id: NSNumber, onCompletion: @escaping (GuidedRec) -> (), onFailure: @escaping (PreferabliException) -> ()) {
         do {
             try canWeContinue(needsToBeLoggedIn: false)
             
             SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "get_guided_rec"])
             
-            var instantRecResponse = try Preferabli.api.getAlamo().get(APIEndpoints.getGuidedRec(id: guided_rec_id))
+            var instantRecResponse = try Preferabli.api.getAlamo().get(APIEndpoints.guidedRec(id: guided_rec_id))
             instantRecResponse = try PreferabliTools.continueOrThrowPreferabliException(response: instantRecResponse)
             let dictionary = try PreferabliTools.continueOrThrowJSONException(data: instantRecResponse.data!) as! [String : Any]
             let quiz = GuidedRec(map: dictionary)
@@ -807,6 +812,7 @@ public class Preferabli {
     
     /// Get Guided Rec results based on the selected ``GuidedRecChoice``.
     /// - Parameters:
+    ///   - guided_rec_id: id of the Guided Rec you wish to run.
     ///   - selected_choice_ids: an array of selected ``GuidedRecChoice`` ids.
     ///   - price_min: pass if you want to lock results to a minimum price. Defaults to *nil*.
     ///   - price_max: pass if you want to lock results to a maximum price. Defaults to *nil*.
@@ -814,13 +820,13 @@ public class Preferabli {
     ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` that connect Preferabli products to your own. Defaults to *true*.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func getGuidedRecResults(selected_choice_ids : Array<NSNumber>, price_min : Int? = nil, price_max : Int? = nil, collection_id : NSNumber? = Preferabli.getPrimaryInventoryId(), include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func getGuidedRecResults(guided_rec_id: NSNumber, selected_choice_ids : Array<NSNumber>, price_min : Int? = nil, price_max : Int? = nil, collection_id : NSNumber? = Preferabli.getPrimaryInventoryId(), include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
-            self.getGuidedRecResultsActual(selected_choice_ids: selected_choice_ids, price_min: price_min, price_max: price_max, collection_id: collection_id, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
+            self.getGuidedRecResultsActual(guided_rec_id: guided_rec_id, selected_choice_ids: selected_choice_ids, price_min: price_min, price_max: price_max, collection_id: collection_id, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
         })
     }
     
-    private func getGuidedRecResultsActual(selected_choice_ids : Array<NSNumber>, price_min : Int?, price_max : Int?, collection_id : NSNumber?, include_merchant_links: Bool, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    private func getGuidedRecResultsActual(guided_rec_id: NSNumber, selected_choice_ids : Array<NSNumber>, price_min : Int?, price_max : Int?, collection_id : NSNumber?, include_merchant_links: Bool, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         do {
             try canWeContinue(needsToBeLoggedIn: false)
             
@@ -829,7 +835,7 @@ public class Preferabli {
             var dictionary = [String : Any]()
             dictionary["limit"] = 8
             dictionary["sort_by"] = "preference"
-            dictionary["questionnaire_id"] = 1
+            dictionary["questionnaire_id"] = guided_rec_id
             dictionary["offset"] = 0
             dictionary["questionnaire_choice_ids"] = selected_choice_ids
             
@@ -853,7 +859,7 @@ public class Preferabli {
             let context = NSManagedObjectContext.mr_()
             context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
             
-            var recResponse = try Preferabli.api.getAlamo().post(collection_id == nil ? APIEndpoints.getGuidedRecResults() : APIEndpoints.getGuidedRecResults(id: collection_id!.intValue), json: dictionary)
+            var recResponse = try Preferabli.api.getAlamo().post(collection_id == nil ? APIEndpoints.guidedRecResults() : APIEndpoints.guidedRecResults(id: collection_id!), json: dictionary)
             recResponse = try PreferabliTools.continueOrThrowPreferabliException(response: recResponse)
             let recDictionary = try PreferabliTools.continueOrThrowJSONException(data: recResponse.data!) as! [String : Any]
             let types = recDictionary["types"] as! Array<[String : Any]>
@@ -905,7 +911,7 @@ public class Preferabli {
     
     /// Get a Like This, Try That recommendation. Start with a ``Product``, get similar tasting results. This function will return personalized results if a user is logged in.
     /// - Parameters:
-    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:)`` to convert your product id into a Preferabli product id.
+    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:onCompletion:onFailure:)`` to convert your product id into a Preferabli product id.
     ///   - year: year of the ``Variant`` that you want to get results on. Defaults to ``Variant/CURRENT_VARIANT_YEAR``.
     ///   - collection_id: the id of a specific ``Collection`` that you want to draw results from. Defaults to ``PRIMARY_INVENTORY_ID``.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
@@ -914,41 +920,6 @@ public class Preferabli {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
             self.ltttActual(product_id: product_id, year: year, collection_id: collection_id, onCompletion: onCompletion, onFailure: onFailure)
         })
-    }
-    
-    /// Call this to convert your merchant product / variant id to the Preferabli product id for use with our functions.
-    /// - Parameters:
-    ///   - merchant_product_id: the id of your product (as it appears in your system).
-    ///   - merchant_variant_id: the id of your product variant (as it appears in your system). *Used only if you have a hierarchal database format for your products.*
-    /// - Returns: the Preferabli product id for use with our functions.
-    static public func getPreferabliProductId(merchant_product_id : String?, merchant_variant_id : String?) throws -> (NSNumber, NSNumber) {
-        if (merchant_product_id == nil && merchant_variant_id == nil) {
-            throw PreferabliException.init(type: .MappingNotFound)
-        }
-        var dictionaries = Array<[String : Any]>()
-        
-        var dictionary = [String : Any]()
-        dictionary["number"] = 1
-        if (merchant_product_id != nil) {
-            dictionary["merchant_product_ids"] = [merchant_product_id!]
-        }
-        if (merchant_variant_id != nil) {
-            dictionary["merchant_variant_ids"] = [merchant_variant_id!]
-        }
-        dictionaries.append(dictionary)
-        
-        var conversionResponse = try Preferabli.api.getAlamo().post(APIEndpoints.lookupConversion(id: PreferabliTools.getIntegrationId()), jsonObject: dictionaries)
-        conversionResponse = try PreferabliTools.continueOrThrowPreferabliException(response: conversionResponse)
-        let conversionDictionaries = try PreferabliTools.continueOrThrowJSONException(data: conversionResponse.data!) as! Array<[String : Any]>
-        for dictionary in conversionDictionaries {
-            let lookups = dictionary["lookups"] as! Array<[String : Any]>
-            if (lookups.count > 0) {
-                let lookup = lookups[0]
-                return (lookup["product_id"] as! NSNumber, NSNumber.init(value: Int(lookup["year"] as! String)!))
-            }
-        }
-        
-        throw PreferabliException.init(type: .MappingNotFound)
     }
     
     private func ltttActual(product_id : NSNumber, year : NSNumber, collection_id : NSNumber, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
@@ -960,7 +931,7 @@ public class Preferabli {
             var dictionary: [String : Any] = ["product_id" : product_id, "year" : year, "collection_id" : collection_id]
             
             if (Preferabli.isPreferabliUserLoggedIn()) {
-                dictionary["user_id"] = PreferabliTools.getUserId()
+                dictionary["user_id"] = PreferabliTools.getPreferabliUserId()
             } else if (Preferabli.isCustomerLoggedIn()) {
                 dictionary["channel_customer_id"] = PreferabliTools.getCustomerId()
             }
@@ -968,9 +939,9 @@ public class Preferabli {
             let context = NSManagedObjectContext.mr_()
             context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
             
-            var getWinesResponse = try Preferabli.api.getAlamo().get(APIEndpoints.lttt, params: dictionary)
-            getWinesResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getWinesResponse)
-            let responseDictionary = try PreferabliTools.continueOrThrowJSONException(data: getWinesResponse.data!) as! [String : Any]
+            var getProductsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.lttt, params: dictionary)
+            getProductsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getProductsResponse)
+            let responseDictionary = try PreferabliTools.continueOrThrowJSONException(data: getProductsResponse.data!) as! [String : Any]
             
             let dictionaries = responseDictionary["products"] as? Array<[String : Any]>
             var productsToReturn = Array<Product>()
@@ -998,10 +969,64 @@ public class Preferabli {
         }
     }
     
+    /// Call this to convert your merchant product / variant id to the Preferabli product id for use with our functions.
+    /// - Parameters:
+    ///   - merchant_product_id: the id of your product (as it appears in your system). *Either this or merchant_variant_id is required.*
+    ///   - merchant_variant_id: the id of your product variant (as it appears in your system). *Used only if you have a hierarchical database format for your products.*
+    ///   - onCompletion: returns product id if the call was successful. *Returns on the main thread.*
+    ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
+    public func getPreferabliProductId(merchant_product_id : String? = nil, merchant_variant_id : String? = nil, onCompletion: @escaping (NSNumber) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+        PreferabliTools.startNewWorkThread(priority: .veryHigh, {
+            self.getPreferabliProductIdActual(merchant_product_id: merchant_product_id, merchant_variant_id: merchant_variant_id, onCompletion: onCompletion, onFailure: onFailure)
+        })
+    }
+    
+    private func getPreferabliProductIdActual(merchant_product_id : String?, merchant_variant_id : String?, onCompletion: @escaping (NSNumber) -> (), onFailure: @escaping (PreferabliException) -> ()) {
+        do {
+            try canWeContinue(needsToBeLoggedIn: false)
+            
+            if (merchant_product_id == nil && merchant_variant_id == nil) {
+                throw PreferabliException.init(type: .MappingNotFound)
+            }
+            
+            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "get_preferabli_id"])
+            
+            var dictionaries = Array<[String : Any]>()
+            
+            var dictionary = [String : Any]()
+            dictionary["number"] = 1
+            if (merchant_product_id != nil) {
+                dictionary["merchant_product_ids"] = [merchant_product_id!]
+            }
+            if (merchant_variant_id != nil) {
+                dictionary["merchant_variant_ids"] = [merchant_variant_id!]
+            }
+            dictionaries.append(dictionary)
+            
+            var conversionResponse = try Preferabli.api.getAlamo().post(APIEndpoints.lookupConversion(id: Preferabli.INTEGRATION_ID), jsonObject: dictionaries)
+            conversionResponse = try PreferabliTools.continueOrThrowPreferabliException(response: conversionResponse)
+            let conversionDictionaries = try PreferabliTools.continueOrThrowJSONException(data: conversionResponse.data!) as! Array<[String : Any]>
+            for dictionary in conversionDictionaries {
+                let lookups = dictionary["lookups"] as! Array<[String : Any]>
+                if (lookups.count > 0) {
+                    let lookup = lookups[0]
+                    DispatchQueue.main.async {
+                        onCompletion((lookup["product_id"] as! NSNumber))
+                    }
+                }
+            }
+            
+            throw PreferabliException.init(type: .MappingNotFound)
+            
+        } catch {
+            handleError(error: error, onFailure: onFailure)
+        }
+    }
+    
     /// Get help finding out where a ``Product`` is in stock.
     /// - Parameters:
-    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:)`` to convert your product id into a Preferabli product id.
-    ///   - fulfill_sort: pass ``FulfillSort`` for sorting & filtering options. *If sorting by distance, location MUST be present!
+    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:onCompletion:onFailure:)`` to convert your product id into a Preferabli product id.
+    ///   - fulfill_sort: pass ``FulfillSort`` for sorting & filtering options. If sorting by distance, ``Location`` MUST be present!
     ///   - append_nonconforming_results: pass true if you want results that *DO NOT* conform to all filtering & sorting parameters to be returned. Useful so that something is returned even if the user's filter parameters are too narrow. All results that do not conform contain nonconforming_result = true within. Defaults to *true*.
     ///   - lock_to_integration: pass true if you only want to draw results from your integration. Defaults to *true*.
     ///   - onCompletion: returns ``WhereToBuy`` if the call was successful. *Returns on the main thread.*
@@ -1032,7 +1057,7 @@ public class Preferabli {
             var params = ["product_id" : product_id, "sort_by" : sort_by, "merge_products" : true, "pickup" : fulfill_sort.include_pickup, "local_delivery" : fulfill_sort.include_delivery, "standard_shipping" : fulfill_sort.include_shipping, "append_nonconforming_results" : append_nonconforming_results, "limit" : 1000, "offset" : 0, "distance_miles" : fulfill_sort.distance_miles] as [String : Any]
             
             if (fulfill_sort.type == .DISTANCE && fulfill_sort.location == nil) {
-                throw PreferabliException.init(type: .UnknownError, message: "Sort by distance requires a location.")
+                throw PreferabliException.init(type: .OtherError, message: "Sort by distance requires a location.")
             } else if (fulfill_sort.location != nil) {
                 if (PreferabliTools.isNullOrWhitespace(string: fulfill_sort.location!.zip_code)) {
                     params["lat"] = fulfill_sort.location!.latitude
@@ -1045,8 +1070,8 @@ public class Preferabli {
             }
             
             if (lock_to_integration) {
-                var channelIds = Array<Int>()
-                channelIds.append(PreferabliTools.getChannelId().intValue)
+                var channelIds = Array<NSNumber>()
+                channelIds.append(Preferabli.CHANNEL_ID)
                 params["channel_ids"] = channelIds
             }
             
@@ -1113,7 +1138,7 @@ public class Preferabli {
             
             if (force_refresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoadedProfile")) {
                 try getProfileActual(context: context, force_refresh: force_refresh)
-            } else if (PreferabliTools.has5MinutesPassed(startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalledProfile") as? Date)) {
+            } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalledProfile") as? Date)) {
                 PreferabliTools.startNewWorkThread(priority: .low) {
                     do {
                         let context = NSManagedObjectContext.mr_()
@@ -1125,10 +1150,10 @@ public class Preferabli {
                 }
             }
             
-            let predicate = Preferabli.isCustomerLoggedIn() ? NSPredicate.init(format: "customer_id == %@", argumentArray: [PreferabliTools.getCustomerId()]) : NSPredicate.init(format: "user_id == %@", argumentArray: [PreferabliTools.getUserId()])
+            let predicate = Preferabli.isCustomerLoggedIn() ? NSPredicate.init(format: "customer_id == %@", argumentArray: [PreferabliTools.getCustomerId()]) : NSPredicate.init(format: "user_id == %@", argumentArray: [PreferabliTools.getPreferabliUserId()])
             let coredataProfile = CoreData_Profile.mr_findFirst(with: predicate, in: context)!
             let profile = Profile.init(profile: coredataProfile)
-                        
+            
             DispatchQueue.main.async {
                 onCompletion(profile)
             }
@@ -1139,10 +1164,10 @@ public class Preferabli {
     }
     
     private func getProfileActual(context : NSManagedObjectContext, force_refresh : Bool) throws {
-        var getPreferencesResponse = try Preferabli.api.getAlamo().get(Preferabli.isCustomerLoggedIn() ? APIEndpoints.getCustomerProfile(id: PreferabliTools.getChannelId(), and: PreferabliTools.getCustomerId()) : APIEndpoints.getPreferences())
+        var getPreferencesResponse = try Preferabli.api.getAlamo().get(Preferabli.isCustomerLoggedIn() ? APIEndpoints.customerProfile(id: Preferabli.CHANNEL_ID, and: PreferabliTools.getCustomerId()) : APIEndpoints.profile(id: PreferabliTools.getPreferabliUserId()))
         getPreferencesResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getPreferencesResponse)
         
-        let styles = CoreData_PreferenceStyle.mr_findAll(in: context) as! [CoreData_PreferenceStyle]
+        let styles = CoreData_ProfileStyle.mr_findAll(in: context) as! [CoreData_ProfileStyle]
         let otherProfile = CoreData_Profile.mr_createEntity(in: context)!
         for style in styles {
             style.profile = otherProfile
@@ -1151,11 +1176,11 @@ public class Preferabli {
         let profileDictionary = try PreferabliTools.continueOrThrowJSONException(data: getPreferencesResponse.data!)
         let profile = CoreData_Profile.mr_import(from: profileDictionary, in: context)
         profile.customer_id = PreferabliTools.getCustomerId()
-        profile.user_id = PreferabliTools.getUserId()
+        profile.user_id = PreferabliTools.getPreferabliUserId()
         
         var style_ids = Array<NSNumber>()
-        var preferenceMap = [NSNumber : CoreData_PreferenceStyle]()
-        for preferenceStyle in profile.preference_styles.allObjects as! [CoreData_PreferenceStyle] {
+        var preferenceMap = [NSNumber : CoreData_ProfileStyle]()
+        for preferenceStyle in profile.preference_styles.allObjects as! [CoreData_ProfileStyle] {
             if (force_refresh) {
                 style_ids.append(preferenceStyle.style_id)
                 preferenceMap[preferenceStyle.style_id] = preferenceStyle
@@ -1169,7 +1194,7 @@ public class Preferabli {
         }
         
         if (style_ids.count > 0) {
-            var getStylesResponse = try Preferabli.api.getAlamo().get(APIEndpoints.getStyles, params: ["style_ids" : style_ids])
+            var getStylesResponse = try Preferabli.api.getAlamo().get(APIEndpoints.styles, params: ["style_ids" : style_ids])
             getStylesResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getStylesResponse)
             let styleDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getStylesResponse.data!) as! NSArray
             for styleDic in styleDictionaries {
@@ -1204,7 +1229,7 @@ public class Preferabli {
             
             if (force_refresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoadedFoods")) {
                 try loadFoods(context: context)
-            } else if (PreferabliTools.has5MinutesPassed(startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalledFoods") as? Date)) {
+            } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalledFoods") as? Date)) {
                 PreferabliTools.startNewWorkThread(priority: .low) {
                     do {
                         let context = NSManagedObjectContext.mr_()
@@ -1276,18 +1301,18 @@ public class Preferabli {
             context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
             
             var dictionaryArray = Array<[String : Any]>()
-            var typeParam = ["type" : "types", "values" : [ product_type != .OTHER ? product_type.getTypeName() : product_category.getCategoryName()]] as! [String : Any]
-            var categoryParam = ["type" : "product_categories", "values" : [product_category.getCategoryName()]] as! [String : Any]
-            var precParam = ["type" : "precedence", "values" : false] as! [String : Any]
+            let typeParam = ["type" : "types", "values" : [ product_type != .OTHER ? product_type.getTypeName() : product_category.getCategoryName()]] as! [String : Any]
+            let categoryParam = ["type" : "product_categories", "values" : [product_category.getCategoryName()]] as! [String : Any]
+            let precParam = ["type" : "precedence", "values" : false] as! [String : Any]
             if (Preferabli.isCustomerLoggedIn()) {
-                var customerParam = ["type" : "channel_customer_ids", "values" : [PreferabliTools.getCustomerId()]] as! [String : Any]
+                let customerParam = ["type" : "channel_customer_ids", "values" : [PreferabliTools.getCustomerId()]] as! [String : Any]
                 dictionaryArray.append(customerParam)
             } else {
-                var usersParam = ["type" : "user_ids", "values" : [PreferabliTools.getUserId()]] as! [String : Any]
+                let usersParam = ["type" : "user_ids", "values" : [PreferabliTools.getPreferabliUserId()]] as! [String : Any]
                 dictionaryArray.append(usersParam)
             }
-            var oneStyleParam = ["type" : "single_style", "values" : false] as! [String : Any]
-            var ratedParam = ["type" : "rated_wines", "values" : "ignore"] as! [String : Any]
+            let oneStyleParam = ["type" : "single_style", "values" : false] as! [String : Any]
+            let ratedParam = ["type" : "rated_wines", "values" : "ignore"] as! [String : Any]
             let newParam = ["type" : "collection_ids", "values" : [ collection_id ]] as [String : Any]
             dictionaryArray.append(newParam)
             dictionaryArray.append(typeParam)
@@ -1307,11 +1332,11 @@ public class Preferabli {
             }
             
             if (price_min != nil) {
-                let min = ["type" : "price_min", "values" : price_min] as! [String : Any]
+                let min = ["type" : "price_min", "values" : price_min!] as! [String : Any]
                 dictionaryArray.append(min)
             }
             if (price_max != nil) {
-                let max = ["type" : "price_max", "values" : price_max] as! [String : Any]
+                let max = ["type" : "price_max", "values" : price_max!] as! [String : Any]
                 dictionaryArray.append(max)
             }
             
@@ -1323,13 +1348,13 @@ public class Preferabli {
             let message = recDictionary["message"] as? String
             let results = recDictionary["results"] as! Array<[String : Any]>
             
-            var vintageIds = Array<NSNumber>()
+            var variantIds = Array<NSNumber>()
             var predictRatings = Array<NSNumber>()
             var confidenceCodes = Array<NSNumber>()
             
-            var primaryVintageIds = Array<NSNumber>()
-            var secondaryVintageIds = Array<NSNumber>()
-            var tertiaryVintageIds = Array<NSNumber>()
+            var primaryVariantIds = Array<NSNumber>()
+            var secondaryVariantIds = Array<NSNumber>()
+            var tertiaryVariantIds = Array<NSNumber>()
             
             var wines = Array<Product>()
             
@@ -1339,72 +1364,72 @@ public class Preferabli {
             
             var x = 0
             for rec in results {
-                vintageIds.append(rec["variant_id"] as! NSNumber)
+                variantIds.append(rec["variant_id"] as! NSNumber)
                 predictRatings.append(rec["formatted_predict_rating"] as! NSNumber)
                 confidenceCodes.append(rec["confidence_code"] as! NSNumber)
                 
                 if (x < 12) {
                     primaryStyleId = rec["style_id"] as! NSNumber
-                    primaryVintageIds.append(rec["variant_id"] as! NSNumber)
+                    primaryVariantIds.append(rec["variant_id"] as! NSNumber)
                 } else if (x < 24) {
                     secondaryStyleId = rec["style_id"] as! NSNumber
-                    secondaryVintageIds.append(rec["variant_id"] as! NSNumber)
+                    secondaryVariantIds.append(rec["variant_id"] as! NSNumber)
                 } else {
                     tertiaryStyleId = rec["style_id"] as! NSNumber
-                    tertiaryVintageIds.append(rec["variant_id"] as! NSNumber)
+                    tertiaryVariantIds.append(rec["variant_id"] as! NSNumber)
                 }
                 x = x + 1
             }
             
             if (primaryStyleId != 0 && primaryStyleId == secondaryStyleId) {
-                primaryVintageIds.append(contentsOf: secondaryVintageIds)
-                secondaryVintageIds.removeAll()
+                primaryVariantIds.append(contentsOf: secondaryVariantIds)
+                secondaryVariantIds.removeAll()
                 secondaryStyleId = 0
             }
             
             if (primaryStyleId != 0 && primaryStyleId == tertiaryStyleId) {
-                primaryVintageIds.append(contentsOf: tertiaryVintageIds)
-                tertiaryVintageIds.removeAll()
+                primaryVariantIds.append(contentsOf: tertiaryVariantIds)
+                tertiaryVariantIds.removeAll()
                 tertiaryStyleId = 0
             }
             
             if (secondaryStyleId != 0 && secondaryStyleId == tertiaryStyleId) {
-                secondaryVintageIds.append(contentsOf: tertiaryVintageIds)
-                tertiaryVintageIds.removeAll()
+                secondaryVariantIds.append(contentsOf: tertiaryVariantIds)
+                tertiaryVariantIds.removeAll()
                 tertiaryStyleId = 0
             }
             
             if (primaryStyleId != 0 && CoreData_Style.mr_findFirst(byAttribute: "id", withValue: primaryStyleId) == nil) {
-                var getStyleResponse = try Preferabli.api.getAlamo().get(APIEndpoints.getStyle(id: primaryStyleId))
+                var getStyleResponse = try Preferabli.api.getAlamo().get(APIEndpoints.style(id: primaryStyleId))
                 getStyleResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getStyleResponse)
                 let styleDictionary = try PreferabliTools.continueOrThrowJSONException(data: getStyleResponse.data!)
                 CoreData_Style.mr_import(from: styleDictionary, in: context)
             }
             
             if (secondaryStyleId != 0 && CoreData_Style.mr_findFirst(byAttribute: "id", withValue: secondaryStyleId) == nil) {
-                var getStyleResponse = try Preferabli.api.getAlamo().get(APIEndpoints.getStyle(id: secondaryStyleId))
+                var getStyleResponse = try Preferabli.api.getAlamo().get(APIEndpoints.style(id: secondaryStyleId))
                 getStyleResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getStyleResponse)
                 let styleDictionary = try PreferabliTools.continueOrThrowJSONException(data: getStyleResponse.data!)
                 CoreData_Style.mr_import(from: styleDictionary, in: context)
             }
             
             if (tertiaryStyleId != 0 && CoreData_Style.mr_findFirst(byAttribute: "id", withValue: tertiaryStyleId) == nil) {
-                var getStyleResponse = try Preferabli.api.getAlamo().get(APIEndpoints.getStyle(id: tertiaryStyleId))
+                var getStyleResponse = try Preferabli.api.getAlamo().get(APIEndpoints.style(id: tertiaryStyleId))
                 getStyleResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getStyleResponse)
                 let styleDictionary = try PreferabliTools.continueOrThrowJSONException(data: getStyleResponse.data!)
                 CoreData_Style.mr_import(from: styleDictionary, in: context)
             }
             
-            if (vintageIds.count > 0) {
-                var getWinesResponse = try Preferabli.api.getAlamo().get(APIEndpoints.products, params: ["variant_ids" : vintageIds])
-                getWinesResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getWinesResponse)
-                let wineDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getWinesResponse.data!) as! NSArray
-                for wine in wineDictionaries {
-                    let importedWine = CoreData_Product.mr_import(from: wine, in: context)
+            if (variantIds.count > 0) {
+                var getProductsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.products, params: ["variant_ids" : variantIds])
+                getProductsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getProductsResponse)
+                let productDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getProductsResponse.data!) as! NSArray
+                for product in productDictionaries {
+                    let productObject = CoreData_Product.mr_import(from: product, in: context)
                     
-                    let product = Product.init(product: importedWine)
+                    let product = Product.init(product: productObject)
                     var position = 0
-                    for variant in vintageIds {
+                    for variant in variantIds {
                         let variantHere = product.getVariantWithId(id: variant)
                         if (variantHere != nil) {
                             let predictRating = predictRatings[position]
@@ -1426,7 +1451,7 @@ public class Preferabli {
             if (include_merchant_links) {
                 try addMerchantDataToProducts(products: wines)
             }
-                        
+            
             DispatchQueue.main.async {
                 onCompletion(message, wines)
             }
@@ -1451,7 +1476,7 @@ public class Preferabli {
             }
         }
         
-        var conversionResponse = try Preferabli.api.getAlamo().post(APIEndpoints.lookupConversion(id: PreferabliTools.getIntegrationId()), jsonObject: dictionaries)
+        var conversionResponse = try Preferabli.api.getAlamo().post(APIEndpoints.lookupConversion(id: Preferabli.INTEGRATION_ID), jsonObject: dictionaries)
         conversionResponse = try PreferabliTools.continueOrThrowPreferabliException(response: conversionResponse)
         let conversionDictionaries = try PreferabliTools.continueOrThrowJSONException(data: conversionResponse.data!) as! Array<[String : Any]>
         
@@ -1478,7 +1503,7 @@ public class Preferabli {
     
     /// Rate a ``Product``. Creates a ``Tag`` of type ``TagType/RATING`` which is returned within the relevant product ``Variant``. Customer / user must be logged in to run this call.
     /// - Parameters:
-    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:)`` to convert your product id into a Preferabli product id.
+    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:onCompletion:onFailure:)`` to convert your product id into a Preferabli product id.
     ///   - year: year of the ``Variant`` that you want to rate. Can use ``Variant/CURRENT_VARIANT_YEAR`` if you want to rate the latest variant, or ``Variant/NON_VARIANT`` if the product is not vintaged.
     ///   - rating: pass one of ``RatingType/LOVE``, ``RatingType/LIKE``, ``RatingType/SOSO``, ``RatingType/DISLIKE``.
     ///   - location: location where the rating occurred. Defaults to *nil*.
@@ -1502,7 +1527,7 @@ public class Preferabli {
     
     /// Wishlist a ``Product``. Creates a ``Tag`` of type ``TagType/WISHLIST`` which is returned within the relevant product ``Variant``. Customer / user must be logged in to run this call.
     /// - Parameters:
-    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:)`` to convert your product id into a Preferabli product id.
+    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:onCompletion:onFailure:)`` to convert your product id into a Preferabli product id.
     ///   - year: year of the ``Variant`` that you want to wishlist. Can use ``Variant/CURRENT_VARIANT_YEAR`` if you want to wishlist the latest variant, or ``Variant/NON_VARIANT`` if the product is not vintaged.
     ///   - location: location where the wishlisted item exists. Defaults to *nil*.
     ///   - notes: any notes to go along with the wishlisting. Defaults to *nil*.
@@ -1529,36 +1554,36 @@ public class Preferabli {
             let context = NSManagedObjectContext.mr_()
             context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
             
-            var tagDictionary = ["type" : tag_type.getDatabaseName(), "location" : location ?? "", "comment" : notes ?? "", "value" : value ?? "", "year" : year, "product_id" : product_id, "price" : price, "quantity" : quantity, "format_ml" : format_ml, "collection_id" : collection_id] as [String : Any]
+            let tagDictionary = ["type" : tag_type.getDatabaseName(), "location" : location ?? "", "comment" : notes ?? "", "value" : value ?? "", "year" : year, "product_id" : product_id, "price" : price ?? 0, "quantity" : quantity ?? 0, "format_ml" : format_ml ?? 0, "collection_id" : collection_id] as [String : Any]
             
             var tagResponseDictionary : Any?
             if (tag_type == .CELLAR) {
-                var tagResponse = try Preferabli.api.getAlamo().post(APIEndpoints.createTag(collectionId: collection_id), json: tagDictionary)
+                var tagResponse = try Preferabli.api.getAlamo().post(APIEndpoints.tags(id: collection_id), json: tagDictionary)
                 tagResponse = try PreferabliTools.continueOrThrowPreferabliException(response: tagResponse)
                 PreferabliTools.saveCollectionEtag(response: tagResponse, collectionId: collection_id)
                 tagResponseDictionary = try JSONSerialization.jsonObject(with: tagResponse.data!, options: [])
             } else if (Preferabli.isPreferabliUserLoggedIn()) {
-                var tagResponse = try Preferabli.api.getAlamo().post(APIEndpoints.createTag(id: PreferabliTools.getUserId()), json: tagDictionary)
+                var tagResponse = try Preferabli.api.getAlamo().post(APIEndpoints.userTags(id: PreferabliTools.getPreferabliUserId()), json: tagDictionary)
                 tagResponse = try PreferabliTools.continueOrThrowPreferabliException(response: tagResponse)
                 tagResponseDictionary = try PreferabliTools.continueOrThrowJSONException(data: tagResponse.data!)
             } else if (Preferabli.isCustomerLoggedIn()) {
-                var tagResponse = try Preferabli.api.getAlamo().post(APIEndpoints.customerTags(id: PreferabliTools.getChannelId(), and: PreferabliTools.getCustomerId()), json: tagDictionary)
+                var tagResponse = try Preferabli.api.getAlamo().post(APIEndpoints.customerTags(id: Preferabli.CHANNEL_ID, and: PreferabliTools.getCustomerId()), json: tagDictionary)
                 tagResponse = try PreferabliTools.continueOrThrowPreferabliException(response: tagResponse)
                 tagResponseDictionary = try PreferabliTools.continueOrThrowJSONException(data: tagResponse.data!)
             }
             
-            var tag = CoreData_Tag.mr_import(from: tagResponseDictionary, in: context)
+            let tag = CoreData_Tag.mr_import(from: tagResponseDictionary!, in: context)
             let variant_id = tag.variant_id
             
             var product = CoreData_Product.mr_findFirst(byAttribute: "id", withValue: product_id, in: context)
             var variant = CoreData_Variant.mr_findFirst(byAttribute: "id", withValue: variant_id, in: context)
             
             if (variant == nil) {
-                var getWinesResponse = try Preferabli.api.getAlamo().get(APIEndpoints.products, params: ["variant_ids" : [ variant_id ]])
-                getWinesResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getWinesResponse)
-                let wineDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getWinesResponse.data!) as! NSArray
-                for wine in wineDictionaries {
-                    product = CoreData_Product.mr_import(from: wine, in: context)
+                var getProductsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.products, params: ["variant_ids" : [ variant_id ]])
+                getProductsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getProductsResponse)
+                let productDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getProductsResponse.data!) as! NSArray
+                for productDictionary in productDictionaries {
+                    product = CoreData_Product.mr_import(from: productDictionary, in: context)
                     variant = product!.getVariantWithId(id: variant_id)
                 }
             }
@@ -1568,7 +1593,7 @@ public class Preferabli {
             let productToReturn = Product.init(product: product!)
             
             try addMerchantDataToProducts(products: [ productToReturn ])
-                        
+            
             DispatchQueue.main.async {
                 onCompletion(productToReturn)
             }
@@ -1597,24 +1622,26 @@ public class Preferabli {
             let context = NSManagedObjectContext.mr_()
             context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
             
-            let tag = CoreData_Tag.mr_findFirst(byAttribute: "id", withValue: tag_id, in: context)
+            guard let tag = CoreData_Tag.mr_findFirst(byAttribute: "id", withValue: tag_id, in: context) else {
+                throw PreferabliException(type: .DatabaseError)
+            }
             
             if (PreferabliTools.isCustomerLoggedIn()) {
-                var tagResponse = try Preferabli.api.getAlamo().delete(APIEndpoints.customerTag(id: PreferabliTools.getChannelId(), customerId: PreferabliTools.getCustomerId(), tagId: tag_id))
+                var tagResponse = try Preferabli.api.getAlamo().delete(APIEndpoints.customerTag(id: Preferabli.CHANNEL_ID, customerId: PreferabliTools.getCustomerId(), tagId: tag_id))
                 tagResponse = try PreferabliTools.continueOrThrowPreferabliException(response: tagResponse)
             } else {
-                var tagResponse = try Preferabli.api.getAlamo().delete(APIEndpoints.deleteTag(id: PreferabliTools.getUserId(), tagId: tag_id))
+                var tagResponse = try Preferabli.api.getAlamo().delete(APIEndpoints.userTag(id: PreferabliTools.getPreferabliUserId(), tagId: tag_id))
                 tagResponse = try PreferabliTools.continueOrThrowPreferabliException(response: tagResponse)
             }
             
-            tag?.mr_deleteEntity(in: context)
-            let product_id = tag?.product_id
+            tag.mr_deleteEntity(in: context)
+            let product_id = tag.product_id
             context.mr_saveToPersistentStoreAndWait()
             
-            var product = CoreData_Product.mr_findFirst(byAttribute: "id", withValue: product_id, in: context)
+            let product = CoreData_Product.mr_findFirst(byAttribute: "id", withValue: product_id, in: context)
             let productToReturn = Product.init(product: product!)
             try addMerchantDataToProducts(products: [ productToReturn ])
-                        
+            
             DispatchQueue.main.async {
                 onCompletion(productToReturn)
             }
@@ -1652,10 +1679,11 @@ public class Preferabli {
             var wiliResponse : DataResponse<Data>
             if (PreferabliTools.isCustomerLoggedIn()) {
                 let params = ["product_id" : product_id, "year" : year, "third_person_response" : 1, "channel_customer_id" : PreferabliTools.getCustomerId()] as [String : Any]
-                wiliResponse = try Preferabli.api.getAlamo().get(APIEndpoints.willThey(), params: params)
+                wiliResponse = try Preferabli.api.getAlamo().get(APIEndpoints.wili(), params: params)
                 wiliResponse = try PreferabliTools.continueOrThrowPreferabliException(response: wiliResponse)
             } else {
-                wiliResponse = try Preferabli.api.getAlamo().get(APIEndpoints.getWili(id: product_id, year: year))
+                let params = ["product_id" : product_id, "year" : year, "third_person_response" : 1, "user_id" : PreferabliTools.getPreferabliUserId()] as [String : Any]
+                wiliResponse = try Preferabli.api.getAlamo().get(APIEndpoints.wili(), params: params)
                 wiliResponse = try PreferabliTools.continueOrThrowPreferabliException(response: wiliResponse)
             }
             
@@ -1698,7 +1726,7 @@ public class Preferabli {
             let context = NSManagedObjectContext.mr_()
             context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
             
-            var tagDictionary = ["location" : location ?? "", "comment" : notes ?? "", "value" : value ?? "", "year" : year, "price" : price, "quantity" : quantity, "format_ml" : format_ml ] as [String : Any]
+            let tagDictionary = ["location" : location ?? "", "comment" : notes ?? "", "value" : value ?? "", "year" : year, "price" : price ?? 0, "quantity" : quantity ?? 0, "format_ml" : format_ml ?? 0 ] as [String : Any]
             
             var tagResponseDictionary : Any?
             if (Preferabli.isPreferabliUserLoggedIn()) {
@@ -1710,27 +1738,27 @@ public class Preferabli {
                 } else {
                     return
                 }
-                var tagResponse = try Preferabli.api.getAlamo().put(APIEndpoints.editTag(collectionId: collection_id, tagId: tag_id), json: tagDictionary)
+                var tagResponse = try Preferabli.api.getAlamo().put(APIEndpoints.tag(collectionId: collection_id, tagId: tag_id), json: tagDictionary)
                 tagResponse = try PreferabliTools.continueOrThrowPreferabliException(response: tagResponse)
                 tagResponseDictionary = try PreferabliTools.continueOrThrowJSONException(data: tagResponse.data!)
-            } else if (Preferabli.isCustomerLoggedIn()) {
-                var tagResponse = try Preferabli.api.getAlamo().put(APIEndpoints.customerTag(id: PreferabliTools.getChannelId(), customerId: PreferabliTools.getCustomerId(), tagId: tag_id), json: tagDictionary)
+            } else {
+                var tagResponse = try Preferabli.api.getAlamo().put(APIEndpoints.customerTag(id: Preferabli.CHANNEL_ID, customerId: PreferabliTools.getCustomerId(), tagId: tag_id), json: tagDictionary)
                 tagResponse = try PreferabliTools.continueOrThrowPreferabliException(response: tagResponse)
                 tagResponseDictionary = try PreferabliTools.continueOrThrowJSONException(data: tagResponse.data!)
             }
             
-            var tag = CoreData_Tag.mr_import(from: tagResponseDictionary, in: context)
+            let tag = CoreData_Tag.mr_import(from: tagResponseDictionary!, in: context)
             let variant_id = tag.variant_id
             
             var variant = CoreData_Variant.mr_findFirst(byAttribute: "id", withValue: variant_id, in: context)
             var product : CoreData_Product?
             
             if (variant == nil) {
-                var getWinesResponse = try Preferabli.api.getAlamo().get(APIEndpoints.products, params: ["variant_ids" : [ variant_id ]])
-                getWinesResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getWinesResponse)
-                let wineDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getWinesResponse.data!) as! NSArray
-                for wine in wineDictionaries {
-                    product = CoreData_Product.mr_import(from: wine, in: context)
+                var getProductsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.products, params: ["variant_ids" : [ variant_id ]])
+                getProductsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getProductsResponse)
+                let productDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getProductsResponse.data!) as! NSArray
+                for productDictionary in productDictionaries {
+                    product = CoreData_Product.mr_import(from: productDictionary, in: context)
                     variant = product!.getVariantWithId(id: variant_id)
                 }
             } else {
@@ -1742,7 +1770,7 @@ public class Preferabli {
             let productToReturn = Product.init(product: product!)
             
             try addMerchantDataToProducts(products: [ productToReturn ])
-                        
+            
             DispatchQueue.main.async {
                 onCompletion(productToReturn)
             }

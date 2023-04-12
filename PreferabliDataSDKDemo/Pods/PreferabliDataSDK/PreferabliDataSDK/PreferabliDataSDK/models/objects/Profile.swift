@@ -17,16 +17,16 @@ public class Profile : BaseObject {
     
     /// A score that represents how developed a profile is.
     public var score: NSNumber
-    public var preference_styles: [PreferenceStyle]
+    public var profile_styles: [ProfileStyle]
     
     internal init(profile : CoreData_Profile) {
         user_id = profile.user_id
         customer_id = profile.customer_id
         score = profile.score
-        preference_styles = Array<PreferenceStyle>()
+        profile_styles = Array<ProfileStyle>()
         super.init(id: profile.id)
-        for preference_style in profile.preference_styles.allObjects as! [CoreData_PreferenceStyle] {
-            preference_styles.append(PreferenceStyle.init(preference_style: preference_style, holding_profile: self))
+        for profile_style in profile.preference_styles.allObjects as! [CoreData_ProfileStyle] {
+            profile_styles.append(ProfileStyle.init(profile_style: profile_style, holding_profile: self))
         }
     }
 }

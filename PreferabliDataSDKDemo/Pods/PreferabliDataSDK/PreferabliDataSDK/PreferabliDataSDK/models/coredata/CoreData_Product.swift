@@ -13,39 +13,14 @@ import UIKit
 @objc(CoreData_Product)
 internal class CoreData_Product: NSManagedObject {
     
-    public func getMostRecentVariant() -> CoreData_Variant {
-        return mostRecentVariant!
-    }
-    
-    var mostRecentVariant: CoreData_Variant? {
-        var mostRecentYear = NSNumber(integerLiteral: -2)
-        var mostRecentVariant : CoreData_Variant?
-        for vintage in variants.allObjects as! [CoreData_Variant] {
-            if (vintage.year.intValue  > mostRecentYear.intValue && vintage.id.intValue > 0) {
-                mostRecentYear = vintage.year
-                mostRecentVariant = vintage
-            }
-        }
-        
-        return mostRecentVariant!
-    }
-    
     public func getVariantWithId(id : NSNumber) -> CoreData_Variant? {
-        for vintage in variants.allObjects as! [CoreData_Variant] {
-            if (vintage.id == id) {
-                return vintage
+        for variant in variants.allObjects as! [CoreData_Variant] {
+            if (variant.id == id) {
+                return variant
             }
         }
         
         return nil
-    }
-    
-    static internal func sortProducts(sortedIds : Array<NSManagedObjectID>, products: [CoreData_Product]) -> Array<CoreData_Product> {
-        return products.sorted {
-            let first = sortedIds.firstIndex(of: $0.objectID)!
-            let second = sortedIds.firstIndex(of: $1.objectID)!
-            return first < second
-        }
     }
 }
 

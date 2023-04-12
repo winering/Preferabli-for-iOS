@@ -11,7 +11,6 @@ import CoreData
 
 @objc(CoreData_CollectionOrder)
 internal class CoreData_CollectionOrder: NSManagedObject {
-    
     internal func setTag(in context : NSManagedObjectContext) throws {
         let tagFromDB = CoreData_Tag.mr_findFirst(byAttribute: "id", withValue: tag_id, in: context)
         if (tagFromDB == nil) {

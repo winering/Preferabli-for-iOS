@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Represents an error returned from our API.
 internal class APIError {
     
     internal var code : Int?

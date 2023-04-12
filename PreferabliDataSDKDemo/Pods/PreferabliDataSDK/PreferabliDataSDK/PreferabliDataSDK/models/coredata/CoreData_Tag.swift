@@ -12,19 +12,8 @@ import UIKit
 
 @objc(CoreData_Tag)
 internal class CoreData_Tag: NSManagedObject {
-    static internal func sortTags(sortedIds : Array<NSManagedObjectID>, tags: [CoreData_Tag]) -> Array<CoreData_Tag> {
-        return tags.sorted {
-            let first = sortedIds.firstIndex(of: $0.objectID)!
-            let second = sortedIds.firstIndex(of: $1.objectID)!
-            return first < second
-        }
-    }
-    
     internal func isRating() -> Bool {
-        if (PreferabliTools.getKeyStore().bool(forKey: "MerchantWineRingApp")) {
-            return type == "rating"
-        }
-        return type == "rating" && collection_id.intValue == PreferabliTools.getKeyStore().integer(forKey: "ratings_id")
+        return type == "rating"
     }
 }
 

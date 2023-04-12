@@ -10,6 +10,7 @@ import Foundation
 import MagicalRecord
 import SwiftEventBus
 
+/// Contains methods that help load Preferabli User data.
 internal class PreferabliUserTools {
     
     internal static var sharedInstance = PreferabliUserTools()
@@ -26,7 +27,7 @@ internal class PreferabliUserTools {
         
         if (forceRefresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoadedPurchaseHistory")) {
             try getPurchaseHistoryFromAPI(context: context, priority: .normal, forceRefresh: forceRefresh)
-        } else if (PreferabliTools.has5MinutesPassed(startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalledPurchaseHistory") as? Date)) {
+        } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalledPurchaseHistory") as? Date)) {
             PreferabliTools.startNewWorkThread(priority: .low) {
                 do {
                     let context = NSManagedObjectContext.mr_()
@@ -116,7 +117,7 @@ internal class PreferabliUserTools {
         
         if (forceRefresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoadedUserCollections")) {
             try getUserCollections(in: context)
-        } else if (PreferabliTools.has5MinutesPassed(startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalledUserCollections") as? Date)) {
+        } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalledUserCollections") as? Date)) {
             PreferabliTools.startNewWorkThread(priority: .low, {
                 do {
                     let context = NSManagedObjectContext.mr_()
@@ -197,7 +198,7 @@ internal class PreferabliUserTools {
                     context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
                     
                     let params = ["offset" : offsetInside, "limit" : limit]
-                    var getUserCollectionsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.userCollections(), params: params)
+                    var getUserCollectionsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.userCollections(id: PreferabliTools.getPreferabliUserId()), params: params)
                     getUserCollectionsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getUserCollectionsResponse)
                     let userCollectionDictionaries = try PreferabliTools.continueOrThrowJSONException(data: getUserCollectionsResponse.data!) as! NSArray
                     var channelIds = Array<NSNumber>()

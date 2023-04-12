@@ -1013,6 +1013,7 @@ public class Preferabli {
                     DispatchQueue.main.async {
                         onCompletion((lookup["product_id"] as! NSNumber))
                     }
+                    return
                 }
             }
             
