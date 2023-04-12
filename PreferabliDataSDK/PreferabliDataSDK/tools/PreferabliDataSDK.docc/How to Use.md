@@ -93,7 +93,7 @@ The Preferabli class also provides these helpful class utility methods:
 - ``Preferabli/isCustomerLoggedIn()``
 - ``Preferabli/getPrimaryInventoryId()``
 - ``Preferabli/getPoweredByPreferabliLogo(light_background:)``
-- ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:)``
+- ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:onCompletion:onFailure:)``
 
 These are called without the ``Preferabli/main`` instance.
 

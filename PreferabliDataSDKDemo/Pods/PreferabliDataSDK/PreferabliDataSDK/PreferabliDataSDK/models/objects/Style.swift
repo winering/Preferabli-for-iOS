@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-/// Styles link products together by characteristics and geography - they help inform us of a user's preferences in certain types of products.
+/// Styles express how product characteristics synthesize in the context of human perception and define the nature of consumer taste preferences. These are *not* unique for each customer.
 public class Style : BaseObject {
     
     public var desc: String
@@ -34,10 +34,14 @@ public class Style : BaseObject {
         }
     }
     
-    /// Get the path of the style's primary image.
-    /// - Returns: a string path.
-    public func getImage() -> String {
-        return primary_image_url ?? ""
+    /// Get the style image.
+    /// - Parameters:
+    ///   - width: returns an image with the specified width in pixels.
+    ///   - height: returns an image with the specified height in pixels.
+    ///   - quality: returns an image with the specified quality. Scales from 0 - 100.
+    /// - Returns: the URL of the requested image.
+    public func getImage(width : CGFloat, height : CGFloat, quality : Int = 80) -> URL? {
+        return PreferabliTools.getImageUrl(image: primary_image_url, width: width, height: height, quality: quality)
     }
     
     /// Get product type.

@@ -46,7 +46,7 @@ public class Preferabli {
         loggingEnabled = logging_enabled
         
         INTEGRATION_ID = integration_id
-                	
+        
         PreferabliTools.getKeyStore().set(integration_id, forKey: "INTEGRATION_ID")
         PreferabliTools.getKeyStore().set(client_interface, forKey: "CLIENT_INTERFACE")
         api.createAlamo()
@@ -128,7 +128,7 @@ public class Preferabli {
     /// Will let you know if a customer is logged in or not.
     /// - Returns: bool
     static public func isCustomerLoggedIn() -> Bool {
-            return PreferabliTools.isCustomerLoggedIn()
+        return PreferabliTools.isCustomerLoggedIn()
     }
     
     /// Will get you the collection id of your integration's primary inventory.
@@ -286,7 +286,7 @@ public class Preferabli {
             
             let context = NSManagedObjectContext.mr_()
             context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-                        
+            
             var parameters = ["email": email, "password" : password, "subscribed" : 1] as [String : Any]
             if (!PreferabliTools.isNullOrWhitespace(string: user_claim_code)) {
                 parameters["use_user_claim_code"] = user_claim_code
@@ -911,7 +911,7 @@ public class Preferabli {
     
     /// Get a Like This, Try That recommendation. Start with a ``Product``, get similar tasting results. This function will return personalized results if a user is logged in.
     /// - Parameters:
-    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:)`` to convert your product id into a Preferabli product id.
+    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:onCompletion:onFailure:)`` to convert your product id into a Preferabli product id.
     ///   - year: year of the ``Variant`` that you want to get results on. Defaults to ``Variant/CURRENT_VARIANT_YEAR``.
     ///   - collection_id: the id of a specific ``Collection`` that you want to draw results from. Defaults to ``PRIMARY_INVENTORY_ID``.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
@@ -920,41 +920,6 @@ public class Preferabli {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
             self.ltttActual(product_id: product_id, year: year, collection_id: collection_id, onCompletion: onCompletion, onFailure: onFailure)
         })
-    }
-    
-    /// Call this to convert your merchant product / variant id to the Preferabli product id for use with our functions.
-    /// - Parameters:
-    ///   - merchant_product_id: the id of your product (as it appears in your system).
-    ///   - merchant_variant_id: the id of your product variant (as it appears in your system). *Used only if you have a hierarchal database format for your products.*
-    /// - Returns: the Preferabli product id for use with our functions.
-    static public func getPreferabliProductId(merchant_product_id : String?, merchant_variant_id : String?) throws -> (NSNumber, NSNumber) {
-        if (merchant_product_id == nil && merchant_variant_id == nil) {
-            throw PreferabliException.init(type: .MappingNotFound)
-        }
-        var dictionaries = Array<[String : Any]>()
-        
-        var dictionary = [String : Any]()
-        dictionary["number"] = 1
-        if (merchant_product_id != nil) {
-            dictionary["merchant_product_ids"] = [merchant_product_id!]
-        }
-        if (merchant_variant_id != nil) {
-            dictionary["merchant_variant_ids"] = [merchant_variant_id!]
-        }
-        dictionaries.append(dictionary)
-        
-        var conversionResponse = try Preferabli.api.getAlamo().post(APIEndpoints.lookupConversion(id: Preferabli.INTEGRATION_ID), jsonObject: dictionaries)
-        conversionResponse = try PreferabliTools.continueOrThrowPreferabliException(response: conversionResponse)
-        let conversionDictionaries = try PreferabliTools.continueOrThrowJSONException(data: conversionResponse.data!) as! Array<[String : Any]>
-        for dictionary in conversionDictionaries {
-            let lookups = dictionary["lookups"] as! Array<[String : Any]>
-            if (lookups.count > 0) {
-                let lookup = lookups[0]
-                return (lookup["product_id"] as! NSNumber, NSNumber.init(value: Int(lookup["year"] as! String)!))
-            }
-        }
-        
-        throw PreferabliException.init(type: .MappingNotFound)
     }
     
     private func ltttActual(product_id : NSNumber, year : NSNumber, collection_id : NSNumber, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
@@ -1004,10 +969,65 @@ public class Preferabli {
         }
     }
     
+    /// Call this to convert your merchant product / variant id to the Preferabli product id for use with our functions.
+    /// - Parameters:
+    ///   - merchant_product_id: the id of your product (as it appears in your system). *Either this or merchant_variant_id is required.*
+    ///   - merchant_variant_id: the id of your product variant (as it appears in your system). *Used only if you have a hierarchical database format for your products.*
+    ///   - onCompletion: returns product id if the call was successful. *Returns on the main thread.*
+    ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
+    public func getPreferabliProductId(merchant_product_id : String? = nil, merchant_variant_id : String? = nil, onCompletion: @escaping (NSNumber) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+        PreferabliTools.startNewWorkThread(priority: .veryHigh, {
+            self.getPreferabliProductIdActual(merchant_product_id: merchant_product_id, merchant_variant_id: merchant_variant_id, onCompletion: onCompletion, onFailure: onFailure)
+        })
+    }
+    
+    private func getPreferabliProductIdActual(merchant_product_id : String?, merchant_variant_id : String?, onCompletion: @escaping (NSNumber) -> (), onFailure: @escaping (PreferabliException) -> ()) {
+        do {
+            try canWeContinue(needsToBeLoggedIn: false)
+            
+            if (merchant_product_id == nil && merchant_variant_id == nil) {
+                throw PreferabliException.init(type: .MappingNotFound)
+            }
+            
+            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "get_preferabli_id"])
+            
+            var dictionaries = Array<[String : Any]>()
+            
+            var dictionary = [String : Any]()
+            dictionary["number"] = 1
+            if (merchant_product_id != nil) {
+                dictionary["merchant_product_ids"] = [merchant_product_id!]
+            }
+            if (merchant_variant_id != nil) {
+                dictionary["merchant_variant_ids"] = [merchant_variant_id!]
+            }
+            dictionaries.append(dictionary)
+            
+            var conversionResponse = try Preferabli.api.getAlamo().post(APIEndpoints.lookupConversion(id: Preferabli.INTEGRATION_ID), jsonObject: dictionaries)
+            conversionResponse = try PreferabliTools.continueOrThrowPreferabliException(response: conversionResponse)
+            let conversionDictionaries = try PreferabliTools.continueOrThrowJSONException(data: conversionResponse.data!) as! Array<[String : Any]>
+            for dictionary in conversionDictionaries {
+                let lookups = dictionary["lookups"] as! Array<[String : Any]>
+                if (lookups.count > 0) {
+                    let lookup = lookups[0]
+                    DispatchQueue.main.async {
+                        onCompletion((lookup["product_id"] as! NSNumber))
+                    }
+                    return
+                }
+            }
+            
+            throw PreferabliException.init(type: .MappingNotFound)
+            
+        } catch {
+            handleError(error: error, onFailure: onFailure)
+        }
+    }
+    
     /// Get help finding out where a ``Product`` is in stock.
     /// - Parameters:
-    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:)`` to convert your product id into a Preferabli product id.
-    ///   - fulfill_sort: pass ``FulfillSort`` for sorting & filtering options. *If sorting by distance, location MUST be present!
+    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:onCompletion:onFailure:)`` to convert your product id into a Preferabli product id.
+    ///   - fulfill_sort: pass ``FulfillSort`` for sorting & filtering options. If sorting by distance, ``Location`` MUST be present!
     ///   - append_nonconforming_results: pass true if you want results that *DO NOT* conform to all filtering & sorting parameters to be returned. Useful so that something is returned even if the user's filter parameters are too narrow. All results that do not conform contain nonconforming_result = true within. Defaults to *true*.
     ///   - lock_to_integration: pass true if you only want to draw results from your integration. Defaults to *true*.
     ///   - onCompletion: returns ``WhereToBuy`` if the call was successful. *Returns on the main thread.*
@@ -1038,7 +1058,7 @@ public class Preferabli {
             var params = ["product_id" : product_id, "sort_by" : sort_by, "merge_products" : true, "pickup" : fulfill_sort.include_pickup, "local_delivery" : fulfill_sort.include_delivery, "standard_shipping" : fulfill_sort.include_shipping, "append_nonconforming_results" : append_nonconforming_results, "limit" : 1000, "offset" : 0, "distance_miles" : fulfill_sort.distance_miles] as [String : Any]
             
             if (fulfill_sort.type == .DISTANCE && fulfill_sort.location == nil) {
-                throw PreferabliException.init(type: .UnknownError, message: "Sort by distance requires a location.")
+                throw PreferabliException.init(type: .OtherError, message: "Sort by distance requires a location.")
             } else if (fulfill_sort.location != nil) {
                 if (PreferabliTools.isNullOrWhitespace(string: fulfill_sort.location!.zip_code)) {
                     params["lat"] = fulfill_sort.location!.latitude
@@ -1134,7 +1154,7 @@ public class Preferabli {
             let predicate = Preferabli.isCustomerLoggedIn() ? NSPredicate.init(format: "customer_id == %@", argumentArray: [PreferabliTools.getCustomerId()]) : NSPredicate.init(format: "user_id == %@", argumentArray: [PreferabliTools.getPreferabliUserId()])
             let coredataProfile = CoreData_Profile.mr_findFirst(with: predicate, in: context)!
             let profile = Profile.init(profile: coredataProfile)
-                        
+            
             DispatchQueue.main.async {
                 onCompletion(profile)
             }
@@ -1432,7 +1452,7 @@ public class Preferabli {
             if (include_merchant_links) {
                 try addMerchantDataToProducts(products: wines)
             }
-                        
+            
             DispatchQueue.main.async {
                 onCompletion(message, wines)
             }
@@ -1484,7 +1504,7 @@ public class Preferabli {
     
     /// Rate a ``Product``. Creates a ``Tag`` of type ``TagType/RATING`` which is returned within the relevant product ``Variant``. Customer / user must be logged in to run this call.
     /// - Parameters:
-    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:)`` to convert your product id into a Preferabli product id.
+    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:onCompletion:onFailure:)`` to convert your product id into a Preferabli product id.
     ///   - year: year of the ``Variant`` that you want to rate. Can use ``Variant/CURRENT_VARIANT_YEAR`` if you want to rate the latest variant, or ``Variant/NON_VARIANT`` if the product is not vintaged.
     ///   - rating: pass one of ``RatingType/LOVE``, ``RatingType/LIKE``, ``RatingType/SOSO``, ``RatingType/DISLIKE``.
     ///   - location: location where the rating occurred. Defaults to *nil*.
@@ -1508,7 +1528,7 @@ public class Preferabli {
     
     /// Wishlist a ``Product``. Creates a ``Tag`` of type ``TagType/WISHLIST`` which is returned within the relevant product ``Variant``. Customer / user must be logged in to run this call.
     /// - Parameters:
-    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:)`` to convert your product id into a Preferabli product id.
+    ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:onCompletion:onFailure:)`` to convert your product id into a Preferabli product id.
     ///   - year: year of the ``Variant`` that you want to wishlist. Can use ``Variant/CURRENT_VARIANT_YEAR`` if you want to wishlist the latest variant, or ``Variant/NON_VARIANT`` if the product is not vintaged.
     ///   - location: location where the wishlisted item exists. Defaults to *nil*.
     ///   - notes: any notes to go along with the wishlisting. Defaults to *nil*.
@@ -1574,7 +1594,7 @@ public class Preferabli {
             let productToReturn = Product.init(product: product!)
             
             try addMerchantDataToProducts(products: [ productToReturn ])
-                        
+            
             DispatchQueue.main.async {
                 onCompletion(productToReturn)
             }
@@ -1622,7 +1642,7 @@ public class Preferabli {
             let product = CoreData_Product.mr_findFirst(byAttribute: "id", withValue: product_id, in: context)
             let productToReturn = Product.init(product: product!)
             try addMerchantDataToProducts(products: [ productToReturn ])
-                        
+            
             DispatchQueue.main.async {
                 onCompletion(productToReturn)
             }
@@ -1751,7 +1771,7 @@ public class Preferabli {
             let productToReturn = Product.init(product: product!)
             
             try addMerchantDataToProducts(products: [ productToReturn ])
-                        
+            
             DispatchQueue.main.async {
                 onCompletion(productToReturn)
             }

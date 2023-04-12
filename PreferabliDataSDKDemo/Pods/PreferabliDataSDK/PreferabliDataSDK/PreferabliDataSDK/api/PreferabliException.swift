@@ -28,7 +28,7 @@ public struct PreferabliException : Error {
     }
     
     internal init(error : Error) {
-        self.type = .UnknownError
+        self.type = .OtherError
         self.message = error.localizedDescription
         self.code = 0
     }
@@ -63,7 +63,7 @@ public enum PreferabliExceptionType {
     /// A network error.
     case NetworkError
     /// An unknown / other error.
-    case UnknownError
+    case OtherError
     /// An error decoding JSON.
     case JSONError
     /// The data you requested is already loaded.
@@ -90,7 +90,7 @@ public enum PreferabliExceptionType {
             return "API error."
         case .NetworkError:
             return "Network issue."
-        case .UnknownError:
+        case .OtherError:
             return "Other / unknown issue. Contact support."
         case .JSONError:
             return "JSON error. Contact support."

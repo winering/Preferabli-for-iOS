@@ -264,7 +264,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
                 }
             }
             
-            Preferabli.main.getGuidedRecResults(selected_choice_ids: selected_choice_ids) { products in
+            Preferabli.main.getGuidedRecResults(guided_rec_id: guided_rec.id, selected_choice_ids: selected_choice_ids) { products in
                 self.products = products
                 self.items = products.map { $0.name } as! [String]
                 self.tableView.reloadData()
@@ -282,15 +282,20 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     
     @IBAction func whereToBuyPressed() {
         showLoadingView()
-        Preferabli.main.whereToBuy(product_id: 11263) { where_to_buy in
-            self.products.removeAll()
-            if where_to_buy.links.count > 0 {
-                self.items = where_to_buy.links.map { $0.product_name } as! [String]
-            } else {
-                self.items = where_to_buy.venues.map { $0.name } as! [String]
+        Preferabli.main.getPreferabliProductId(merchant_variant_id: "107811") { product_id in
+            Preferabli.main.whereToBuy(product_id: product_id) { where_to_buy in
+                self.products.removeAll()
+                if where_to_buy.links.count > 0 {
+                    self.items = where_to_buy.links.map { $0.product_name } as! [String]
+                } else {
+                    self.items = where_to_buy.venues.map { $0.name } as! [String]
+                }
+                self.tableView.reloadData()
+                self.hideLoadingView()
+            } onFailure: { error in
+                self.hideLoadingView()
+                self.showSnackBar(message: error.getMessage())
             }
-            self.tableView.reloadData()
-            self.hideLoadingView()
         } onFailure: { error in
             self.hideLoadingView()
             self.showSnackBar(message: error.getMessage())
@@ -340,7 +345,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
         showLoadingView()
         Preferabli.main.getProfile { profile in
             self.products.removeAll()
-            self.items = profile.preference_styles.map { $0.style.name } as! [String]
+            self.items = profile.profile_styles.map { $0.style.name } as! [String]
             self.tableView.reloadData()
             self.hideLoadingView()
         } onFailure: { error in

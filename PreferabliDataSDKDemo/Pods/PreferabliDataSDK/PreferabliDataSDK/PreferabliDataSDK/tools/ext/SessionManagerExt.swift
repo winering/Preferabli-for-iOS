@@ -61,7 +61,7 @@ extension SessionManager {
     
     internal func syncRequest(url: URLConvertible, method: HTTPMethod, parameters: Parameters?, encoding: ParameterEncoding, headers: HTTPHeaders?) -> DataResponse<Data> {
         if (Preferabli.loggingEnabled && parameters != nil) {
-            print(parameters)
+            print(parameters!)
         }
         
         var outResponse: DataResponse<Data>!
@@ -71,14 +71,14 @@ extension SessionManager {
             outResponse = response
             semaphore.signal()
         }
-        semaphore.wait(timeout: DispatchTime.distantFuture)
+        _ = semaphore.wait(timeout: DispatchTime.distantFuture)
         
         return outResponse
     }
     
-    internal func syncRequest(urlString: String, method: String, jsonObject: Any) throws -> DataResponse<Data> {
-        if (Preferabli.loggingEnabled) {
-            print(jsonObject)
+    internal func syncRequest(urlString: String, method: String, jsonObject: Any?) throws -> DataResponse<Data> {
+        if (Preferabli.loggingEnabled && jsonObject != nil) {
+            print(jsonObject!)
         }
         
         var outResponse: DataResponse<Data>!
@@ -88,17 +88,19 @@ extension SessionManager {
         var request = URLRequest(url: url!)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        if (jsonObject is Data) {
-            request.httpBody = jsonObject as! Data
-        } else {
-            request.httpBody = try JSONSerialization.data(withJSONObject: jsonObject)
+        if (jsonObject != nil) {
+            if (jsonObject is Data) {
+                request.httpBody = jsonObject as? Data
+            } else {
+                request.httpBody = try JSONSerialization.data(withJSONObject: jsonObject!)
+            }
         }
         
         self.request(request).responseData { response in
             outResponse = response
             semaphore.signal()
         }
-        semaphore.wait(timeout: DispatchTime.distantFuture)
+        _ = semaphore.wait(timeout: DispatchTime.distantFuture)
         
         return outResponse
     }
@@ -114,8 +116,8 @@ extension SessionManager {
         
         self.upload(multipartFormData: { multipartFormData in
             multipartFormData.append(data, withName: "file", fileName: "file.jpg", mimeType: "image/jpeg")
-            if (PreferabliTools.isUserLoggedIn()) {
-                multipartFormData.append(PreferabliTools.getUserId().stringValue.data(using: String.Encoding.utf8, allowLossyConversion: false)!, withName: "user_id")
+            if (PreferabliTools.isPreferabliUserLoggedIn()) {
+                multipartFormData.append(PreferabliTools.getPreferabliUserId().stringValue.data(using: String.Encoding.utf8, allowLossyConversion: false)!, withName: "user_id")
             }
         }, with: request) { result in
             switch result {
@@ -137,7 +139,7 @@ extension SessionManager {
                 }
             }
         }
-        semaphore.wait(timeout: DispatchTime.distantFuture)
+        _ = semaphore.wait(timeout: DispatchTime.distantFuture)
         
         return outResponse
     }
@@ -174,7 +176,7 @@ extension SessionManager {
                 }
             }
         }
-        semaphore.wait(timeout: DispatchTime.distantFuture)
+        _ = semaphore.wait(timeout: DispatchTime.distantFuture)
         
         return outResponse
     }
