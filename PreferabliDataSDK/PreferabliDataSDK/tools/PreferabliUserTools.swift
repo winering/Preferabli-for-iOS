@@ -18,7 +18,7 @@ internal class PreferabliUserTools {
     private let purchasesObject = NSObject()
     private let collectionsObject = NSObject()
     
-    internal func getPurchaseHistory(forceRefresh : Bool, lock_to_integration : Bool) throws -> Array<Product> {
+    internal func getPurchaseHistory(priority : Operation.QueuePriority, forceRefresh : Bool, lock_to_integration : Bool) throws -> Array<Product> {
         objc_sync_enter(purchasesObject)
         defer { objc_sync_exit(purchasesObject) }
         
@@ -26,7 +26,7 @@ internal class PreferabliUserTools {
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         
         if (forceRefresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoadedPurchaseHistory")) {
-            try getPurchaseHistoryFromAPI(context: context, priority: .normal, forceRefresh: forceRefresh)
+            try getPurchaseHistoryFromAPI(context: context, priority: priority, forceRefresh: forceRefresh)
         } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalledPurchaseHistory") as? Date)) {
             PreferabliTools.startNewWorkThread(priority: .low) {
                 do {

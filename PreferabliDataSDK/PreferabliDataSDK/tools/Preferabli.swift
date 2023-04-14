@@ -81,10 +81,10 @@ public class Preferabli {
     private func loadUserData() {
         if (Preferabli.isPreferabliUserLoggedIn() || Preferabli.isCustomerLoggedIn()) {
             PreferabliTools.startNewWorkThread(priority: .normal, {
-                Preferabli.main.getProfile()
-                Preferabli.main.getRatedProducts(include_merchant_links: false)
+                Preferabli.main.getProfileActual()
+                Preferabli.main.getRatedProducts(include_merchant_links: false, priority: .normal)
                 //                    Preferabli.main.getWishlistProducts()
-                Preferabli.main.getPurchaseHistory(include_merchant_links: false)
+                Preferabli.main.getPurchasedProducts(include_merchant_links: false, priority: .normal)
             })
         }
     }
@@ -374,7 +374,7 @@ public class Preferabli {
     /// Performs label recognition on a supplied image. Returns any ``Product`` matches.
     /// - Parameters:
     ///   - image: label image you want to search for.
-    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` that connect Preferabli products to your own. Defaults to *true*.
+    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
     ///   - onCompletion: returns ``Media``, \[``LabelRecResult``\] if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
     public func labelRecognition(image : UIImage, include_merchant_links: Bool = true, onCompletion: @escaping (Media, [LabelRecResult]) -> () = {_,_  in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
@@ -434,7 +434,7 @@ public class Preferabli {
     ///   - lock_to_integration: pass true if you only want to draw results from your integration. Defaults to *false*.
     ///   - product_categories: pass any ``ProductCategory`` that you would like the results to conform to. Pass *nil* for all results. Defaults to *nil*.
     ///   - product_types: pass any ``ProductType`` that you would like the results to conform to. Pass *nil* for all results. Defaults to *nil*.
-    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` that connect Preferabli products to your own. Defaults to *true*.
+    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
     public func searchProducts(query : String, lock_to_integration : Bool = false, product_categories : [ProductCategory]? = nil, product_types : [ProductType]? = nil, include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
@@ -556,184 +556,196 @@ public class Preferabli {
         }
     }
     
-    /// Get rated products. Customer / user must be logged in to run this call.
+    /// Get rated products. Customer / Preferabli user must be logged in to run this call.
     /// - Parameters:
     ///   - force_refresh: pass true if you want to force a refresh from the API and wait for the results to return. Otherwise, the call will load locally if available and run a background refresh only if one has not been initiated in the past 5 minutes. Defaults to *false*.
-    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` that connect Preferabli products to your own. Defaults to *true*.
+    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
     public func getRatedProducts(force_refresh : Bool = false, include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
-        do {
-            try canWeContinue(needsToBeLoggedIn: true)
-            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "get_rated_products"])
-            if (Preferabli.isPreferabliUserLoggedIn()) {
-                getProductsInCollection(force_refresh: force_refresh, collection_id: NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "ratings_id")), include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
-            } else {
-                getCustomerTags(force_refresh: force_refresh, tag_type: "rating", include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
-            }
-        } catch {
-            handleError(error: error, onFailure: onFailure)
-        }
+        getRatedProducts(force_refresh: force_refresh, include_merchant_links: include_merchant_links, priority: .veryHigh, onCompletion: onCompletion, onFailure: onFailure)
     }
     
-    /// Get wishlisted products. Customer / user must be logged in to run this call.
+    internal func getRatedProducts(force_refresh : Bool = false, include_merchant_links: Bool = true, priority : Operation.QueuePriority = .veryHigh, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+        PreferabliTools.startNewWorkThread(priority: priority, {
+            
+            do {
+                try self.canWeContinue(needsToBeLoggedIn: true)
+                SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "get_rated_products"])
+                
+                let products : Array<Product>
+                if (Preferabli.isPreferabliUserLoggedIn()) {
+                    products = try self.getProductsInCollection(priority: priority, force_refresh: force_refresh, collection_id: NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "ratings_id")))
+                } else {
+                    products = try self.getCustomerTagProducts(force_refresh: force_refresh, tag_type: "rating")
+                }
+                
+                if (include_merchant_links) {
+                    try self.addMerchantDataToProducts(products: products)
+                }
+                
+                DispatchQueue.main.async {
+                    onCompletion(products)
+                }
+                
+            } catch {
+                self.handleError(error: error, onFailure: onFailure)
+            }
+        })
+    }
+    
+    /// Get wishlisted products. Customer / Preferabli user must be logged in to run this call.
     /// - Parameters:
     ///   - force_refresh: pass true if you want to force a refresh from the API and wait for the results to return. Otherwise, the call will load locally if available and run a background refresh only if one has not been initiated in the past 5 minutes. Defaults to *false*.
-    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` that connect Preferabli products to your own. Defaults to *true*.
+    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func getWishlistProducts(force_refresh : Bool = false, include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
-        do {
-            try canWeContinue(needsToBeLoggedIn: true)
-            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "get_wishlist_products"])
-            if (Preferabli.isPreferabliUserLoggedIn()) {
-                getProductsInCollection(force_refresh: force_refresh, collection_id: NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "wishlist_id")), include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
-            } else {
-                getCustomerTags(force_refresh: force_refresh, tag_type: "wishlist", include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
-            }
-        } catch {
-            handleError(error: error, onFailure: onFailure)
-        }
+    public func getWishlistedProducts(force_refresh : Bool = false, include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+        getWishlistedProducts(force_refresh: force_refresh, include_merchant_links: include_merchant_links, priority: .veryHigh, onCompletion: onCompletion, onFailure: onFailure)
     }
     
-    /// Get purchased products. Customer / user must be logged in to run this call.
+    internal func getWishlistedProducts(force_refresh : Bool = false, include_merchant_links: Bool = true, priority : Operation.QueuePriority = .veryHigh, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+        PreferabliTools.startNewWorkThread(priority: priority, {
+            do {
+                try self.canWeContinue(needsToBeLoggedIn: true)
+                SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "get_wishlist_products"])
+                
+                let products : Array<Product>
+                if (Preferabli.isPreferabliUserLoggedIn()) {
+                    products = try self.getProductsInCollection(priority: priority, force_refresh: force_refresh, collection_id: NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "wishlist_id")))
+                } else {
+                    products = try self.getCustomerTagProducts(force_refresh: force_refresh, tag_type: "wishlist")
+                }
+                
+                if (include_merchant_links) {
+                    try self.addMerchantDataToProducts(products: products)
+                }
+                
+                DispatchQueue.main.async {
+                    onCompletion(products)
+                }
+                
+            } catch {
+                self.handleError(error: error, onFailure: onFailure)
+            }
+        })
+    }
+    
+    /// Get purchased products. Customer / Preferabli user must be logged in to run this call.
     /// - Parameters:
     ///   - force_refresh: pass true if you want to force a refresh from the API and wait for the results to return. Otherwise, the call will load locally if available and run a background refresh only if one has not been initiated in the past 5 minutes. Defaults to *false*.
     ///   - lock_to_integration: pass true if you only want to draw results from your integration. Defaults to *true*.
-    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` that connect Preferabli products to your own. Defaults to *true*.
+    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func getPurchaseHistory(force_refresh : Bool = false, lock_to_integration : Bool = true, include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
-        do {
-            try canWeContinue(needsToBeLoggedIn: true)
-            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "get_purchase_history"])
-            if (Preferabli.isPreferabliUserLoggedIn()) {
-                let products = try PreferabliUserTools.sharedInstance.getPurchaseHistory(forceRefresh: force_refresh, lock_to_integration: lock_to_integration)
+    public func getPurchasedProducts(force_refresh : Bool = false, lock_to_integration : Bool = true, include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+        getPurchasedProducts(force_refresh: force_refresh, lock_to_integration: lock_to_integration, include_merchant_links: include_merchant_links, priority: .veryHigh, onCompletion: onCompletion, onFailure: onFailure)
+    }
+    
+    internal func getPurchasedProducts(force_refresh : Bool = false, lock_to_integration : Bool = true, include_merchant_links: Bool = true, priority : Operation.QueuePriority = .veryHigh, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+        PreferabliTools.startNewWorkThread(priority: priority, {
+            do {
+                try self.canWeContinue(needsToBeLoggedIn: true)
+                SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "get_purchase_history"])
+                
+                let products : Array<Product>
+                if (Preferabli.isPreferabliUserLoggedIn()) {
+                    products = try PreferabliUserTools.sharedInstance.getPurchaseHistory(priority: priority, forceRefresh: force_refresh, lock_to_integration: lock_to_integration)
+                } else {
+                    products = try self.getCustomerTagProducts(force_refresh: force_refresh, tag_type: "purchase")
+                }
+                
                 if (include_merchant_links) {
-                    try addMerchantDataToProducts(products: products)
+                    try self.addMerchantDataToProducts(products: products)
                 }
+                
                 onCompletion(products)
-            } else {
-                getCustomerTags(force_refresh: force_refresh, tag_type: "purchase", include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
+                
+            } catch {
+                self.handleError(error: error, onFailure: onFailure)
             }
-        } catch {
-            handleError(error: error, onFailure: onFailure)
-        }
-    }
-    
-    private func getProductsInCollection(force_refresh : Bool, collection_id : NSNumber, include_merchant_links: Bool, onCompletion: @escaping ([Product]) -> (), onFailure: @escaping (PreferabliException) -> ()) {
-        PreferabliTools.startNewWorkThread(priority: .veryHigh, {
-            self.getProductsInCollectionActual(force_refresh: force_refresh, collection_id: collection_id, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
         })
     }
     
-    private func getProductsInCollectionActual(force_refresh : Bool, collection_id : NSNumber, include_merchant_links: Bool, onCompletion: @escaping ([Product]) -> (), onFailure: @escaping (PreferabliException) -> ()) {
-        do {
-            try canWeContinue(needsToBeLoggedIn: true)
-            
-            let context = NSManagedObjectContext.mr_()
-            context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-            
-            if (force_refresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoaded\(collection_id)")) {
-                try LoadCollectionTools.sharedInstance.loadCollectionViaTags(in: context, priority: .normal, with: collection_id)
-            } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalled\(collection_id)") as? Date)) {
-                PreferabliTools.startNewWorkThread(priority: .low) {
-                    do {
-                        let context = NSManagedObjectContext.mr_()
-                        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-                        try LoadCollectionTools.sharedInstance.loadCollectionViaTags(in: context, priority: .normal, with: collection_id)
-                    } catch {
-                        // catching any issues here so that we can still pull up our saved data
-                        if (Preferabli.loggingEnabled) {
-                            print(error)
-                        }
+    private func getProductsInCollection(priority : Operation.QueuePriority, force_refresh : Bool, collection_id : NSNumber) throws -> [Product] {
+        try canWeContinue(needsToBeLoggedIn: true)
+        
+        let context = NSManagedObjectContext.mr_()
+        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        
+        if (force_refresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoaded\(collection_id)")) {
+            try LoadCollectionTools.sharedInstance.loadCollectionViaTags(in: context, priority: priority, with: collection_id)
+        } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalled\(collection_id)") as? Date)) {
+            PreferabliTools.startNewWorkThread(priority: .low) {
+                do {
+                    let context = NSManagedObjectContext.mr_()
+                    context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+                    try LoadCollectionTools.sharedInstance.loadCollectionViaTags(in: context, priority: .low, with: collection_id)
+                } catch {
+                    // catching any issues here so that we can still pull up our saved data
+                    if (Preferabli.loggingEnabled) {
+                        print(error)
                     }
                 }
             }
-            
-            let predicate = NSPredicate(format: "SUBQUERY(variants, $v, ANY $v.tags.collection_id == %d).@count != 0", collection_id)
-            let products = CoreData_Product.mr_findAll(with: predicate, in: context) as! [CoreData_Product]
-            
-            var productsToReturn = Array<Product>()
-            for product in products {
-                productsToReturn.append(Product.init(product: product))
-            }
-            
-            if (include_merchant_links) {
-                try addMerchantDataToProducts(products: productsToReturn)
-            }
-            
-            try canWeContinue(needsToBeLoggedIn: true)
-            
-            DispatchQueue.main.async {
-                onCompletion(productsToReturn)
-            }
-            
-        } catch {
-            handleError(error: error, onFailure: onFailure)
         }
+        
+        let predicate = NSPredicate(format: "SUBQUERY(variants, $v, ANY $v.tags.collection_id == %d).@count != 0", collection_id)
+        let products = CoreData_Product.mr_findAll(with: predicate, in: context) as! [CoreData_Product]
+        
+        var productsToReturn = Array<Product>()
+        for product in products {
+            productsToReturn.append(Product.init(product: product))
+        }
+        
+        try canWeContinue(needsToBeLoggedIn: true)
+        
+        return productsToReturn
     }
     
-    private func getCustomerTags(force_refresh : Bool, tag_type : String? = nil, include_merchant_links : Bool, onCompletion: @escaping ([Product]) -> (), onFailure: @escaping (PreferabliException) -> ()) {
-        PreferabliTools.startNewWorkThread(priority: .veryHigh, {
-            self.getCustomerTagsActual(force_refresh: force_refresh, tag_type: tag_type, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
-        })
-    }
-    
-    private func getCustomerTagsActual(force_refresh : Bool, tag_type : String?, include_merchant_links : Bool, onCompletion: @escaping ([Product]) -> (), onFailure: @escaping (PreferabliException) -> ()) {
-        do {
-            try canWeContinue(needsToBeLoggedIn: true)
-            
-            let context = NSManagedObjectContext.mr_()
-            context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-            
-            if (force_refresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoaded" + (tag_type ?? "AllCustomerTags"))) {
-                try self.actuallyGetCustomerTags(context: context, tag_type: tag_type)
-            } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalled" + (tag_type ?? "AllCustomerTags")) as? Date)) {
-                PreferabliTools.startNewWorkThread(priority: .low) {
-                    do {
-                        let context = NSManagedObjectContext.mr_()
-                        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-                        try self.actuallyGetCustomerTags(context: context, tag_type: tag_type)
-                    } catch {
-                        // catching any issues here so that we can still pull up our saved data
-                        if (Preferabli.loggingEnabled) {
-                            print(error)
-                        }
+    private func getCustomerTagProducts(force_refresh : Bool, tag_type : String?) throws -> [Product]  {
+        try canWeContinue(needsToBeLoggedIn: true)
+        
+        let context = NSManagedObjectContext.mr_()
+        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        
+        if (force_refresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoaded" + (tag_type ?? "AllCustomerTags"))) {
+            try self.getCustomerTagProductsActual(context: context, tag_type: tag_type)
+        } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalled" + (tag_type ?? "AllCustomerTags")) as? Date)) {
+            PreferabliTools.startNewWorkThread(priority: .low) {
+                do {
+                    let context = NSManagedObjectContext.mr_()
+                    context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+                    try self.getCustomerTagProductsActual(context: context, tag_type: tag_type)
+                } catch {
+                    // catching any issues here so that we can still pull up our saved data
+                    if (Preferabli.loggingEnabled) {
+                        print(error)
                     }
                 }
             }
-            
-            let predicate : NSPredicate
-            if (tag_type != nil) {
-                predicate = NSPredicate(format: "SUBQUERY(variants, $v, ANY $v.tags.customer_id = %d).@count != 0 AND SUBQUERY(variants, $v, ANY $v.tags.type = %@).@count != 0", PreferabliTools.getCustomerId().intValue, tag_type!)
-            } else {
-                predicate = NSPredicate(format: "SUBQUERY(variants, $v, ANY $v.tags.customer_id == %d).@count != 0", PreferabliTools.getCustomerId())
-            }
-            
-            let products = CoreData_Product.mr_findAll(with: predicate, in: context) as! [CoreData_Product]
-            
-            var productsToReturn = Array<Product>()
-            for product in products {
-                productsToReturn.append(Product.init(product: product))
-            }
-            
-            if (include_merchant_links) {
-                try addMerchantDataToProducts(products: productsToReturn)
-            }
-            
-            try canWeContinue(needsToBeLoggedIn: true)
-            
-            DispatchQueue.main.async {
-                onCompletion(productsToReturn)
-            }
-            
-        } catch {
-            handleError(error: error, onFailure: onFailure)
         }
+        
+        let predicate : NSPredicate
+        if (tag_type != nil) {
+            predicate = NSPredicate(format: "SUBQUERY(variants, $v, ANY $v.tags.customer_id = %d).@count != 0 AND SUBQUERY(variants, $v, ANY $v.tags.type = %@).@count != 0", PreferabliTools.getCustomerId().intValue, tag_type!)
+        } else {
+            predicate = NSPredicate(format: "SUBQUERY(variants, $v, ANY $v.tags.customer_id == %d).@count != 0", PreferabliTools.getCustomerId())
+        }
+        
+        let products = CoreData_Product.mr_findAll(with: predicate, in: context) as! [CoreData_Product]
+        
+        var productsToReturn = Array<Product>()
+        for product in products {
+            productsToReturn.append(Product.init(product: product))
+        }
+        
+        try canWeContinue(needsToBeLoggedIn: true)
+        
+        return productsToReturn
     }
     
-    private func actuallyGetCustomerTags(context : NSManagedObjectContext, tag_type : String?) throws {
+    private func getCustomerTagProductsActual(context : NSManagedObjectContext, tag_type : String?) throws {
         var params = ["offset" : 0, "limit" : 9999] as! [String : Any]
         if (tag_type != nil) {
             params["tag_type"] = tag_type!
@@ -817,7 +829,7 @@ public class Preferabli {
     ///   - price_min: pass if you want to lock results to a minimum price. Defaults to *nil*.
     ///   - price_max: pass if you want to lock results to a maximum price. Defaults to *nil*.
     ///   - collection_id: the id of a specific ``Collection`` that you want to draw results from. Defaults to ``PRIMARY_INVENTORY_ID``. Pass *nil* for results from anywhere.
-    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` that connect Preferabli products to your own. Defaults to *true*.
+    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
     public func getGuidedRecResults(guided_rec_id: NSNumber, selected_choice_ids : Array<NSNumber>, price_min : Int? = nil, price_max : Int? = nil, collection_id : NSNumber? = Preferabli.getPrimaryInventoryId(), include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
@@ -916,13 +928,13 @@ public class Preferabli {
     ///   - collection_id: the id of a specific ``Collection`` that you want to draw results from. Defaults to ``PRIMARY_INVENTORY_ID``.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func lttt(product_id : NSNumber, year : NSNumber = Variant.CURRENT_VARIANT_YEAR, collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func lttt(product_id : NSNumber, year : NSNumber = Variant.CURRENT_VARIANT_YEAR, collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
-            self.ltttActual(product_id: product_id, year: year, collection_id: collection_id, onCompletion: onCompletion, onFailure: onFailure)
+            self.ltttActual(product_id: product_id, year: year, collection_id: collection_id, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
         })
     }
     
-    private func ltttActual(product_id : NSNumber, year : NSNumber, collection_id : NSNumber, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    private func ltttActual(product_id : NSNumber, year : NSNumber, collection_id : NSNumber, include_merchant_links: Bool, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         do {
             try canWeContinue(needsToBeLoggedIn: false)
             
@@ -943,7 +955,7 @@ public class Preferabli {
             getProductsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getProductsResponse)
             let responseDictionary = try PreferabliTools.continueOrThrowJSONException(data: getProductsResponse.data!) as! [String : Any]
             
-            let dictionaries = responseDictionary["products"] as? Array<[String : Any]>
+            let dictionaries = responseDictionary["results"] as? Array<[String : Any]>
             var productsToReturn = Array<Product>()
             
             if (dictionaries != nil) {
@@ -958,7 +970,9 @@ public class Preferabli {
             
             context.mr_saveToPersistentStoreAndWait()
             
-            try addMerchantDataToProducts(products: productsToReturn)
+            if (include_merchant_links) {
+                try addMerchantDataToProducts(products: productsToReturn)
+            }
             
             DispatchQueue.main.async {
                 onCompletion(productsToReturn)
@@ -1128,7 +1142,7 @@ public class Preferabli {
         })
     }
     
-    private func getProfileActual(force_refresh : Bool, onCompletion: @escaping (Profile) -> (), onFailure: @escaping (PreferabliException) -> ()) {
+    private func getProfileActual(force_refresh : Bool = false, onCompletion: @escaping (Profile) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> ()  = {_ in }) {
         do {
             try canWeContinue(needsToBeLoggedIn: true)
             
@@ -1147,6 +1161,9 @@ public class Preferabli {
                         try self.getProfileActual(context: context, force_refresh: false)
                     } catch {
                         // catching any issues here so that we can still pull up our saved data
+                        if (Preferabli.loggingEnabled) {
+                            print(error)
+                        }
                     }
                 }
             }
@@ -1154,6 +1171,8 @@ public class Preferabli {
             let predicate = Preferabli.isCustomerLoggedIn() ? NSPredicate.init(format: "customer_id == %@", argumentArray: [PreferabliTools.getCustomerId()]) : NSPredicate.init(format: "user_id == %@", argumentArray: [PreferabliTools.getPreferabliUserId()])
             let coredataProfile = CoreData_Profile.mr_findFirst(with: predicate, in: context)!
             let profile = Profile.init(profile: coredataProfile)
+            
+            try canWeContinue(needsToBeLoggedIn: true)
             
             DispatchQueue.main.async {
                 onCompletion(profile)
@@ -1238,7 +1257,9 @@ public class Preferabli {
                         try self.loadFoods(context: context)
                     } catch {
                         // catching any issues here so that we can still pull up our saved data
-                    }
+                        if (Preferabli.loggingEnabled) {
+                            print(error)
+                        }                    }
                 }
             }
             
@@ -1248,6 +1269,8 @@ public class Preferabli {
                 foodArray.append(Food.init(food: food))
             }
             foodArray = Food.sortFoodsAlpha(foods: foodArray)
+            
+            try canWeContinue(needsToBeLoggedIn: true)
             
             DispatchQueue.main.async {
                 onCompletion(foodArray)
@@ -1283,7 +1306,7 @@ public class Preferabli {
     ///   - collection_id: the id of a specific ``Collection`` that you want to draw results from. Defaults to ``PRIMARY_INVENTORY_ID``. Pass *nil* for results from anywhere.
     ///   - style_ids: an array of ``Style`` ids that you want to constrain results to. Get available styles from ``getProfile(force_refresh:onCompletion:onFailure:)``. Defaults to *nil*.
     ///   - food_ids: an array of ``Food`` ids that should pair with the recommendation. Get available foods from ``getFoods(force_refresh:onCompletion:onFailure:)`` Defaults to *nil*.
-    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` that connect Preferabli products to your own. Defaults to *true*.
+    ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
     ///   - onCompletion: returns an optional message as a string along with an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
     public func getRecs(product_category : ProductCategory, product_type : ProductType, price_min : Int? = nil, price_max : Int? = nil, collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), style_ids : [NSNumber]? = nil, food_ids : [NSNumber]? = nil, include_merchant_links: Bool = true, onCompletion: @escaping (String?, [Product]) -> () = {_,_  in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
@@ -1453,6 +1476,8 @@ public class Preferabli {
                 try addMerchantDataToProducts(products: wines)
             }
             
+            try canWeContinue(needsToBeLoggedIn: true)
+            
             DispatchQueue.main.async {
                 onCompletion(message, wines)
             }
@@ -1595,6 +1620,8 @@ public class Preferabli {
             
             try addMerchantDataToProducts(products: [ productToReturn ])
             
+            try canWeContinue(needsToBeLoggedIn: true)
+            
             DispatchQueue.main.async {
                 onCompletion(productToReturn)
             }
@@ -1643,6 +1670,8 @@ public class Preferabli {
             let productToReturn = Product.init(product: product!)
             try addMerchantDataToProducts(products: [ productToReturn ])
             
+            try canWeContinue(needsToBeLoggedIn: true)
+            
             DispatchQueue.main.async {
                 onCompletion(productToReturn)
             }
@@ -1689,6 +1718,8 @@ public class Preferabli {
             }
             
             let wiliData = PreferenceData(map: try PreferabliTools.continueOrThrowJSONException(data: wiliResponse.data!) as! [String : Any])
+            
+            try canWeContinue(needsToBeLoggedIn: true)
             
             DispatchQueue.main.async {
                 onCompletion(wiliData)
@@ -1771,6 +1802,8 @@ public class Preferabli {
             let productToReturn = Product.init(product: product!)
             
             try addMerchantDataToProducts(products: [ productToReturn ])
+            
+            try canWeContinue(needsToBeLoggedIn: true)
             
             DispatchQueue.main.async {
                 onCompletion(productToReturn)

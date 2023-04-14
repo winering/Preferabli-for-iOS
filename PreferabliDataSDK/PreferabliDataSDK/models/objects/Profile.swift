@@ -16,7 +16,7 @@ public class Profile : BaseObject {
     public var customer_id: NSNumber
     
     /// A score that represents how developed a profile is.
-    public var score: NSNumber
+    internal var score: NSNumber
     public var profile_styles: [ProfileStyle]
     
     internal init(profile : CoreData_Profile) {
