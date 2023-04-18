@@ -12,7 +12,9 @@ import UIKit
 
 /// A Collection is a selection of Products, organized into one or more groupings.  For example, a Collection can represent an inventory for a store or just a subset of Products, such as selection of Products that are currently on sale or a selection of private-label Products.
 ///
-/// In general, a Collection will be an Inventory or an Event.  Events are temporal in nature, such as a tasting events or weekly promotions.  Inventories, whether entire inventories or subsets of an inventory, are meant to change from time to time but are not specifically temporal in nature.  A Collection may be a Cellar type (e.g., a ``Customer``'s personal cellar) or Other type.
+/// In general, a Collection will be an Inventory or an Event.  Events are temporal in nature, such as a tasting events or weekly promotions.  Inventories, whether entire inventories or subsets of an inventory, are meant to change from time to time but are not specifically temporal in nature.
+///
+/// A Collection may also be a Cellar type (e.g., a ``Customer``'s personal cellar) or Other type.
 public class Collection : BaseObject {
     
     public var channel_id: NSNumber?
@@ -45,7 +47,7 @@ public class Collection : BaseObject {
     public var versions: [CollectionVersion]
     public var sort_channel_name: String
     
-    /// Collection Type of this collection.  In general, collections will be an Inventory or an Event.  Events are temporal in nature, such as a tasting event or a sale.  Inventories, whether entire inventories or subsets of an inventory, are meant to change from time to time but are not specifically temporal in nature.
+    /// Collection Type of a specific collection.  In general, a collection will be an Inventory or an Event.  Events are temporal in nature, such as a tasting event or a sale.  Inventories, whether entire inventories or subsets of an inventory, are meant to change from time to time but are not specifically temporal in nature.
     var type : CollectionType {
         return CollectionType.getCollectionTypeBasedOffCollection(collection: self)
     }

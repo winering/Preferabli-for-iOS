@@ -25,7 +25,7 @@ public class MerchantProductLink : BaseObject {
     public var product_name: String?
     public var price: String?
     
-    /// All of the venues that stock this item in inventory. Call Where to Buy to populate.
+    /// All of the venues that include the specific item in the inventory collection. Call Where to Buy to populate.
     public var venues: [Venue]?
     /// True if this item does not conform to all Where to Buy query parameters.
     public var nonconforming_result: Bool
@@ -74,7 +74,7 @@ public class MerchantProductLink : BaseObject {
 //        super.init(id: lookup.id)
 //    }
     
-    /// Filter links by some search text.
+    /// Filter links by submitted search terms.
     /// - Parameters:
     ///   - lookups: an array of links to be filtered.
     ///   - search_text: search terms as a string.

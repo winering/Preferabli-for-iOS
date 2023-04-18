@@ -8,10 +8,10 @@
 
 import Foundation
 
-/// A Guided Rec quiz.
+/// A Guided Rec questionnaire.
 public class GuidedRec : BaseObject {
     
-    /// The default wine quiz.
+    /// The default wine questionnaire.
     public static let WINE_DEFAULT : NSNumber = 1
     
     public var name : String?

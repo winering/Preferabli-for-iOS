@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-/// A descriptor for a collection.
+/// A trait descriptor for a collection.
 internal class CollectionTrait : BaseObject {
     
     internal var name: String

@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-/// The link between a ``Tag`` (which then references a ``Product``) and a ``Collection``.
+/// The link between a ``Tag`` (which in turn references a ``Product``) and a ``Collection``, including its ordering within the Collection.
 public class CollectionOrder : BaseObject {
     
     public var tag_id: NSNumber

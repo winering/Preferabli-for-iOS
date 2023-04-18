@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-/// Styles express how product characteristics synthesize in the context of human perception and define the nature of consumer taste preferences. These are *not* unique for each customer.
+/// Styles express how product characteristics synthesize in the context of human perception and define the nature of consumer taste preferences. These are *not* unique for each customer, which are represented as ``ProfileStyle``.
 public class Style : BaseObject {
     
     public var desc: String

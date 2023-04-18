@@ -10,7 +10,7 @@
 import Foundation
 import CoreData
 
-/// A location (must have either a latitude / longitude or a zip_code).
+/// A location (must have either a latitude / longitude or a zip code).
 public class Location : BaseObject {
     
     public var latitude: NSNumber?

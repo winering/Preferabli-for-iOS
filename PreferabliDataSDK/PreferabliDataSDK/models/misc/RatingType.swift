@@ -9,15 +9,15 @@
 import Foundation
 import UIKit
 
-/// The rating type of a ``Tag``. Can be one of four valid values.
+/// The degree of appeal for a product as identified by a ``Tag``. 
 public enum RatingType {
-    /// A user really loved the product.
+    /// A user loved the product.
     case LOVE
-    /// A user enjoyed the product.
+    /// A user liked the product.
     case LIKE
-    /// A user found the product to be OK. Would drink if somebody else was paying for it.
+    /// A user did not find the product to be appealing, but not as far as a dislike.  We like to say, "I'd drink it but only if I wasn't paying for it."
     case SOSO
-    /// A user really did not like the product.
+    /// A user disliked the product.
     case DISLIKE
     /// Not a valid rating.
     case NONE
