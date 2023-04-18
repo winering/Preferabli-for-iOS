@@ -674,13 +674,13 @@ public class Preferabli {
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         
         if (force_refresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoaded\(collection_id)")) {
-            try LoadCollectionTools.sharedInstance.loadCollectionViaTags(in: context, priority: priority, with: collection_id)
+            try LoadCollectionTools.sharedInstance.loadCollectionViaTags(in: context, priority: priority, force_refresh: force_refresh, with: collection_id)
         } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalled\(collection_id)") as? Date)) {
             PreferabliTools.startNewWorkThread(priority: .low) {
                 do {
                     let context = NSManagedObjectContext.mr_()
                     context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-                    try LoadCollectionTools.sharedInstance.loadCollectionViaTags(in: context, priority: .low, with: collection_id)
+                    try LoadCollectionTools.sharedInstance.loadCollectionViaTags(in: context, priority: .low, force_refresh: false, with: collection_id)
                 } catch {
                     // catching any issues here so that we can still pull up our saved data
                     if (Preferabli.loggingEnabled) {
@@ -1259,7 +1259,8 @@ public class Preferabli {
                         // catching any issues here so that we can still pull up our saved data
                         if (Preferabli.loggingEnabled) {
                             print(error)
-                        }                    }
+                        }
+                    }
                 }
             }
             
@@ -1541,13 +1542,8 @@ public class Preferabli {
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
     public func rateProduct(product_id : NSNumber, year : NSNumber, rating : RatingType, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
-            do {
-                try self.canWeContinue(needsToBeLoggedIn: true)
                 SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "rate_product"])
                 self.createTagActual(product_id: product_id, year: year, collection_id: NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "ratings_id")), value: rating.getValue(), tag_type: .RATING, location: location, notes: notes, price: price, quantity: quantity, format_ml: format_ml, onCompletion: onCompletion, onFailure: onFailure)
-            } catch {
-                self.handleError(error: error, onFailure: onFailure)
-            }
         })
     }
     
@@ -1558,18 +1554,14 @@ public class Preferabli {
     ///   - location: location where the wishlisted item exists. Defaults to *nil*.
     ///   - notes: any notes to go along with the wishlisting. Defaults to *nil*.
     ///   - price: price of the product wishlisted. Defaults to *nil*.
+    ///   - quantity: quantity desired of the product wishlisted. Defaults to *nil*.
     ///   - format_ml: size of the product wishlisted. Defaults to *nil*.
     ///   - onCompletion: returns ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func wishlistProduct(product_id : NSNumber, year : NSNumber, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
+    public func wishlistProduct(product_id : NSNumber, year : NSNumber, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
-            do {
-                try self.canWeContinue(needsToBeLoggedIn: true)
-                SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "wishlist_product"])
-                self.createTagActual(product_id: product_id, year: year, collection_id: NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "wishlist_id")), value: nil, tag_type: .WISHLIST, location: location, notes: notes, price: price, quantity: nil, format_ml: format_ml, onCompletion: onCompletion, onFailure: onFailure)
-            } catch {
-                self.handleError(error: error, onFailure: onFailure)
-            }
+                self.createTagActual(product_id: product_id, year: year, collection_id: NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "wishlist_id")), value: nil, tag_type: .WISHLIST, location: location, notes: notes, price: price, quantity: quantity, format_ml: format_ml, onCompletion: onCompletion, onFailure: onFailure)
+            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "wishlist_product"])
         })
     }
     
@@ -1587,7 +1579,7 @@ public class Preferabli {
                 var tagResponse = try Preferabli.api.getAlamo().post(APIEndpoints.tags(id: collection_id), json: tagDictionary)
                 tagResponse = try PreferabliTools.continueOrThrowPreferabliException(response: tagResponse)
                 PreferabliTools.saveCollectionEtag(response: tagResponse, collectionId: collection_id)
-                tagResponseDictionary = try JSONSerialization.jsonObject(with: tagResponse.data!, options: [])
+                tagResponseDictionary = try PreferabliTools.continueOrThrowJSONException(data: tagResponse.data!)
             } else if (Preferabli.isPreferabliUserLoggedIn()) {
                 var tagResponse = try Preferabli.api.getAlamo().post(APIEndpoints.userTags(id: PreferabliTools.getPreferabliUserId()), json: tagDictionary)
                 tagResponse = try PreferabliTools.continueOrThrowPreferabliException(response: tagResponse)

@@ -14,13 +14,8 @@ import SwiftEventBus
 internal class PreferabliUserTools {
     
     internal static var sharedInstance = PreferabliUserTools()
-    private let tagSemaphore = DispatchSemaphore(value: 1)
-    private let purchasesObject = NSObject()
-    private let collectionsObject = NSObject()
     
     internal func getPurchaseHistory(priority : Operation.QueuePriority, forceRefresh : Bool, lock_to_integration : Bool) throws -> Array<Product> {
-        objc_sync_enter(purchasesObject)
-        defer { objc_sync_exit(purchasesObject) }
         
         let context = NSManagedObjectContext.mr_()
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
@@ -35,7 +30,10 @@ internal class PreferabliUserTools {
                     
                     try self.getPurchaseHistoryFromAPI(context: context, priority: .low, forceRefresh: false)
                 } catch {
-                    // catching here so that we can still pull up our saved data
+                    // catching any issues here so that we can still pull up our saved data
+                    if (Preferabli.loggingEnabled) {
+                        print(error)
+                    }
                 }
             }
         }
@@ -112,9 +110,7 @@ internal class PreferabliUserTools {
     }
     
     internal func getUserCollections(context : NSManagedObjectContext, forceRefresh : Bool, relationship_type : String) throws -> Array<CoreData_UserCollection> {
-        objc_sync_enter(collectionsObject)
-        defer { objc_sync_exit(collectionsObject) }
-        
+
         if (forceRefresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoadedUserCollections")) {
             try getUserCollections(in: context)
         } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalledUserCollections") as? Date)) {
@@ -124,7 +120,10 @@ internal class PreferabliUserTools {
                     context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
                     try self.getUserCollections(in: context)
                 } catch {
-                    // catching here so that we can still pull up our saved data
+                    // catching any issues here so that we can still pull up our saved data
+                    if (Preferabli.loggingEnabled) {
+                        print(error)
+                    }
                 }
             })
         }

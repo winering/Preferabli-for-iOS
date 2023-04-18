@@ -343,7 +343,7 @@ extension Product {
         most_recent_variant.rate(rating: rating, location: location, notes: notes, price: price, quantity: quantity, format_ml: format_ml, onCompletion: onCompletion, onFailure: onFailure)
     }
     
-    /// See ``Preferabli/lttt(product_id:year:collection_id:onCompletion:onFailure:)``.
+    /// See ``Preferabli/lttt(product_id:year:collection_id:include_merchant_links:onCompletion:onFailure:)``.
     public func lttt(collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         most_recent_variant.lttt(collection_id: collection_id, onCompletion: onCompletion, onFailure: onFailure)
     }
