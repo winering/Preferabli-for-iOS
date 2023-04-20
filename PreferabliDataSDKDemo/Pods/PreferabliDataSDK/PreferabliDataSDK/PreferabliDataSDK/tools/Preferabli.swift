@@ -259,8 +259,8 @@ public class Preferabli {
                 }
             }
 
-            let core_customer = CoreData_Customer.mr_findFirst(byAttribute: "id", withValue: PreferabliTools.getCustomerId(), in: context)
-            let customer = Customer.init(map: core_customer)
+            let core_customer = CoreData_Customer.mr_findFirst(byAttribute: "id", withValue: PreferabliTools.getCustomerId(), in: context)!
+            let customer = Customer.init(customer: core_customer)
             
             DispatchQueue.main.async {
                 onCompletion(customer)

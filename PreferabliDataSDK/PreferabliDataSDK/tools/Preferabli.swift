@@ -195,6 +195,9 @@ public class Preferabli {
             
             SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "login_customer"])
             
+            let context = NSManagedObjectContext.mr_()
+            context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            
             let parameters = ["merchant_customer_identification": merchant_customer_identification, "merchant_customer_verification" : merchant_customer_verification, "merchant_channel_id" : Preferabli.CHANNEL_ID] as [String : Any]
             
             var sessionResponse = try Preferabli.api.getAlamo(requiresAccessToken: false).post(APIEndpoints.postSession, json: parameters)
@@ -205,6 +208,8 @@ public class Preferabli {
             customerResponse = try PreferabliTools.continueOrThrowPreferabliException(response: customerResponse)
             let customerDictionary = try PreferabliTools.continueOrThrowJSONException(data: customerResponse.data!) as! [String : Any]
             let customerData = Customer(map: customerDictionary)
+            _ = CoreData_Customer.mr_import(from: customerDictionary, in: context)
+            context.mr_saveToPersistentStoreAndWait()
             
             DispatchQueue.main.async {
                 onCompletion(customerData)
