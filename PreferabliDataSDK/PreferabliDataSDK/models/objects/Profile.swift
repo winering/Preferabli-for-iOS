@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-/// A user's preference profile contains information on what a user likes and dislikes.
+/// A user's preference profile represents appealing and unappealing ``ProfileStyle``s for a particular user.
 public class Profile : BaseObject {
     
     public var user_id: NSNumber

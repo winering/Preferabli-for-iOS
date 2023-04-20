@@ -9,22 +9,22 @@
 import Foundation
 import CoreData
 
-/// The profile style object links a ``Style`` to a user's ``Profile``. Unique for each customer.
+/// The profile style object identifies a specific ``Style`` as included in a user's ``Profile``. A ``ProfileStyle`` represents a unique representation of a Style to a particular user.
 public class ProfileStyle : BaseObject {
     
-    /// Indicates if there is any ambiguity in the user's affinity for this style.
+    /// Indicates if there is any ambiguity in the user's affinity for a specific style.
     public var conflict: Bool
     
     /// A ranking of 1..n which indicates where this style fits within its ``RatingType`` and ``ProductType`` where 1 indicates the highest level of appeal and n indicates the lowest.
     public var order_profile: NSNumber
     
-    /// A ranking of 1..n which indicates where this style fits within its ``ProductType`` where 1 indicates the most recommendable and n indicates the least recommendable. 0 means the style is not recommendable.
+    /// A ranking of 1..n which indicates where a specific style fits within its ``ProductType`` where 1 indicates the most recommendable and n indicates the least recommendable. A ranking value of 0 means the particular style is not recommendable.
     public var order_recommend: NSNumber
     public var style_id: NSNumber
     
-    /// True if this style is recommendable for this user.
+    /// True if a specific style is recommendable for this user.
     public var recommend: Bool
-    /// True if we could use some additional data from the user to better understand their affinity for this style.
+    /// True if we could use some additional data from the user to better understand their affinity for a particular style.
     public var refine: Bool
     public var style: Style
     public var keywords: String?
@@ -54,7 +54,7 @@ public class ProfileStyle : BaseObject {
         super.init(id: profile_style.id)
     }
     
-    /// The ``RatingType`` of this profile style.
+    /// The ``RatingType`` of a specific profile style.
     var rating_type : RatingType {
         return RatingType.getRatingTypeBasedOffTagValue(value: rating.stringValue)
     }
@@ -94,7 +94,7 @@ public class ProfileStyle : BaseObject {
         }
     }
     
-    /// Filter profile styles by some search term(s).
+    /// Filter profile styles by submitted search term(s).
     /// - Parameters:
     ///   - profile_styles: an array of profile styles to be filtered.
     ///   - search_text: a search term string.

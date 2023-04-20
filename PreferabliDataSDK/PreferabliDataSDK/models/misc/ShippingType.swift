@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-/// Represents an avenue for fulfillment for a ``Venue``. Contained within ``DeliveryMethod``.
+/// Represents a fulfillment method for a ``Venue``. Contained within ``DeliveryMethod``.
 public enum ShippingType {
     case SHIPPING
     case LOCAL_DELIVERY

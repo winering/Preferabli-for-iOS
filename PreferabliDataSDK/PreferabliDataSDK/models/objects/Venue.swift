@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-/// A venue represents a location for your business. If returned as part of ``WhereToBuy``, will contain an array of ``MerchantProductLink`` as ``links``.
+/// A venue represents the details for a specific location. If returned as part of ``WhereToBuy``, will contain an array of ``MerchantProductLink``s as ``links``.
 public class Venue : BaseObject {
     
     public var address_l1: String?
@@ -135,7 +135,7 @@ public class Venue : BaseObject {
             return PreferabliTools.calculateDistanceInMiles(lat1: your_lat, lon1: your_lon, lat2: lat, lon2: lon)
     }
     
-    /// Get the venue's address formatted.
+    /// Get a formatted return of the address for a specific venue.
     /// - Parameter one_line: pass true if you want the address returned in one line. False returns the address in a multiline format.
     /// - Returns: the venue's full formatted address.
     public func getFormattedAddress(one_line : Bool) -> String {
@@ -163,7 +163,7 @@ public class Venue : BaseObject {
         }
     }
     
-    /// Get the venues shipping speed.
+    /// Get the venue's shipping speed.
     /// - Returns: the venue's notes about its shipping speed.
     public func getShippingSpeedNote() -> String? {
         for delivery_method in active_delivery_methods{
@@ -175,7 +175,7 @@ public class Venue : BaseObject {
         return ""
     }
     
-    /// Get teh venues shipping cost.
+    /// Get the venue's shipping cost.
     /// - Returns: the venue's notes about its shipping cost.
     public func getShippingCostNote() -> String? {
         for delivery_method in active_delivery_methods {
@@ -187,7 +187,7 @@ public class Venue : BaseObject {
         return ""
     }
     
-    /// Does the venue have shipping?
+    /// Does the venue offer shipping?
     /// - Returns: true if the venue can ship to the user.
     public func getHasShipping() -> Bool {
         if (hasShipping == nil) {
@@ -197,7 +197,7 @@ public class Venue : BaseObject {
         return hasShipping!
     }
     
-    /// Does the venue have local delivery?
+    /// Does the venue offer local delivery?
     /// - Returns: true if the venue can deliver locally to the user.
     public func getHasLocalDelivery() -> Bool {
         if (hasLocalDelivery == nil) {
@@ -217,7 +217,7 @@ public class Venue : BaseObject {
         return hasPickup!
     }
     
-    /// Get when the venue opens for the given day of the week.
+    /// Get the open time for the given day of the week for a venue.
     /// - Parameter weekday: a day of the week.
     /// - Returns: the opening time of the venue if it is available. Returns *nil* if it does not exist.
     public func getOpenTime(weekday : Weekday) -> String? {
@@ -231,7 +231,7 @@ public class Venue : BaseObject {
         return nil
     }
     
-    /// Get when the venue closes for the given day of the week.
+    /// Get the close time for the given day of the week for a venue.
     /// - Parameter weekday: a day of the week.
     /// - Returns: the closing time of the venue if it is available. Returns *nil* if it does not exist.
     public func getCloseTime(weekday : Weekday) -> String {
@@ -245,7 +245,7 @@ public class Venue : BaseObject {
         return ""
     }
     
-    /// Get whether or not the venue is closed for the given day of the week.
+    /// Get whether a venue is closed for the given day of the week.
     /// - Parameter weekday: a day of the week.
     /// - Returns: true if the venue is closed on the given day.
     public func getIsClosed(weekday : Weekday) -> Bool {
@@ -331,26 +331,26 @@ public class Venue : BaseObject {
         return false
     }
     
-    /// Get the full combination of Facebook url with the venue's user ame.
+    /// Get the Facebook url for a venue.
     /// - Returns: the full Facebook url of the venue.
     public func getFacebookUrl() -> String {
         return "https://www.facebook.com/" + (url_facebook ?? "")
     }
     
-    /// Get the full combination of Instagram url with the venue's username.
+    /// Get the Instagram url for a venue.
     /// - Returns: the full Instagram url of the venue.
     public func getInstagramUrl() -> String {
         return "https://www.instagram.com/" + (url_instagram ?? "")
     }
     
-    /// Get the full combination of Twitter url with the venue's username.
+    /// Get the Twitter url for a venue.
     /// - Returns: the full Twitter url of the venue.
     public func getTwitterUrl() -> String {
         return "https://www.twitter.com/" + (url_twitter ?? "")
     }
     
-    /// Get the full combination of Youtube url with the venue's username.
-    /// - Returns: the full Youtube url of the venue.
+    /// Get the YouTube url for a venue.
+    /// - Returns: the full YouTube url of the venue.
     public func getYoutubeUrl() -> String {
         return "https://www.youtube.com/" + (url_youtube ?? "")
     }

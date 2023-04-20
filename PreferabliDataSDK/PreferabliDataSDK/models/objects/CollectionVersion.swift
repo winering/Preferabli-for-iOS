@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-/// A version of a ``Collection``. Most collections will only have one version.
+/// A version of a ``Collection``. For the most part, collections will only have one version.
 public class CollectionVersion : BaseObject {
     
     public var name: String

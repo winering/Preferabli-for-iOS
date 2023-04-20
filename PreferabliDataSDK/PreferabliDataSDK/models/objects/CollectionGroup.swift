@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-/// A grouping of products within a ``CollectionVersion``. Can be ordered.
+/// Products in a Collection are organized into one or more groups.  A CollectionGroup object sits within a ``CollectionVersion``.  Each CollectionGroup has an order representing its display ``order`` within a Collection.  Products that are tagged as belonging to a Collection are ordered within the applicable CollectionGroup with ``orderings``
 public class CollectionGroup : BaseObject {
     
     public var name: String

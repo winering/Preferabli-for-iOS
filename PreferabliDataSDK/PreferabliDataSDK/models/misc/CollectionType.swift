@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-/// The type of a ``Collection``.
+/// The type of a ``Collection``. 
 public enum CollectionType {
     case EVENT
     case INVENTORY

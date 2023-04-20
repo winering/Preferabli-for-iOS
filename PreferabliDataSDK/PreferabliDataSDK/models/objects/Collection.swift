@@ -10,7 +10,11 @@ import Foundation
 import CoreData
 import UIKit
 
-/// A group of products.
+/// A Collection is a selection of Products, organized into one or more groupings.  For example, a Collection can represent an inventory for a store or just a subset of Products, such as selection of Products that are currently on sale or a selection of private-label Products.
+///
+/// In general, a Collection will be an Inventory or an Event.  Events are temporal in nature, such as a tasting events or weekly promotions.  Inventories, whether entire inventories or subsets of an inventory, are meant to change from time to time but are not specifically temporal in nature.
+///
+/// A Collection may also be a Cellar type (e.g., a ``Customer``'s personal cellar) or Other type.
 public class Collection : BaseObject {
     
     public var channel_id: NSNumber?
@@ -43,7 +47,7 @@ public class Collection : BaseObject {
     public var versions: [CollectionVersion]
     public var sort_channel_name: String
     
-    /// Collection Type of this collection.
+    /// Collection Type of a specific collection.  In general, a collection will be an Inventory or an Event.  Events are temporal in nature, such as a tasting event or a sale.  Inventories, whether entire inventories or subsets of an inventory, are meant to change from time to time but are not specifically temporal in nature.
     var type : CollectionType {
         return CollectionType.getCollectionTypeBasedOffCollection(collection: self)
     }
@@ -129,7 +133,7 @@ public class Collection : BaseObject {
         return nil
     }
     
-    /// This helper method fitlers an array of collections to an array of collections of type Inventory.
+    /// This helper method fitlers an array of collections to an array of collections where the type is Inventory.
     /// - Parameter collections: array of collections of different types.
     /// - Returns: array of collection of type Inventory.
     static public func filterToInventories(collections : Array<Collection>) -> [Collection] {
@@ -205,7 +209,7 @@ public class Collection : BaseObject {
         return false
     }
     
-    /// Lets us know if a collection is of type ``CollectionType/INVENTORY``.
+    /// Lets us know if a collection is of the type ``CollectionType/INVENTORY``.
     /// - Returns: true if an inventory.
     public func isInventory() -> Bool {
         for trait in traits {
@@ -217,7 +221,7 @@ public class Collection : BaseObject {
         return false
     }
     
-    /// Lets us know if a collection is of type ``CollectionType/EVENT``.
+    /// Lets us know if a collection is of the type ``CollectionType/EVENT``.
     /// - Returns: true if an event.
     public func isEvent() -> Bool {
         for trait in traits {

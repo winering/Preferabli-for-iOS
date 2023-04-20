@@ -10,7 +10,7 @@
 import Foundation
 import CoreData
 
-/// Represents a venue's open and close times for a given day. Each day of the week will have it's own.
+/// Represents a venue's open and close times for a given day. Each day of the week has separate corresponding values.
 public class VenueHour : BaseObject {
     
     public var weekday: String?

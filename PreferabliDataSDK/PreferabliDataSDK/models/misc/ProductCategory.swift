@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-/// The category of a ``Product``.
+/// The category of a ``Product``.  
 public enum ProductCategory {
     case WHISKEY
     case MEZCAL
