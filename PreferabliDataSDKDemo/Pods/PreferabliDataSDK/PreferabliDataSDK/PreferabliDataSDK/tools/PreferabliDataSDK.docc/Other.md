@@ -1,6 +1,6 @@
 # Other
 
-These are the other miscellaneous classes you may run into while using the SDK.
+These are the additional classes you may run into while using the SDK.
 
 ## Topics
 

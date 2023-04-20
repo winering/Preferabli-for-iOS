@@ -32,7 +32,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   PreferabliDataSDK:
-    :commit: d6b98a24b6125d2fc3d4ae5c59e014f66e4636fb
+    :commit: d08253bfa388c664c3a1d61badb06cbc4abc7757
     :git: https://github.com/winering/Preferabli-for-iOS.git
 
 SPEC CHECKSUMS:

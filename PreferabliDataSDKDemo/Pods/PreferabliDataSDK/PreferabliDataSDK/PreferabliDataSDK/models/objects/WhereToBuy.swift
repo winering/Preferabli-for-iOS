@@ -8,7 +8,7 @@
 
 import Foundation
 
-/// This object will include an array of either ``MerchantProductLink`` (if sorted by price) or ``Venue`` (if sorted by distance).
+/// This object will include an array of either ``MerchantProductLink``s (if sorted by price) or ``Venue``s (if sorted by distance).
 public class WhereToBuy {
     
     public var links = Array<MerchantProductLink>()

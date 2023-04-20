@@ -10,7 +10,7 @@
 import Foundation
 import CoreData
 
-/// Represents a location that a ``Venue`` services and the method of doing so (``ShippingType``).
+/// Represents a location that a ``Venue`` provides a specified delivery method (``ShippingType``).
 public class DeliveryMethod : BaseObject {
     
     public var shipping_type: String

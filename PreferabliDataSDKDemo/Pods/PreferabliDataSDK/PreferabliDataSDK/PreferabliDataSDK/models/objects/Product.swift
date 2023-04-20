@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 import UIKit
 
-/// Represents a product within the Preferabli SDK. A product may have one or more ``Variant`` stored in ``variants``. To see how this product is mapped to your own object(s), see ``Variant/merchant_links``. To see a user's interaction with the product, see ``Variant/tags``.
+/// Represents a product within the Preferabli SDK. A product may have one or more ``Variant``s stored as ``variants``. To see how a product is mapped to your own object(s), see ``Variant/merchant_links``. To see a user's interaction with the product, see ``Variant/tags``.
 public class Product : BaseObject {
     
     public var brand: String
@@ -58,13 +58,13 @@ public class Product : BaseObject {
         }
     }
     
-    /// The ``RatingType`` of the most recent rating within this product for the current user.
-    var rating_type : RatingType {
+    /// The ``RatingType`` of the most recent rating of a specific product for the current user.
+    var rating_type : RatingLevel {
         if let mostRecentRating = most_recent_rating {
-            return RatingType.getRatingTypeBasedOffTagValue(value: mostRecentRating.value)
+            return RatingLevel.getRatingTypeBasedOffTagValue(value: mostRecentRating.value)
         }
         
-        return RatingType.NONE
+        return RatingLevel.NONE
     }
     
     /// The first instance within the product of tag type ``TagType/WISHLIST`` for the current user.
@@ -80,7 +80,7 @@ public class Product : BaseObject {
         return nil
     }
     
-    /// All the product's tags of type ``TagType/PURCHASE`` for the current user.
+    /// All of the product tags of type ``TagType/PURCHASE`` for the current user.
     var purchase_tags: Set<Tag> {
         var purchaseTags = Set<Tag>()
         for variant in variants {
@@ -94,7 +94,7 @@ public class Product : BaseObject {
         return purchaseTags
     }
     
-    /// All the product's tags of type ``TagType/CELLAR`` for the current user.
+    /// All of the product tags of type ``TagType/CELLAR`` for the current user.
     var cellar_tags: Set<Tag> {
         let cellarIds = (CoreData_UserCollection.mr_find(byAttribute: "relationship_type", withValue: "mycellar") as! [CoreData_UserCollection]).map() { $0.collection_id }
         var cellarTags = Set<Tag>()
@@ -109,7 +109,7 @@ public class Product : BaseObject {
         return cellarTags
     }
     
-    /// The user's most recent tag of type ``TagType/PURCHASE`` within this product for the current user.
+    /// The most recent product tags of type ``TagType/PURCHASE`` for the current user.
     var most_recent_purchase: Tag? {
         var date = Date.init(timeIntervalSince1970: 0)
         var mostRecentPurchase : Tag?
@@ -123,25 +123,25 @@ public class Product : BaseObject {
         return mostRecentPurchase
     }
     
-    /// Lets us know if the current user has purchased this product.
+    /// Identifies if the current user has purchased a specific product.
     /// - Returns: true if it was purchased.
     public func wasPurchased() -> Bool {
         return purchase_tags.count != 0
     }
     
-    /// Lets us know if the current user has wishlisted this product.
+    /// Identifies if the current user has added a specific product to their wishlist.
     /// - Returns: true if it was wishlisted.
     public func isOnWishlist() -> Bool {
         return wishlist_tag != nil
     }
     
-    /// Lets us know if the current user has this product in their cellar.
+    /// Identifies if the current user added a specific product to a cellar collection.
     /// - Returns: true if the product is in the user's cellar.
     public func isInCellar() -> Bool {
         return cellar_tags.count != 0
     }
     
-    /// All the product's tags of type ``TagType/RATING`` for the current user.
+    /// All of the product tags of type ``TagType/RATING`` for the current user.
     var ratings_tags: Set<Tag> {
         var ratingsTags = Set<Tag>()
         for variant in variants {
@@ -152,7 +152,7 @@ public class Product : BaseObject {
         return ratingsTags
     }
     
-    /// The most recent tag of type ``TagType/RATING`` for the current user.
+    /// The most recent product tags of type ``TagType/RATING`` for the current user.
     var most_recent_rating: Tag? {
         var date = Date.init(timeIntervalSince1970: 0)
         var mostRecentRating : Tag?
@@ -166,13 +166,13 @@ public class Product : BaseObject {
         return mostRecentRating
     }
     
-    /// Lets us know if the product is still being curated.
+    /// Identifies if a product is still being curated.
     /// - Returns: true if the product has not been curated.
     public func isBeingIdentified() -> Bool {
         return brand.lowercased().containsIgnoreCase("identified")
     }
     
-    /// Get the product image.
+    /// Get the image for a specific product.
     /// - Parameters:
     ///   - width: returns an image with the specified width in pixels.
     ///   - height: returns an image with the specified height in pixels.
@@ -190,7 +190,7 @@ public class Product : BaseObject {
         return PreferabliTools.getImageUrl(image: primary_image?.path, width: width, height: height, quality: quality)
     }
     
-    /// The type of a product. Only for wines.
+    /// The type of a product (e.g., Red). Only for wines.
     var product_type: ProductType {
         return ProductType.getProductTypeFromString(value: type)
     }
@@ -201,8 +201,8 @@ public class Product : BaseObject {
         
     }
     
-    /// Gets the Preferabli price of the most recent ``Variant``.
-    /// - Returns: Preferabli price represented by dollar signs in a string.
+    /// Gets the price range of the most recent ``Variant``.
+    /// - Returns: Price range represented by dollar signs in a string.
     ///
     /// Prices represent Retail | Restaurant
     /// - $ = Less than $12 | < $30
@@ -222,7 +222,7 @@ public class Product : BaseObject {
         return dollarSigns
     }
     
-    /// The most recent ``Variant``.
+    /// The most recent ``Variant`` for a product.
     var most_recent_variant: Variant {
         var mostRecentYear = NSNumber(integerLiteral: -2)
         var mostRecentVariant : Variant?
@@ -242,7 +242,7 @@ public class Product : BaseObject {
         return mostRecentVariant!
     }
     
-    /// Gets a ``Variant`` by its id.
+    /// Gets a ``Variant``of a product by its id.
     /// - Parameter id: a variant id.
     /// - Returns: the corresponding variant. Returns *nil* if this product does not contain the variant.
     public func getVariantWithId(id : NSNumber) -> Variant? {
@@ -255,7 +255,7 @@ public class Product : BaseObject {
         return nil
     }
     
-    /// Get a ``Variant`` by its year.
+    /// Get a ``Variant`` of a product by its year.
     /// - Parameter year: a variant year.
     /// - Returns: the corresponding variant. Returns *nil* if this product does not contain the variant.
     public func getVariantWithYear(year : NSNumber) -> Variant? {
@@ -339,11 +339,11 @@ extension Product {
     }
     
     /// See ``Preferabli/rateProduct(product_id:year:rating:location:notes:price:quantity:format_ml:onCompletion:onFailure:)``.
-    public func rate(rating : RatingType, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
+    public func rate(rating : RatingLevel, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         most_recent_variant.rate(rating: rating, location: location, notes: notes, price: price, quantity: quantity, format_ml: format_ml, onCompletion: onCompletion, onFailure: onFailure)
     }
     
-    /// See ``Preferabli/lttt(product_id:year:collection_id:onCompletion:onFailure:)``.
+    /// See ``Preferabli/lttt(product_id:year:collection_id:include_merchant_links:onCompletion:onFailure:)``.
     public func lttt(collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         most_recent_variant.lttt(collection_id: collection_id, onCompletion: onCompletion, onFailure: onFailure)
     }

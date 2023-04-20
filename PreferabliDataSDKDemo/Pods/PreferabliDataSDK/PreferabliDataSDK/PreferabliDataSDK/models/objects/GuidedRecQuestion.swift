@@ -8,7 +8,7 @@
 
 import Foundation
 
-/// A question within a ``GuidedRec`` quiz.
+/// A question within a ``GuidedRec`` questionnaire.
 public class GuidedRecQuestion : BaseObject {
     
     public var number : NSNumber?

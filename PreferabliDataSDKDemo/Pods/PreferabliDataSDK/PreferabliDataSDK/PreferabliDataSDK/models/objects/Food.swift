@@ -38,7 +38,7 @@ public class Food: BaseObject {
         }
     }
     
-    /// Filter foods by your search.
+    /// Filter foods by submitted search terms.
     /// - Parameters:
     ///   - foods: an array of foods to be filtered.
     ///   - search_text: string that contains the search term.

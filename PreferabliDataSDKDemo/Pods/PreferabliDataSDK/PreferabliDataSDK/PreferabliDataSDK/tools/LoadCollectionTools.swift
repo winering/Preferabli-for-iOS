@@ -15,9 +15,26 @@ internal class LoadCollectionTools {
     
     internal static var sharedInstance = LoadCollectionTools()
     
-    private let tagSemaphore = DispatchSemaphore(value: 1)
-
-    internal func loadCollectionViaTags(in context : NSManagedObjectContext, priority : Operation.QueuePriority, with collectionId : NSNumber) throws {
+    internal func loadCollectionViaTags(in context : NSManagedObjectContext, priority : Operation.QueuePriority, force_refresh : Bool, with collection_id : NSNumber)  throws {
+        if (force_refresh || !PreferabliTools.getKeyStore().bool(forKey: "hasLoaded\(collection_id)")) {
+            try LoadCollectionTools.sharedInstance.loadCollectionViaTags(in: context, priority: priority, with: collection_id)
+        } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalled\(collection_id)") as? Date)) {
+            PreferabliTools.startNewWorkThread(priority: .low) {
+                do {
+                    let context = NSManagedObjectContext.mr_()
+                    context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+                    try LoadCollectionTools.sharedInstance.loadCollectionViaTags(in: context, priority: .low, with: collection_id)
+                } catch {
+                    // catching any issues here so that we can still pull up our saved data
+                    if (Preferabli.loggingEnabled) {
+                        print(error)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func loadCollectionViaTags(in context : NSManagedObjectContext, priority : Operation.QueuePriority, with collectionId : NSNumber) throws {
         var tagIds = Array<NSNumber>()
 
         let predicate1 = NSPredicate(format: "collection_id == %d", collectionId.intValue)
@@ -58,6 +75,8 @@ internal class LoadCollectionTools {
     internal func getTagsAndProducts(collection : CoreData_Collection, priority : Operation.QueuePriority) throws -> [NSNumber] {
         let collectionId = collection.id
         let dispatchGroup = DispatchGroup()
+        let tagSemaphore = DispatchSemaphore(value: 1)
+
         var offset = 0
         let limit = 50
         var noErrors = true
@@ -133,9 +152,9 @@ internal class LoadCollectionTools {
 
                         let tagIdsHere = tags.map { $0.id }
                         dispatchGroup.enter()
-                        self.tagSemaphore.wait()
+                        tagSemaphore.wait()
                         tagIds.append(contentsOf: tagIdsHere)
-                        self.tagSemaphore.signal()
+                        tagSemaphore.signal()
                         dispatchGroup.leave()
                     }
 
@@ -254,6 +273,8 @@ internal class LoadCollectionTools {
     private func getGroupItems(context : NSManagedObjectContext, operation : BlockOperation, collection : CoreData_Collection, versionId : NSNumber, group : CoreData_CollectionGroup, limit : Int, offset : Int, failCount : Int, dispatchGroup : DispatchGroup, tagIds : inout Array<NSNumber>) throws {
         do {
             let collectionId = collection.id
+            let tagSemaphore = DispatchSemaphore(value: 1)
+
 
             var getOrderingsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.orderings(collectionId: collectionId, versionId: versionId, groupId: group.id), params: ["limit" : limit, "offset" : offset])
             getOrderingsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getOrderingsResponse)
@@ -313,9 +334,9 @@ internal class LoadCollectionTools {
 
                 let tagObjectIds = tags.map { $0.id }
                 dispatchGroup.enter()
-                self.tagSemaphore.wait()
+                tagSemaphore.wait()
                 tagIds.append(contentsOf: tagObjectIds)
-                self.tagSemaphore.signal()
+                tagSemaphore.signal()
                 dispatchGroup.leave()
             }
 

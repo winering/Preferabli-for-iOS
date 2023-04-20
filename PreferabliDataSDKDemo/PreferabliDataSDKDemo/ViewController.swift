@@ -332,7 +332,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     
     @IBAction func rateProductPressed() {
         showLoadingView()
-        Preferabli.main.rateProduct(product_id: 11263, year: Variant.CURRENT_VARIANT_YEAR, rating: RatingType.SOSO) { product in
+        Preferabli.main.rateProduct(product_id: 11263, year: Variant.CURRENT_VARIANT_YEAR, rating: RatingLevel.SOSO) { product in
             self.products = [product]
             self.items = [ product.name ]
             self.tableView.reloadData()
@@ -410,7 +410,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     
     @IBAction func getWishlistedProductsPressed() {
         showLoadingView()
-        Preferabli.main.getWishlistProducts { products in
+        Preferabli.main.getWishlistedProducts { products in
             self.products = products
             self.items = products.map { $0.name } as! [String]
             self.tableView.reloadData()
@@ -423,7 +423,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     
     @IBAction func getPurchasedProductsPressed() {
         showLoadingView()
-        Preferabli.main.getPurchaseHistory { products in
+        Preferabli.main.getPurchasedProducts { products in
             self.products = products
             self.items = products.map { $0.name } as! [String]
             self.tableView.reloadData()

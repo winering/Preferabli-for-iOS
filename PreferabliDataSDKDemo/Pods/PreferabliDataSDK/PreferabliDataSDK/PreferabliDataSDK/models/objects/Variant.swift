@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 import UIKit
 
-/// Used to represent any variation of a ``Product``. An example would be different vintages of the same wine.
+/// A Variant is a particular representation of a ``Product``.  For example, a specific vintage of a particular wine.
 public class Variant : BaseObject {
     
     /// Used to represent the most recent variant of a product.
@@ -83,10 +83,10 @@ public class Variant : BaseObject {
         return mostRecentRating
     }
     
-    /// The ``RatingType`` of the most recent rating of this variant for the current user.
-    var rating_type : RatingType {
+    /// The ``RatingType`` of the most recent rating of a specific variant for the current user.
+    var rating_type : RatingLevel {
         if (most_recent_rating != nil) {
-            return RatingType.getRatingTypeBasedOffTagValue(value: most_recent_rating!.value)
+            return RatingLevel.getRatingTypeBasedOffTagValue(value: most_recent_rating!.value)
         }
         
         return .NONE
@@ -103,8 +103,8 @@ public class Variant : BaseObject {
         return collectionTags
     }
     
-    /// Gets the Preferabli price of this variant.
-    /// - Returns: Preferabli price represented by dollar signs in a string.
+    /// Gets the general price range of a specific variant.
+    /// - Returns: Price range represented by dollar signs in a string.
     ///
     /// Prices represent Retail | Restaurant
     /// - $ = Less than $12 | < $30
@@ -144,7 +144,7 @@ public class Variant : BaseObject {
         return PreferabliTools.getImageUrl(image: primary_image?.path, width: width, height: height, quality: quality)
     }
     
-    /// All the variant's tags of type ``TagType/RATING`` for the current user.
+    /// All of the variant tags of type ``TagType/RATING`` for the current user.
     var ratings_tags: Set<Tag> {
         var ratingsTags = Set<Tag>()
         for tag in tags {
@@ -168,13 +168,13 @@ public class Variant : BaseObject {
         return nil
     }
     
-    /// Lets us know if the current user has wishlisted this product.
+    /// Identifies if the current user has added a specific variant to their wishlist.
     /// - Returns: true if it was wishlisted.
     public func isOnWishlist() -> Bool {
        return wishlist_tag != nil
    }
     
-    /// The first instance within this variant of tag type ``TagType/WISHLIST`` for the current user.
+    /// The first instance for a variant of tag type ``TagType/WISHLIST`` for the current user.
     var wishlist_tag : Tag? {
                for tag in tags {
                    if (tag.tag_type == .WISHLIST) {
@@ -204,7 +204,7 @@ extension Variant {
     }
     
     /// See ``Preferabli/rateProduct(product_id:year:rating:location:notes:price:quantity:format_ml:onCompletion:onFailure:)``.
-    public func rate(rating : RatingType, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
+    public func rate(rating : RatingLevel, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         Preferabli.main.rateProduct(product_id: product.id, year: year, rating: rating, location: location, notes: notes, price: price, quantity: quantity, format_ml: format_ml, onCompletion: onCompletion, onFailure: onFailure)
     }
     

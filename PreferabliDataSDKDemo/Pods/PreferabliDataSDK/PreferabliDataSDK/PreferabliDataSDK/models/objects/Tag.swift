@@ -63,8 +63,8 @@ public class Tag : BaseObject {
     }
     
     /// The rating type of the tag. Only for tags of type ``TagType/RATING``.
-    var rating_Type : RatingType {
-        return RatingType.getRatingTypeBasedOffTagValue(value: value)
+    var rating_Type : RatingLevel {
+        return RatingLevel.getRatingTypeBasedOffTagValue(value: value)
     }
     
     /// Sort tags by date.
@@ -92,7 +92,7 @@ extension Tag {
     }
     
     /// See ``Preferabli/editTag(tag_id:tag_type:year:rating:location:notes:price:quantity:format_ml:onCompletion:onFailure:)``.
-    public func edit(year : NSNumber, rating : RatingType = .NONE, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
+    public func edit(year : NSNumber, rating : RatingLevel = .NONE, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         Preferabli.main.editTag(tag_id: id, tag_type: tag_type, year: year, rating: rating, location: location, notes: notes, price: price, quantity: quantity, format_ml: format_ml, onCompletion: onCompletion, onFailure: onFailure)
     }
 }

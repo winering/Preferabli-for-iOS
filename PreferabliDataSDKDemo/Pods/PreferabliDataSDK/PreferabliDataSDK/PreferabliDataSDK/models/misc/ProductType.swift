@@ -9,14 +9,14 @@
 import Foundation
 import UIKit
 
-/// The type of a ``Product``. Mainly for wines. Will be ``OTHER`` if not a wine.
+/// The recognized type of a ``Product``.  At this time, non-wine products use the type ``ProductType/OTHER``.
 public enum ProductType {
     case RED
     case WHITE
     case ROSE
     case SPARKLING
     case FORTIFIED
-    /// Use other if product is a whiskey, tequila, or beer.
+    /// Use other if product is not a wine (e.g., a whiskey, mezcal/tequila, or beer).
     case OTHER
 
     internal func getTypeName() -> String {
@@ -57,7 +57,7 @@ public enum ProductType {
         return .OTHER
     }
     
-    /// Is this prouduct type a wine?
+    /// Is a specific prouduct  a wine?
     /// - Returns: true if the product type corresponds to a wine.
     public func isWine() -> Bool {
         return self == .RED || self == .WHITE || self == .ROSE || self == .SPARKLING || self == .FORTIFIED

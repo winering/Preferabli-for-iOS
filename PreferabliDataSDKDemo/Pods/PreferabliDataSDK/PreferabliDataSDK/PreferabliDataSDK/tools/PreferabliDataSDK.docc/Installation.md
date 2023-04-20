@@ -34,4 +34,4 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 
 ## Installation complete.
 
-You are ready to start using the Preferabli Data SDK. For more information on how to use the SDK, see <doc:How-to-use>.
+You are ready to start using the Preferabli Data SDK. For more information on how to use the SDK, see <doc:How-to-Use>.

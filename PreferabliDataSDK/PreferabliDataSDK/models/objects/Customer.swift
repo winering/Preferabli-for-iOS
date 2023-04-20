@@ -20,7 +20,7 @@ public class Customer : BaseObject {
     public var user_id: NSNumber?
     public var has_profile: Bool
     public var claim_code: String?
-    public var ratings_collection_id: Int
+    public var ratings_collection_id: NSNumber
 
     internal init(map : [String : Any]) {
         avatar_url = map["avatar_url"] as? String
@@ -32,7 +32,7 @@ public class Customer : BaseObject {
         user_id = map["user_id"] as? NSNumber
         has_profile = map["has_profile"] as? Bool ?? false
         claim_code = map["claim_code"] as? String
-        ratings_collection_id = map["ratings_collection_id"] as! Int
+        ratings_collection_id = map["ratings_collection_id"] as! NSNumber
         super.init(id: map["id"] as? NSNumber ?? NSNumber.init(value: 0))
         PreferabliTools.getKeyStore().set(id, forKey: "customer_id")
         PreferabliTools.getKeyStore().set(merchant_user_email_address, forKey: "email")
@@ -50,6 +50,7 @@ public class Customer : BaseObject {
         has_profile = customer.has_profile
         claim_code = customer.claim_code
         ratings_collection_id = customer.ratings_collection_id
+        super.init(id: customer.id)
     }
     
     /// Get a customer's display name.

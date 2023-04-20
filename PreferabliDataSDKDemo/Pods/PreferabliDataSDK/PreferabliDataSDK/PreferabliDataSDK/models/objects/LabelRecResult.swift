@@ -12,7 +12,7 @@ import CoreData
 /// Returned by ``Preferabli/labelRecognition(image:include_merchant_links:onCompletion:onFailure:)``.
 public class LabelRecResult {
     
-    /// A score on a scale of 0 - 100 which represents how close of a match the supplied label is to the ``Product``.
+    /// A score on a scale of 0 - 100  representing the degree of difference between the submitted image and the matching image.  Results with higher scores ore more likely a matching ``Product``.
     public var score: NSNumber
     public var product: Product
     

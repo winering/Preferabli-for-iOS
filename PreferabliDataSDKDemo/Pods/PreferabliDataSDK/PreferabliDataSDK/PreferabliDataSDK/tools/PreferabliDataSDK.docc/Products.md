@@ -1,9 +1,9 @@
 # Products
 
-Products are the main objects that you will encounter being returned by the SDK. 
+Products represent specific products (e.g., wines, beers, spirits) that are the returned by the SDK. 
 
 
-A ``Product`` can have one or multiple ``Variant``. A variant can have one or many user ``Tag`` which are used to chronicle a user's interaction with a product. A product can also have ``PreferenceData`` which informs us of the user's affinity for the product.
+A ``Product`` can have one or more ``Variant``s. A variant can have one or more ``Tag``s which are used to associate a ``Product`` with a user's interaction (e.g., rating) or with a particular ``Collection``. With respect to a ``Customer``, a product return may also include ``PreferenceData`` which identifies the Customer's affinity for the product.
 
 ## Topics
 

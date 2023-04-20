@@ -9,14 +9,14 @@
 import Foundation
 import CoreData
 
-/// A user's preference profile contains information on what a user likes and dislikes.
+/// A user's preference profile represents appealing and unappealing ``ProfileStyle``s for a particular user.
 public class Profile : BaseObject {
     
     public var user_id: NSNumber
     public var customer_id: NSNumber
     
     /// A score that represents how developed a profile is.
-    public var score: NSNumber
+    internal var score: NSNumber
     public var profile_styles: [ProfileStyle]
     
     internal init(profile : CoreData_Profile) {
