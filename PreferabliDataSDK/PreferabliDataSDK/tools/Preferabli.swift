@@ -1302,15 +1302,15 @@ public class Preferabli {
     /// - Parameters:
     ///   - product_category: pass a ``ProductCategory`` that you would like the results to conform to.
     ///   - product_type: pass a ``ProductType`` that you would like the results to conform to. Pass ``ProductType/OTHER`` if ``ProductCategory`` is not set  to ``ProductCategory/WINE``. If ``ProductCategory/WINE`` is passed, a type of wine *must* be passed here.
+    ///   - collection_id: the id of a specific ``Collection`` that you want to draw results from. Defaults to ``PRIMARY_INVENTORY_ID``. Pass *nil* for results from anywhere.
     ///   - price_min: pass if you want to lock results to a minimum price. Defaults to *nil*.
     ///   - price_max: pass if you want to lock results to a maximum price. Defaults to *nil*.
-    ///   - collection_id: the id of a specific ``Collection`` that you want to draw results from. Defaults to ``PRIMARY_INVENTORY_ID``. Pass *nil* for results from anywhere.
     ///   - style_ids: an array of ``Style`` ids that you want to constrain results to. Get available styles from ``getProfile(force_refresh:onCompletion:onFailure:)``. Defaults to *nil*.
     ///   - food_ids: an array of ``Food`` ids that should pair with the recommendation. Get available foods from ``getFoods(force_refresh:onCompletion:onFailure:)`` Defaults to *nil*.
     ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
     ///   - onCompletion: returns an optional message as a string along with an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func getRecs(product_category : ProductCategory, product_type : ProductType, price_min : Int? = nil, price_max : Int? = nil, collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), style_ids : [NSNumber]? = nil, food_ids : [NSNumber]? = nil, include_merchant_links: Bool = true, onCompletion: @escaping (String?, [Product]) -> () = {_,_  in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func getRecs(product_category : ProductCategory, product_type : ProductType,  collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), price_min : Int? = nil, price_max : Int? = nil, style_ids : [NSNumber]? = nil, food_ids : [NSNumber]? = nil, include_merchant_links: Bool = true, onCompletion: @escaping (String?, [Product]) -> () = {_,_  in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
             self.getRecsActual(product_category: product_category, product_type: product_type, price_min: price_min, price_max: price_max, collection_id: collection_id, style_ids: style_ids, food_ids: food_ids, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
         })
@@ -1376,75 +1376,15 @@ public class Preferabli {
             var variantIds = Array<NSNumber>()
             var predictRatings = Array<NSNumber>()
             var confidenceCodes = Array<NSNumber>()
-            
-            var primaryVariantIds = Array<NSNumber>()
-            var secondaryVariantIds = Array<NSNumber>()
-            var tertiaryVariantIds = Array<NSNumber>()
-            
-            var wines = Array<Product>()
-            
-            var primaryStyleId : NSNumber = 0
-            var secondaryStyleId : NSNumber = 0
-            var tertiaryStyleId : NSNumber = 0
-            
-            var x = 0
+
+            var products = Array<Product>()
+
             for rec in results {
                 variantIds.append(rec["variant_id"] as! NSNumber)
                 predictRatings.append(rec["formatted_predict_rating"] as! NSNumber)
                 confidenceCodes.append(rec["confidence_code"] as! NSNumber)
-                
-                if (x < 12) {
-                    primaryStyleId = rec["style_id"] as! NSNumber
-                    primaryVariantIds.append(rec["variant_id"] as! NSNumber)
-                } else if (x < 24) {
-                    secondaryStyleId = rec["style_id"] as! NSNumber
-                    secondaryVariantIds.append(rec["variant_id"] as! NSNumber)
-                } else {
-                    tertiaryStyleId = rec["style_id"] as! NSNumber
-                    tertiaryVariantIds.append(rec["variant_id"] as! NSNumber)
-                }
-                x = x + 1
             }
-            
-            if (primaryStyleId != 0 && primaryStyleId == secondaryStyleId) {
-                primaryVariantIds.append(contentsOf: secondaryVariantIds)
-                secondaryVariantIds.removeAll()
-                secondaryStyleId = 0
-            }
-            
-            if (primaryStyleId != 0 && primaryStyleId == tertiaryStyleId) {
-                primaryVariantIds.append(contentsOf: tertiaryVariantIds)
-                tertiaryVariantIds.removeAll()
-                tertiaryStyleId = 0
-            }
-            
-            if (secondaryStyleId != 0 && secondaryStyleId == tertiaryStyleId) {
-                secondaryVariantIds.append(contentsOf: tertiaryVariantIds)
-                tertiaryVariantIds.removeAll()
-                tertiaryStyleId = 0
-            }
-            
-            if (primaryStyleId != 0 && CoreData_Style.mr_findFirst(byAttribute: "id", withValue: primaryStyleId) == nil) {
-                var getStyleResponse = try Preferabli.api.getAlamo().get(APIEndpoints.style(id: primaryStyleId))
-                getStyleResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getStyleResponse)
-                let styleDictionary = try PreferabliTools.continueOrThrowJSONException(data: getStyleResponse.data!)
-                CoreData_Style.mr_import(from: styleDictionary, in: context)
-            }
-            
-            if (secondaryStyleId != 0 && CoreData_Style.mr_findFirst(byAttribute: "id", withValue: secondaryStyleId) == nil) {
-                var getStyleResponse = try Preferabli.api.getAlamo().get(APIEndpoints.style(id: secondaryStyleId))
-                getStyleResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getStyleResponse)
-                let styleDictionary = try PreferabliTools.continueOrThrowJSONException(data: getStyleResponse.data!)
-                CoreData_Style.mr_import(from: styleDictionary, in: context)
-            }
-            
-            if (tertiaryStyleId != 0 && CoreData_Style.mr_findFirst(byAttribute: "id", withValue: tertiaryStyleId) == nil) {
-                var getStyleResponse = try Preferabli.api.getAlamo().get(APIEndpoints.style(id: tertiaryStyleId))
-                getStyleResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getStyleResponse)
-                let styleDictionary = try PreferabliTools.continueOrThrowJSONException(data: getStyleResponse.data!)
-                CoreData_Style.mr_import(from: styleDictionary, in: context)
-            }
-            
+
             if (variantIds.count > 0) {
                 var getProductsResponse = try Preferabli.api.getAlamo().get(APIEndpoints.products, params: ["variant_ids" : variantIds])
                 getProductsResponse = try PreferabliTools.continueOrThrowPreferabliException(response: getProductsResponse)
@@ -1467,20 +1407,20 @@ public class Preferabli {
                         position = position + 1
                     }
                     
-                    wines.append(product)
+                    products.append(product)
                 }
             }
             
             context.mr_saveToPersistentStoreAndWait()
             
             if (include_merchant_links) {
-                try addMerchantDataToProducts(products: wines)
+                try addMerchantDataToProducts(products: products)
             }
             
             try canWeContinue(needsToBeLoggedIn: true)
             
             DispatchQueue.main.async {
-                onCompletion(message, wines)
+                onCompletion(message, products)
             }
             
         } catch {
@@ -1746,7 +1686,8 @@ public class Preferabli {
     private func editTagActual(tag_id : NSNumber, tag_type : TagType, year : NSNumber, value : String?, location : String?, notes : String?, price : NSNumber?, quantity : NSNumber?, format_ml : NSNumber?, onCompletion : @escaping (Product) -> (), onFailure : @escaping (PreferabliException) -> ()) {
         do {
             try canWeContinue(needsToBeLoggedIn: true)
-            
+            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "edit_tag"])
+
             let context = NSManagedObjectContext.mr_()
             context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
             
