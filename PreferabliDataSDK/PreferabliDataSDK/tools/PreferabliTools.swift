@@ -631,7 +631,7 @@ internal class PreferabliTools {
         var image = image!
         if (image.contains("placeholder")) {
             return nil
-        } else if (image.contains("winering.com")) {
+        } else if (image.contains("winering.com") || image.contains("preferabli.com")) {
             return URL.init(string: image)
         } else if (image.contains("s3.amazonaws.com/winering-production")) {
             let index = image.range(of: "/", options: .backwards, range: nil, locale: nil)!.upperBound

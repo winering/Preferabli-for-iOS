@@ -1,5 +1,5 @@
 //
-//  RatingType.swift
+//  RatingLevel.swift
 //  Preferabli
 //
 //  Created by Nicholas Bortolussi on 11/8/16.
@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 /// The degree of appeal for a product as identified by a ``Tag``. 
-public enum RatingType {
+public enum RatingLevel {
     /// A user loved the product.
     case LOVE
     /// A user liked the product.
@@ -22,25 +22,25 @@ public enum RatingType {
     /// Not a valid rating.
     case NONE
     
-    static internal func getRatingTypeBasedOffTagValue(value : String?) -> RatingType {
+    static internal func getRatingTypeBasedOffTagValue(value : String?) -> RatingLevel {
         if (value != nil) {
             switch value! {
             case "0":
-                return RatingType.NONE
+                return RatingLevel.NONE
             case "1":
-                return RatingType.DISLIKE
+                return RatingLevel.DISLIKE
             case "2":
-                return RatingType.SOSO
+                return RatingLevel.SOSO
             case "3":
-                return RatingType.LIKE
+                return RatingLevel.LIKE
             case "4":
-                return RatingType.LOVE
+                return RatingLevel.LOVE
             default:
-                return RatingType.NONE
+                return RatingLevel.NONE
             }
         }
         
-        return RatingType.NONE;
+        return RatingLevel.NONE;
     }
     
     internal func getValue() -> String {
@@ -58,7 +58,7 @@ public enum RatingType {
         }
     }
     
-    public func compare(_ other: RatingType) -> ComparisonResult {
+    public func compare(_ other: RatingLevel) -> ComparisonResult {
         return self.getValue().caseInsensitiveCompare(other.getValue())
     }
 }

@@ -59,12 +59,12 @@ public class Product : BaseObject {
     }
     
     /// The ``RatingType`` of the most recent rating of a specific product for the current user.
-    var rating_type : RatingType {
+    var rating_type : RatingLevel {
         if let mostRecentRating = most_recent_rating {
-            return RatingType.getRatingTypeBasedOffTagValue(value: mostRecentRating.value)
+            return RatingLevel.getRatingTypeBasedOffTagValue(value: mostRecentRating.value)
         }
         
-        return RatingType.NONE
+        return RatingLevel.NONE
     }
     
     /// The first instance within the product of tag type ``TagType/WISHLIST`` for the current user.
@@ -339,7 +339,7 @@ extension Product {
     }
     
     /// See ``Preferabli/rateProduct(product_id:year:rating:location:notes:price:quantity:format_ml:onCompletion:onFailure:)``.
-    public func rate(rating : RatingType, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
+    public func rate(rating : RatingLevel, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         most_recent_variant.rate(rating: rating, location: location, notes: notes, price: price, quantity: quantity, format_ml: format_ml, onCompletion: onCompletion, onFailure: onFailure)
     }
     

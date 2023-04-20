@@ -27,7 +27,7 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
     var picker2 : UIPickerView!
     var toolBar : UIToolbar!
     let pickerOptions = ["Search", "Label Rec", "Guided Rec", "Where To Buy", "Like That, Try This"]
-    let pickerOptions2 = ["Rate Product", "Wishlist Product", "Get Profile", "Get Recs", "Get Foods", "Get Rated Products", "Get Wishlisted Products", "Get Purchased Products"]
+    let pickerOptions2 = ["Rate Product", "Wishlist Product", "Get Profile", "Get Recs", "Get Foods", "Get Rated Products", "Get Wishlisted Products", "Get Purchased Products", "Get Customer"]
     var items = Array<String>()
     var products = Array<Product>()
     
@@ -121,6 +121,8 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
             rateProductPressed()
         } else if (result == "Wishlist Product") {
             wishlistProductPressed()
+        } else if (result == "Get Customer") {
+            getCustomer()
         }
         dismissPicker()
     }
@@ -223,6 +225,19 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
                 self.hideLoadingView()
                 self.showSnackBar(message: error.getMessage())
             }
+        }
+    }
+    
+    func getCustomer() {
+        Preferabli.main.getCustomer { customer in
+            self.products.removeAll()
+            self.items = ["Got the customer.", "Display Name: " + customer.getName()]
+            self.tableView.reloadData()
+            self.hideLoadingView()
+            self.handleViews()
+        } onFailure: { error in
+            self.hideLoadingView()
+            self.showSnackBar(message: error.getMessage())
         }
     }
     

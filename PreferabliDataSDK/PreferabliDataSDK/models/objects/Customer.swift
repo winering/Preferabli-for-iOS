@@ -39,6 +39,19 @@ public class Customer : BaseObject {
         PreferabliTools.getKeyStore().set(ratings_collection_id, forKey: "ratings_id")
     }
     
+    internal init(customer : CoreData_Customer) {
+        avatar_url = customer.avatar_url
+        merchant_user_email_address = customer.merchant_user_email_address
+        merchant_user_id = customer.merchant_user_id
+        merchant_user_name = customer.merchant_user_name
+        merchant_user_display_name = customer.merchant_user_display_name
+        role = customer.role
+        user_id = customer.user_id
+        has_profile = customer.has_profile
+        claim_code = customer.claim_code
+        ratings_collection_id = customer.ratings_collection_id
+    }
+    
     /// Get a customer's display name.
     /// - Returns: the name as a string.
     public func getName() -> String {

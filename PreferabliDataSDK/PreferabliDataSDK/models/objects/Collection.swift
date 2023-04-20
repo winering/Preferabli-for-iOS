@@ -10,11 +10,11 @@ import Foundation
 import CoreData
 import UIKit
 
-/// A Collection is a selection of Products, organized into one or more groupings.  For example, a Collection can represent an inventory for a store or just a subset of Products, such as selection of Products that are currently on sale or a selection of private-label Products.
+/// A Collection is a selection of ``Product``s, organized into one or more ``CollectionGroup``.  For example, a Collection can represent an inventory for a store or just a subset of Products, such as selection of Products that are currently on sale or a selection of private-label Products.
 ///
-/// In general, a Collection will be an Inventory or an Event.  Events are temporal in nature, such as a tasting events or weekly promotions.  Inventories, whether entire inventories or subsets of an inventory, are meant to change from time to time but are not specifically temporal in nature.
+/// In general, a Collection will be an ``CollectionType/INVENTORY`` or an ``CollectionType/EVENT``.  Events are temporal in nature, such as a tasting events or weekly promotions.  Inventories, whether entire inventories or subsets of an inventory, are meant to change from time to time but are not specifically temporal in nature.
 ///
-/// A Collection may also be a Cellar type (e.g., a ``Customer``'s personal cellar) or Other type.
+/// A Collection may also be a ``CollectionType/CELLAR`` type (e.g., a ``Customer``'s personal cellar) or ``CollectionType/OTHER`` type.
 public class Collection : BaseObject {
     
     public var channel_id: NSNumber?
@@ -47,7 +47,7 @@ public class Collection : BaseObject {
     public var versions: [CollectionVersion]
     public var sort_channel_name: String
     
-    /// Collection Type of a specific collection.  In general, a collection will be an Inventory or an Event.  Events are temporal in nature, such as a tasting event or a sale.  Inventories, whether entire inventories or subsets of an inventory, are meant to change from time to time but are not specifically temporal in nature.
+    /// Collection Type of a specific collection.  In general, a Collection will be an ``CollectionType/INVENTORY`` or an ``CollectionType/EVENT``.  Events are temporal in nature, such as a tasting events or weekly promotions.  Inventories, whether entire inventories or subsets of an inventory, are meant to change from time to time but are not specifically temporal in nature.
     var type : CollectionType {
         return CollectionType.getCollectionTypeBasedOffCollection(collection: self)
     }
@@ -231,5 +231,91 @@ public class Collection : BaseObject {
         }
         
         return false
+    }
+}
+
+/// A version of a ``Collection``. For the most part, collections will only have one version.
+public class CollectionVersion : BaseObject {
+    
+    public var name: String
+    public var order: NSNumber
+    public var collection: Collection
+    public var groups: [CollectionGroup]
+    
+    internal init(collection_version : CoreData_CollectionVersion, holding_collection : Collection) {
+        name = collection_version.name
+        order = collection_version.order
+        collection = holding_collection
+        groups = Array<CollectionGroup>()
+        super.init(id: collection_version.id)
+        for group in collection_version.groups.allObjects as! [CoreData_CollectionGroup] {
+            groups.append(CollectionGroup.init(collection_group: group, holding_version: self))
+        }
+    }
+}
+
+
+/// Products in a Collection are organized into one or more groups.  A CollectionGroup object sits within a ``CollectionVersion``.  Each CollectionGroup has an ``order`` representing its display order within a Collection.  Products that are tagged as belonging to a Collection are ordered within the applicable CollectionGroup with ``orderings``.
+public class CollectionGroup : BaseObject {
+    
+    public var name: String
+    public var order: NSNumber?
+    public var orderings_count: NSNumber
+    public var orderings: [CollectionOrder]
+    public var version: CollectionVersion
+    
+    internal init(collection_group : CoreData_CollectionGroup, holding_version : CollectionVersion) {
+        name = collection_group.name
+        order = collection_group.order
+        orderings_count = collection_group.orderings_count
+        orderings = Array<CollectionOrder>()
+        version = holding_version
+        super.init(id: collection_group.id)
+        for ordering in collection_group.orderings.allObjects as! [CoreData_CollectionOrder] {
+            orderings.append(CollectionOrder.init(collection_tag_order: ordering, holding_group: self))
+        }
+    }
+    
+    /// Sort groups by their order.
+    /// - Parameter groups: an array of groups to be sorted.
+    /// - Returns: a sorted array of groups.
+    static public func sortGroups(groups: [CollectionGroup]) -> Array<CollectionGroup> {
+        return groups.sorted {
+            return $0.order?.compare($1.order ?? NSNumber.init(value: 0)) == ComparisonResult.orderedAscending
+        }
+    }
+}
+
+/// The link between a ``Tag`` (which in turn references a ``Product``) and a ``Collection``, including its ordering within the Collection.
+public class CollectionOrder : BaseObject {
+    
+    public var tag_id: NSNumber
+    public var order: NSNumber
+    public var group: CollectionGroup
+    public var tag: Tag?
+    public var group_id: NSNumber
+
+    internal init(collection_tag_order : CoreData_CollectionOrder, holding_group : CollectionGroup) {
+        tag_id = collection_tag_order.tag_id
+        order = collection_tag_order.order
+        group = holding_group
+        tag = Tag.init(tag: collection_tag_order.tag, holding_variant: Variant.init(variant: collection_tag_order.tag.variant, holding_product: Product.init(product: collection_tag_order.tag.variant.product)))
+        group_id = collection_tag_order.group_id
+        super.init(id: collection_tag_order.id)
+    }
+}
+
+/// A trait descriptor for a ``Collection``.
+internal class CollectionTrait : BaseObject {
+    
+    internal var name: String
+    internal var order: NSNumber
+    internal var restrict_to_ring_it: Bool
+    
+    internal init(collection_trait : CoreData_CollectionTrait) {
+        name = collection_trait.name
+        order = collection_trait.order
+        restrict_to_ring_it = collection_trait.restrict_to_ring_it
+        super.init(id: collection_trait.id)
     }
 }

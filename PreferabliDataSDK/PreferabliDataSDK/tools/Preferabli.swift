@@ -217,6 +217,71 @@ public class Preferabli {
         }
     }
     
+    /// Get the current logged in ``Customer``.
+    /// - Parameters:
+    ///   - force_refresh: pass true if you want to force a refresh from the API and wait for the results to return. Otherwise, the call will load locally if available and run a background refresh only if one has not been initiated in the past 5 minutes. Defaults to *false*.
+    ///   - onCompletion: returns ``Customer`` if the call was successful. *Returns on the main thread.*
+    ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
+    public func getCustomer(force_refresh : Bool = false, onCompletion: @escaping (Customer) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+        PreferabliTools.startNewWorkThread(priority: .veryHigh, {
+            self.getCustomerActual(force_refresh: force_refresh, onCompletion: onCompletion, onFailure: onFailure)
+        })
+    }
+    
+    private func getCustomerActual(force_refresh : Bool, onCompletion: @escaping (Customer) -> (), onFailure: @escaping (PreferabliException) -> ()) {
+        do {
+            
+            try canWeContinue(needsToBeLoggedIn: true)
+            
+            if (!Preferabli.isCustomerLoggedIn()) {
+                throw PreferabliException.init(type: .OtherError, message: "No customer found. Are you sure there is a customer logged in?")
+            }
+            
+            SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "get_customer"])
+            
+            let context = NSManagedObjectContext.mr_()
+            context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+            
+            if (force_refresh) {
+                try getCustomerActual(context: context)
+            } else if (PreferabliTools.hasMinutesPassed(minutes: 5, startDate: PreferabliTools.getKeyStore().object(forKey: "lastCalledCustomer") as? Date)) {
+                PreferabliTools.startNewWorkThread(priority: .low) {
+                    do {
+                        let context = NSManagedObjectContext.mr_()
+                        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+                        try self.getCustomerActual(context: context)
+                    } catch {
+                        // catching any issues here so that we can still pull up our saved data
+                        if (Preferabli.loggingEnabled) {
+                            print(error)
+                        }
+                    }
+                }
+            }
+
+            let core_customer = CoreData_Customer.mr_findFirst(byAttribute: "id", withValue: PreferabliTools.getCustomerId(), in: context)
+            let customer = Customer.init(map: core_customer)
+            
+            DispatchQueue.main.async {
+                onCompletion(customer)
+            }
+                        
+        } catch {
+            handleError(error: error, onFailure: onFailure)
+        }
+    }
+    
+    private func getCustomerActual(context : NSManagedObjectContext) throws {
+        let context = NSManagedObjectContext.mr_()
+        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        var customerResponse = try Preferabli.api.getAlamo().get(APIEndpoints.customer(id: Preferabli.CHANNEL_ID, customerId: PreferabliTools.getCustomerId()))
+        customerResponse = try PreferabliTools.continueOrThrowPreferabliException(response: customerResponse)
+        let customerDictionary = try PreferabliTools.continueOrThrowJSONException(data: customerResponse.data!) as! [String : Any]
+        let customerData = Customer(map: customerDictionary)
+        _ = CoreData_Customer.mr_import(from: customerDictionary, in: context)
+        context.mr_saveToPersistentStoreAndWait()
+    }
+    
     /// Login an existing Preferabli user.
     /// - Parameters:
     ///   - email: user's email address.
@@ -1480,7 +1545,7 @@ public class Preferabli {
     ///   - format_ml: size of the product rated. Defaults to *nil*.
     ///   - onCompletion: returns ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func rateProduct(product_id : NSNumber, year : NSNumber, rating : RatingType, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
+    public func rateProduct(product_id : NSNumber, year : NSNumber, rating : RatingLevel, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
                 SwiftEventBus.post("PreferabliDataSDKAnalytics", sender: ["event" : "rate_product"])
                 self.createTagActual(product_id: product_id, year: year, collection_id: NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "ratings_id")), value: rating.getValue(), tag_type: .RATING, location: location, notes: notes, price: price, quantity: quantity, format_ml: format_ml, onCompletion: onCompletion, onFailure: onFailure)
@@ -1677,7 +1742,7 @@ public class Preferabli {
     ///   - format_ml: size of the product tagged in milliliters. Defaults to *nil*.
     ///   - onCompletion: returns ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func editTag(tag_id : NSNumber, tag_type : TagType, year : NSNumber, rating : RatingType = .NONE, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
+    public func editTag(tag_id : NSNumber, tag_type : TagType, year : NSNumber, rating : RatingLevel = .NONE, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
             self.editTagActual(tag_id: tag_id, tag_type: tag_type, year: year, value: rating.getValue(), location: location, notes: notes, price: price, quantity: quantity, format_ml: format_ml, onCompletion: onCompletion, onFailure: onFailure)
         })

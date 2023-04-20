@@ -55,30 +55,30 @@ public class ProfileStyle : BaseObject {
     }
     
     /// The ``RatingType`` of a specific profile style.
-    var rating_type : RatingType {
-        return RatingType.getRatingTypeBasedOffTagValue(value: rating.stringValue)
+    var rating_type : RatingLevel {
+        return RatingLevel.getRatingTypeBasedOffTagValue(value: rating.stringValue)
     }
     
     /// Is a profile style unappealing?
     /// - Returns: true if unappealing.
     public func isUnappealing() -> Bool {
-        return rating_type == RatingType.DISLIKE || rating_type == RatingType.SOSO
+        return rating_type == RatingLevel.DISLIKE || rating_type == RatingLevel.SOSO
     }
     
     /// Is a profile style appealing?
     /// - Returns: true if appealing.
     public func isAppealing() -> Bool {
-        return rating_type == RatingType.LOVE || rating_type == RatingType.LIKE
+        return rating_type == RatingLevel.LOVE || rating_type == RatingLevel.LIKE
     }
     
-    /// Sort profile styles by created at date.
+    /// Sort profile styles by updated at date.
     /// - Parameters:
     ///   - profile_styles: an array of profile styles to be sorted.
     ///   - comparison_result: can be ascending or descending. Defaults to *descending*.
     /// - Returns: a sorted array of profile styles.
     static public func sortProfileStylesByDate(profile_styles: [ProfileStyle], comparison_result: ComparisonResult = .orderedDescending) -> Array<ProfileStyle> {
         return profile_styles.sorted {
-            return $0.created_at.compare($1.created_at) == comparison_result
+            return $0.updated_at.compare($1.updated_at) == comparison_result
             
         }
     }

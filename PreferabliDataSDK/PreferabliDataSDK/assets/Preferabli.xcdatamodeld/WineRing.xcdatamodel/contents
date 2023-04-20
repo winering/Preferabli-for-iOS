@@ -159,6 +159,28 @@
             <entry key="relatedByAttribute" value="id"/>
         </userInfo>
     </entity>
+    <entity name="CoreData_Customer" representedClassName="CoreData_Customer" syncable="YES">
+        <attribute name="avatar_url" optional="YES" attributeType="String"/>
+        <attribute name="claim_code" optional="YES" attributeType="String"/>
+        <attribute name="has_profile" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="merchant_user_display_name" optional="YES" attributeType="String"/>
+        <attribute name="merchant_user_email_address" optional="YES" attributeType="String"/>
+        <attribute name="merchant_user_id" optional="YES" attributeType="String"/>
+        <attribute name="merchant_user_name" optional="YES" attributeType="String"/>
+        <attribute name="order" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="ratings_collection_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="role" optional="YES" attributeType="String"/>
+        <attribute name="user_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="id"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+        <userInfo>
+            <entry key="relatedByAttribute" value="id"/>
+        </userInfo>
+    </entity>
     <entity name="CoreData_DeliveryMethod" representedClassName="CoreData_DeliveryMethod" syncable="YES">
         <attribute name="country" optional="YES" attributeType="String"/>
         <attribute name="created_at" optional="YES" attributeType="String"/>

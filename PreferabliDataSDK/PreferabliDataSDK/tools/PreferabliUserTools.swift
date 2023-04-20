@@ -79,7 +79,7 @@ internal class PreferabliUserTools {
                 do {
                     let context = NSManagedObjectContext.mr_()
                     context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
-                    try LoadCollectionTools.sharedInstance.loadCollectionViaTags(in: context, priority: priority, with: collection!.id)
+                    try LoadCollectionTools.sharedInstance.loadCollectionViaTags(in: context, priority: priority, force_refresh: forceRefresh, with: collection!.id)
                 } catch {
                     // failed
                     noErrors = false
