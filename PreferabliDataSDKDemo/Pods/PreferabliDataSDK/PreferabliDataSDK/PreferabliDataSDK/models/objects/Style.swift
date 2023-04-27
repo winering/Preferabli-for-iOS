@@ -44,13 +44,13 @@ public class Style : BaseObject {
         return PreferabliTools.getImageUrl(image: primary_image_url, width: width, height: height, quality: quality)
     }
     
-    /// Get product type.
+    /// Get product type of the style.
     /// - Returns: ``ProductType`` of the style.
     public func getProductType() -> ProductType {
          return ProductType.getProductTypeFromString(value: type)
     }
     
-    /// Get product category.
+    /// Get product category of the style.
     /// - Returns: ``ProductCategory`` of the style.
     public func getProductCategory() -> ProductCategory {
        return ProductCategory.getProductCategoryFromString(value: product_category);

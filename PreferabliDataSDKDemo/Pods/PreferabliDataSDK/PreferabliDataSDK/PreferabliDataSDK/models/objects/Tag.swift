@@ -62,9 +62,9 @@ public class Tag : BaseObject {
         return TagType.getTagTypeBasedOffDatabaseName(value: type)
     }
     
-    /// The rating type of the tag. Only for tags of type ``TagType/RATING``.
-    var rating_Type : RatingLevel {
-        return RatingLevel.getRatingTypeBasedOffTagValue(value: value)
+    /// The rating level of the tag. Only for tags of type ``TagType/RATING``.
+    var rating_level : RatingLevel {
+        return RatingLevel.getRatingLevelBasedOffTagValue(value: value)
     }
     
     /// Sort tags by date.
@@ -94,5 +94,106 @@ extension Tag {
     /// See ``Preferabli/editTag(tag_id:tag_type:year:rating:location:notes:price:quantity:format_ml:onCompletion:onFailure:)``.
     public func edit(year : NSNumber, rating : RatingLevel = .NONE, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         Preferabli.main.editTag(tag_id: id, tag_type: tag_type, year: year, rating: rating, location: location, notes: notes, price: price, quantity: quantity, format_ml: format_ml, onCompletion: onCompletion, onFailure: onFailure)
+    }
+}
+
+/// The degree of appeal for a product as identified by a ``Tag``.
+public enum RatingLevel {
+    /// A user loved the product.
+    case LOVE
+    /// A user liked the product.
+    case LIKE
+    /// A user did not find the product to be appealing, but not as far as a dislike.  We like to say, "I'd drink it but only if I wasn't paying for it."
+    case SOSO
+    /// A user disliked the product.
+    case DISLIKE
+    /// Not a valid rating.
+    case NONE
+    
+    static internal func getRatingLevelBasedOffTagValue(value : String?) -> RatingLevel {
+        if (value != nil) {
+            switch value! {
+            case "0":
+                return RatingLevel.NONE
+            case "1":
+                return RatingLevel.DISLIKE
+            case "2":
+                return RatingLevel.SOSO
+            case "3":
+                return RatingLevel.LIKE
+            case "4":
+                return RatingLevel.LOVE
+            default:
+                return RatingLevel.NONE
+            }
+        }
+        
+        return RatingLevel.NONE;
+    }
+    
+    internal func getValue() -> String {
+        switch self {
+        case .LOVE:
+            return "4"
+        case .LIKE:
+            return "3"
+        case .SOSO:
+            return "2"
+        case .DISLIKE:
+            return "1"
+        case .NONE:
+            return "0"
+        }
+    }
+    
+    public func compare(_ other: RatingLevel) -> ComparisonResult {
+        return self.getValue().caseInsensitiveCompare(other.getValue())
+    }
+}
+
+/// Type of a ``Tag``. Tags may can contain different information depending on it's type.
+public enum TagType {
+    case RATING
+    case CELLAR
+    case PURCHASE
+    case WISHLIST
+    case OTHER
+    
+    static internal func getTagTypeBasedOffDatabaseName(value : String?) -> TagType {
+        if (value != nil) {
+            switch value! {
+            case "rating":
+                return .RATING
+            case "collection":
+                return .CELLAR
+            case "purchase":
+                return .PURCHASE
+            case "wishlist":
+                return .WISHLIST
+            default:
+                return .OTHER
+            }
+        }
+        
+        return .OTHER;
+    }
+
+    internal func getDatabaseName() -> String {
+        switch self {
+        case .RATING:
+            return "rating"
+        case .CELLAR:
+            return "collection"
+        case .PURCHASE:
+            return "purchase"
+        case .WISHLIST:
+            return "wishlist"
+        case .OTHER:
+            return "other"
+        }
+    }
+    
+    public func compare(_ other: TagType) -> ComparisonResult {
+        return self.getDatabaseName().caseInsensitiveCompare(other.getDatabaseName())
     }
 }

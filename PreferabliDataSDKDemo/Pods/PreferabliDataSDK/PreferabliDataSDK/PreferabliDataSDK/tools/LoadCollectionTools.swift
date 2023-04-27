@@ -10,7 +10,7 @@ import Foundation
 import MagicalRecord
 import SwiftEventBus
 
-/// Contains methods that help load Collections.
+/// Contains methods that help load ``Collection``s.
 internal class LoadCollectionTools {
     
     internal static var sharedInstance = LoadCollectionTools()

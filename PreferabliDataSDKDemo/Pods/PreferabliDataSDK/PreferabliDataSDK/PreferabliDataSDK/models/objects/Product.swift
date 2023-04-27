@@ -58,10 +58,10 @@ public class Product : BaseObject {
         }
     }
     
-    /// The ``RatingType`` of the most recent rating of a specific product for the current user.
-    var rating_type : RatingLevel {
+    /// The ``RatingLevel`` of the most recent rating of a specific product for the current user.
+    var rating_level : RatingLevel {
         if let mostRecentRating = most_recent_rating {
-            return RatingLevel.getRatingTypeBasedOffTagValue(value: mostRecentRating.value)
+            return RatingLevel.getRatingLevelBasedOffTagValue(value: mostRecentRating.value)
         }
         
         return RatingLevel.NONE
@@ -172,7 +172,7 @@ public class Product : BaseObject {
         return brand.lowercased().containsIgnoreCase("identified")
     }
     
-    /// Get the image for a specific product.
+    /// Get the product's image.
     /// - Parameters:
     ///   - width: returns an image with the specified width in pixels.
     ///   - height: returns an image with the specified height in pixels.
@@ -202,7 +202,7 @@ public class Product : BaseObject {
     }
     
     /// Gets the price range of the most recent ``Variant``.
-    /// - Returns: Price range represented by dollar signs in a string.
+    /// - Returns: price range represented by dollar signs in a string.
     ///
     /// Prices represent Retail | Restaurant
     /// - $ = Less than $12 | < $30
@@ -328,7 +328,7 @@ extension Product {
         most_recent_variant.whereToBuy(fulfill_sort: fulfill_sort, append_nonconforming_results: append_nonconforming_results, lock_to_integration: lock_to_integration, onCompletion: onCompletion, onFailure: onFailure)
     }
     
-    /// See ``Preferabli/wishlistProduct(product_id:year:location:notes:price:format_ml:onCompletion:onFailure:)`` and ``Preferabli/deleteTag(tag_id:onCompletion:onFailure:)``.
+    /// See ``Preferabli/wishlistProduct(product_id:year:location:notes:price:quantity:format_ml:onCompletion:onFailure:)``.
     public func toggleWishlist(onCompletion : @escaping (Product) -> ()  = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         let tag = wishlist_tag
         var variant = most_recent_variant
@@ -351,5 +351,103 @@ extension Product {
     /// See ``Preferabli/getPreferabliScore(product_id:year:onCompletion:onFailure:)``.
     public func getPreferabliScore(force_refresh : Bool = false, onCompletion : @escaping (PreferenceData) -> ()  = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         most_recent_variant.getPreferabliScore(force_refresh: force_refresh, onCompletion: onCompletion, onFailure: onFailure)
+    }
+}
+
+/// The category of a ``Product``.
+public enum ProductCategory {
+    case WHISKEY
+    case MEZCAL
+    case BEER
+    case WINE
+    case NONE
+
+    internal func getCategoryName() -> String {
+        switch self {
+        case .WHISKEY:
+            return "whiskey"
+        case .MEZCAL:
+            return "tequila"
+        case .BEER:
+            return "beer"
+        case .WINE:
+            return "wine"
+        case .NONE:
+            return ""
+        }
+    }
+    
+    static internal func getProductCategoryFromString(value : String?) -> ProductCategory {
+        if (value != nil) {
+            switch value!.lowercased() {
+            case "whiskey":
+                return .WHISKEY
+            case "tequila":
+                return .MEZCAL
+            case "beer":
+                return .BEER
+            case "wine":
+                return .WINE
+            default:
+                return .NONE
+            }
+        }
+        
+        return .NONE
+    }
+}
+
+/// The recognized type of a ``Product``.  At this time, non-wine products use the type ``ProductType/OTHER``.
+public enum ProductType {
+    case RED
+    case WHITE
+    case ROSE
+    case SPARKLING
+    case FORTIFIED
+    /// Use other if product is not a wine (e.g., a whiskey, mezcal/tequila, or beer).
+    case OTHER
+
+    internal func getTypeName() -> String {
+        switch self {
+        case .RED:
+            return "red"
+        case .WHITE:
+            return "white"
+        case .ROSE:
+            return "rosé"
+        case .SPARKLING:
+            return "sparkling"
+        case .FORTIFIED:
+            return "fortified"
+        case .OTHER:
+            return "other"
+        }
+    }
+    
+    static internal func getProductTypeFromString(value : String?) -> ProductType {
+        if (value != nil) {
+            switch value!.lowercased() {
+            case "red":
+                return .RED
+            case "white":
+                return .WHITE
+            case "rosé":
+                return .ROSE
+            case "fortified":
+                return .FORTIFIED
+            case "sparkling":
+                return .SPARKLING
+            default:
+                return .OTHER
+            }
+        }
+        
+        return .OTHER
+    }
+    
+    /// Is a specific prouduct  a wine?
+    /// - Returns: true if the product type corresponds to a wine.
+    public func isWine() -> Bool {
+        return self == .RED || self == .WHITE || self == .ROSE || self == .SPARKLING || self == .FORTIFIED
     }
 }

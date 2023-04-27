@@ -30,4 +30,14 @@ public class Media : BaseObject {
         type = media.type
         super.init(id: media.id)
     }
+    
+    /// Get the media's path for display as an image. Only use if the media is an image.
+    /// - Parameters:
+    ///   - width: returns an image with the specified width in pixels.
+    ///   - height: returns an image with the specified height in pixels.
+    ///   - quality: returns an image with the specified quality. Scales from 0 - 100.
+    /// - Returns: the URL of the requested image.
+    public func getImage(width : CGFloat, height : CGFloat, quality : Int = 80) -> URL? {
+        return PreferabliTools.getImageUrl(image: path, width: width, height: height, quality: quality)
+    }
 }

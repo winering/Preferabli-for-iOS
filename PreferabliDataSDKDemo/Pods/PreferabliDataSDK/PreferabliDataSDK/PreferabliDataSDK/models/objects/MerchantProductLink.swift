@@ -11,7 +11,7 @@ import Foundation
 import CoreData
 
 
-/// This is the link between a Preferabli product and a merchant product.  If returned as part of ``WhereToBuy``, will contain an array of ``Venue`` as ``venues``.
+/// This is the link between a Preferabli ``Product`` and a merchant product.  If returned as part of ``WhereToBuy``, will contain an array of ``Venue`` as ``venues``.
 public class MerchantProductLink : BaseObject {
     
     public var variant_id: NSNumber?
@@ -22,6 +22,7 @@ public class MerchantProductLink : BaseObject {
     public var year: NSNumber?
     public var format_ml: NSNumber?
     public var landing_url: String?
+    public var image_url: String?
     public var product_name: String?
     public var price: String?
     
@@ -42,7 +43,8 @@ public class MerchantProductLink : BaseObject {
         landing_url = map["landing_url"] as? String
         product_name = map["product_name"] as? String
         price = map["price"] as? String
-        
+        image_url = map["image_url"] as? String
+
         if (map["venues"] != nil) {
             venues = Array<Venue>()
             for venue in map["venues"] as! Array<[String : Any]> {
@@ -52,27 +54,6 @@ public class MerchantProductLink : BaseObject {
         
         super.init(id: map["id"] as? NSNumber ?? NSNumber.init(value: 0))
     }
-    
-//    internal init(lookup : CoreData_MerchantProductLink, first : Bool) {
-//        variant_id = lookup.variant_id
-//        price_currency = lookup.price_currency
-//        nonconforming_result = lookup.nonconforming_result
-//        year = lookup.variant_year
-//        format_ml = lookup.format_ml
-//        landing_url = lookup.landing_url
-//        product_name = lookup.product_name
-//        price = lookup.bottle_price
-//
-//        if (first) {
-//            var wtbVenues = Array<Venue>()
-//            for venue in lookup.venues?.allObjects as! [CoreData_Venue] {
-//                wtbVenues.append(Venue.init(venue: venue, first: false))
-//            }
-//            venues = Venue.sortVenues(venues: wtbVenues, ascending: true)
-//        }
-//
-//        super.init(id: lookup.id)
-//    }
     
     /// Filter links by submitted search terms.
     /// - Parameters:
@@ -152,6 +133,16 @@ public class MerchantProductLink : BaseObject {
         }
     }
     
+    /// Get the link's image.
+    /// - Parameters:
+    ///   - width: returns an image with the specified width in pixels.
+    ///   - height: returns an image with the specified height in pixels.
+    ///   - quality: returns an image with the specified quality. Scales from 0 - 100.
+    /// - Returns: the URL of the requested image.
+    public func getImage(width : CGFloat, height : CGFloat, quality : Int = 80) -> URL? {
+        return PreferabliTools.getImageUrl(image: image_url, width: width, height: height, quality: quality)
+    }
+    
     /// Gets price formatted with the currency.
     /// - Returns: a string representing the localized price.
     public func getFormattedPrice() -> String {
@@ -171,6 +162,27 @@ extension MerchantProductLink {
     public func whereToBuy(fulfill_sort : FulfillSort = FulfillSort.init(), append_nonconforming_results : Bool = true, lock_to_integration : Bool = true,  onCompletion: @escaping (WhereToBuy) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         if (product_id != nil) {
             Preferabli.main.whereToBuy(product_id: product_id!, fulfill_sort: fulfill_sort, append_nonconforming_results: append_nonconforming_results, lock_to_integration: lock_to_integration, onCompletion: onCompletion, onFailure: onFailure)
+        }
+    }
+
+    /// See ``Preferabli/rateProduct(product_id:year:rating:location:notes:price:quantity:format_ml:onCompletion:onFailure:)``.
+    public func rate(rating : RatingLevel, location : String? = nil, notes : String? = nil, price : NSNumber? = nil, quantity : NSNumber? = nil, format_ml : NSNumber? = nil, onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
+        if (product_id != nil) {
+            Preferabli.main.rateProduct(product_id: product_id!, year: year ?? Variant.CURRENT_VARIANT_YEAR, rating: rating, location: location, notes: notes, price: price, quantity: quantity, format_ml: format_ml, onCompletion: onCompletion, onFailure: onFailure)
+        }
+    }
+    
+    /// See ``Preferabli/lttt(product_id:year:collection_id:include_merchant_links:onCompletion:onFailure:)``.
+    public func lttt(collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+        if (product_id != nil) {
+            Preferabli.main.lttt(product_id: product_id!, collection_id: collection_id, onCompletion: onCompletion, onFailure: onFailure)
+        }
+    }
+    
+    /// See ``Preferabli/getPreferabliScore(product_id:year:onCompletion:onFailure:)``.
+    public func getPreferabliScore(onCompletion : @escaping (PreferenceData) -> ()  = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
+        if (product_id != nil) {
+            Preferabli.main.getPreferabliScore(product_id: product_id!, year: year ?? Variant.CURRENT_VARIANT_YEAR, onCompletion: onCompletion, onFailure: onFailure)
         }
     }
 }

@@ -9,13 +9,13 @@
 import Foundation
 import CoreData
 
-/// The profile style object identifies a specific ``Style`` as included in a user's ``Profile``. A ``ProfileStyle`` represents a unique representation of a Style to a particular user.
+/// The profile style object identifies a specific ``Style`` as included in a user's ``Profile``. A profile style represents a unique representation of a Style to a particular user.
 public class ProfileStyle : BaseObject {
     
     /// Indicates if there is any ambiguity in the user's affinity for a specific style.
     public var conflict: Bool
     
-    /// A ranking of 1..n which indicates where this style fits within its ``RatingType`` and ``ProductType`` where 1 indicates the highest level of appeal and n indicates the lowest.
+    /// A ranking of 1..n which indicates where this style fits within its ``RatingLevel`` and ``ProductType`` where 1 indicates the highest level of appeal and n indicates the lowest.
     public var order_profile: NSNumber
     
     /// A ranking of 1..n which indicates where a specific style fits within its ``ProductType`` where 1 indicates the most recommendable and n indicates the least recommendable. A ranking value of 0 means the particular style is not recommendable.
@@ -34,7 +34,7 @@ public class ProfileStyle : BaseObject {
     /// The profile of the user where this profile style resides.
     public var profile: Profile
     
-    /// Use this to compute ``RatingType``.
+    /// Use this to compute ``RatingLevel``.
     internal var rating: NSNumber
     
     
@@ -54,21 +54,21 @@ public class ProfileStyle : BaseObject {
         super.init(id: profile_style.id)
     }
     
-    /// The ``RatingType`` of a specific profile style.
-    var rating_type : RatingLevel {
-        return RatingLevel.getRatingTypeBasedOffTagValue(value: rating.stringValue)
+    /// The ``RatingLevel`` of a specific profile style.
+    var rating_level : RatingLevel {
+        return RatingLevel.getRatingLevelBasedOffTagValue(value: rating.stringValue)
     }
     
     /// Is a profile style unappealing?
     /// - Returns: true if unappealing.
     public func isUnappealing() -> Bool {
-        return rating_type == RatingLevel.DISLIKE || rating_type == RatingLevel.SOSO
+        return rating_level == RatingLevel.DISLIKE || rating_level == RatingLevel.SOSO
     }
     
     /// Is a profile style appealing?
     /// - Returns: true if appealing.
     public func isAppealing() -> Bool {
-        return rating_type == RatingLevel.LOVE || rating_type == RatingLevel.LIKE
+        return rating_level == RatingLevel.LOVE || rating_level == RatingLevel.LIKE
     }
     
     /// Sort profile styles by updated at date.

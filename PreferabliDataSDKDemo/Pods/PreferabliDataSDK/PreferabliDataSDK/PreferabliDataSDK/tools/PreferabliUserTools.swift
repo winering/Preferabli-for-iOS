@@ -10,7 +10,7 @@ import Foundation
 import MagicalRecord
 import SwiftEventBus
 
-/// Contains methods that help load Preferabli User data.
+/// Contains methods that help load ``PreferabliUser`` data.
 internal class PreferabliUserTools {
     
     internal static var sharedInstance = PreferabliUserTools()
