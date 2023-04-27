@@ -8,13 +8,13 @@
 
 import Foundation
 
-/// A user's preference for a specific ``Product``.
+/// Indicates a user's level of preference for a specific ``Product``.
 public class PreferenceData {
     
     public var title : String?
     public var details : String?
     
-    /// How confident we are that a user will enjoy a product.
+    /// How confident we are in our rating.
     internal var confidence_code : Int?
     
     /// A score from 85 - 100 which informs us how likely a user is to enjoy a product. *Nil if the user will not like the product.*

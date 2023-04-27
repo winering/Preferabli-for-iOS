@@ -65,9 +65,9 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
             password.isHidden = customer
             email.placeholder = customer ? "Customer ID (Email or Phone)" : "Preferabli User Email"
             loginButton.setTitle("SUBMIT", for: .normal)
-            firstLabel.text = "To unlock additional actions, link a customer or login an existing Preferabli user..."
+            firstLabel.text = "To unlock additional actions, link a customer..."
             customerButton.setTitle(customer ? "Link a Customer" : "Preferabli User Login", for: .normal)
-            customerButton.isHidden = false
+            customerButton.isHidden = true
             authenticatedButton.isHidden = true
         }
     }

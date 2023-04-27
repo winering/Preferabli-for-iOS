@@ -15,3 +15,4 @@ These are the additional classes you may run into while using the SDK.
 - ``LabelRecResult``
 - ``PreferabliException``
 - ``PreferabliExceptionType``
+- ``PreferabliUser``

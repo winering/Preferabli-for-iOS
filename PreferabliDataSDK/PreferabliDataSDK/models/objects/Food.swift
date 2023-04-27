@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-/// You can use foods to get pairings within <doc:Get-Recs>.
+/// You can use foods to get pairings within ``Preferabli/getRecs(product_category:product_type:collection_id:price_min:price_max:style_ids:food_ids:include_merchant_links:onCompletion:onFailure:)``.
 public class Food: BaseObject {
     
     public var name: String
@@ -17,7 +17,7 @@ public class Food: BaseObject {
     public var keywords: String?
     public var food_category_id: NSNumber?
     public var food_category_name: String?
-    public var food_category_url: String?
+    internal var food_category_url: String?
     
     internal init(food : CoreData_Food) {
         name = food.name
@@ -64,6 +64,16 @@ public class Food: BaseObject {
         return filteredFoods
     }
     
+    /// Get the food's image.
+    /// - Parameters:
+    ///   - width: returns an image with the specified width in pixels.
+    ///   - height: returns an image with the specified height in pixels.
+    ///   - quality: returns an image with the specified quality. Scales from 0 - 100.
+    /// - Returns: the URL of the requested image.
+    public func getImage(width : CGFloat, height : CGFloat, quality : Int = 80) -> URL? {
+        return PreferabliTools.getImageUrl(image: food_category_url, width: width, height: height, quality: quality)
+    }
+    
      internal func filterFood(search_term : String) -> Bool {
         if (search_term.isEmptyOrWhitespace()) {
             return true
@@ -73,6 +83,24 @@ public class Food: BaseObject {
             return true
         } else {
             return false
+        }
+    }
+}
+
+internal class FoodCategory : BaseObject {
+    
+    internal var name: String
+    internal var icon_url: String?
+    
+    internal init(food_category : CoreData_FoodCategory) {
+        name = food_category.name
+        icon_url = food_category.icon_url
+        super.init(id: food_category.id)
+    }
+    
+    static internal func sortFoodCats(foodCats: [FoodCategory]) -> Array<FoodCategory> {
+        return foodCats.sorted {
+            return $0.name.caseInsensitiveCompare($1.name) == ComparisonResult.orderedAscending
         }
     }
 }

@@ -285,6 +285,7 @@ public class Preferabli {
         let customerData = Customer(map: customerDictionary)
         _ = CoreData_Customer.mr_import(from: customerDictionary, in: context)
         context.mr_saveToPersistentStoreAndWait()
+        PreferabliTools.getKeyStore().set(Date.init(), forKey: "lastCalledCustomer")
     }
     
     /// Login an existing Preferabli user.
@@ -1030,7 +1031,7 @@ public class Preferabli {
             
             if (dictionaries != nil) {
                 for dictionary in dictionaries! {
-                    let coreProduct = CoreData_Product.mr_import(from: dictionary, in: context)
+                    let coreProduct = CoreData_Product.mr_import(from: dictionary["product"], in: context)
                     let wili = PreferenceData(title: nil, details: nil, confidence_code: nil, formatted_predict_rating: dictionary["formatted_predict_rating"] as? Int)
                     let product = Product.init(product: coreProduct)
                     product.most_recent_variant.preference_data = wili
@@ -1201,7 +1202,7 @@ public class Preferabli {
         }
     }
     
-    /// Get the Preference Profile of the customer / user. Customer / user must be logged in to run this call.
+    /// Get the Preference Profile of the customer. Customer must be logged in to run this call.
     /// - Parameters:
     ///   - force_refresh: pass true if you want to force a refresh from the API and wait for the results to return. Otherwise, the call will load locally if available and run a background refresh only if one has not been initiated in the past 5 minutes. Defaults to *false*.
     ///   - onCompletion: returns ``Profile`` if the call was successful. *Returns on the main thread.*
@@ -1538,11 +1539,11 @@ public class Preferabli {
         }
     }
     
-    /// Rate a ``Product``. Creates a ``Tag`` of type ``TagType/RATING`` which is returned within the relevant product ``Variant``. Customer / user must be logged in to run this call.
+    /// Rate a ``Product``. Creates a ``Tag`` of type ``TagType/RATING`` which is returned within the relevant product ``Variant``. Customer must be logged in to run this call.
     /// - Parameters:
     ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:onCompletion:onFailure:)`` to convert your product id into a Preferabli product id.
     ///   - year: year of the ``Variant`` that you want to rate. Can use ``Variant/CURRENT_VARIANT_YEAR`` if you want to rate the latest variant, or ``Variant/NON_VARIANT`` if the product is not vintaged.
-    ///   - rating: pass one of ``RatingType/LOVE``, ``RatingType/LIKE``, ``RatingType/SOSO``, ``RatingType/DISLIKE``.
+    ///   - rating: pass one of ``RatingLevel/LOVE``, ``RatingLevel/LIKE``, ``RatingLevel/SOSO``, ``RatingLevel/DISLIKE``.
     ///   - location: location where the rating occurred. Defaults to *nil*.
     ///   - notes: any notes to go along with the rating. Defaults to *nil*.
     ///   - price: price of the product rated. Defaults to *nil*.
@@ -1557,7 +1558,7 @@ public class Preferabli {
         })
     }
     
-    /// Wishlist a ``Product``. Creates a ``Tag`` of type ``TagType/WISHLIST`` which is returned within the relevant product ``Variant``. Customer / user must be logged in to run this call.
+    /// Wishlist a ``Product``. Creates a ``Tag`` of type ``TagType/WISHLIST`` which is returned within the relevant product ``Variant``. Customer must be logged in to run this call.
     /// - Parameters:
     ///   - product_id: id of the starting ``Product``.  Only pass a Preferabli product id. If necessary, call ``Preferabli/getPreferabliProductId(merchant_product_id:merchant_variant_id:onCompletion:onFailure:)`` to convert your product id into a Preferabli product id.
     ///   - year: year of the ``Variant`` that you want to wishlist. Can use ``Variant/CURRENT_VARIANT_YEAR`` if you want to wishlist the latest variant, or ``Variant/NON_VARIANT`` if the product is not vintaged.
@@ -1739,7 +1740,7 @@ public class Preferabli {
     ///   - tag_id: id of the ``Tag`` that needs to be edited.
     ///   - tag_type: type of the tag you wish to edit. This value is not editable. Can be either ``TagType/RATING``, ``TagType/CELLAR``, ``TagType/PURCHASE``, or ``TagType/WISHLIST``.
     ///   - year: year of the ``Variant``. Can use ``Variant/CURRENT_VARIANT_YEAR`` if you want the latest variant, or ``Variant/NON_VARIANT`` if the product is not vintaged.
-    ///   - rating: pass one of ``RatingType/LOVE``, ``RatingType/LIKE``, ``RatingType/SOSO``, ``RatingType/DISLIKE``. Pass ``RatingType/NONE`` is not a rating. Defaults to ``RatingType/NONE``.
+    ///   - rating: pass one of ``RatingLevel/LOVE``, ``RatingLevel/LIKE``, ``RatingLevel/SOSO``, ``RatingLevel/DISLIKE``. Pass ``RatingLevel/NONE`` is not a rating. Defaults to ``RatiRatingLevelngType/NONE``.
     ///   - location: location of the tag. Defaults to *nil*.
     ///   - notes: any notes to go along with the tag. Defaults to *nil*.
     ///   - price: price of the product tagged. Defaults to *nil*.

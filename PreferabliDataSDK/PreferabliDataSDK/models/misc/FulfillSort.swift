@@ -8,7 +8,7 @@
 
 import Foundation
 
-/// Used to sort within <doc:WhereToBuy>.
+/// Used to sort within ``Preferabli/whereToBuy(product_id:fulfill_sort:append_nonconforming_results:lock_to_integration:onCompletion:onFailure:)``.
 public class FulfillSort : Sort {
     
     public var include_shipping : Bool

@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-/// Returned by ``Preferabli/labelRecognition(image:include_merchant_links:onCompletion:onFailure:)``.
+/// The result container eturned by ``Preferabli/labelRecognition(image:include_merchant_links:onCompletion:onFailure:)``.
 public class LabelRecResult {
     
     /// A score on a scale of 0 - 100  representing the degree of difference between the submitted image and the matching image.  Results with higher scores ore more likely a matching ``Product``.

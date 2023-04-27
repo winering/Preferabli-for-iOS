@@ -83,10 +83,10 @@ public class Variant : BaseObject {
         return mostRecentRating
     }
     
-    /// The ``RatingType`` of the most recent rating of a specific variant for the current user.
-    var rating_type : RatingLevel {
+    /// The ``RatingLevel`` of the most recent rating of a specific variant for the current user.
+    var rating_level : RatingLevel {
         if (most_recent_rating != nil) {
-            return RatingLevel.getRatingTypeBasedOffTagValue(value: most_recent_rating!.value)
+            return RatingLevel.getRatingLevelBasedOffTagValue(value: most_recent_rating!.value)
         }
         
         return .NONE
@@ -194,7 +194,7 @@ extension Variant {
         Preferabli.main.whereToBuy(product_id: product.id, fulfill_sort: fulfill_sort, append_nonconforming_results: append_nonconforming_results, lock_to_integration: lock_to_integration, onCompletion: onCompletion, onFailure: onFailure)
     }
     
-    /// See ``Preferabli/wishlistProduct(product_id:year:location:notes:price:format_ml:onCompletion:onFailure:)`` and ``Preferabli/deleteTag(tag_id:onCompletion:onFailure:)``.
+    /// See ``Preferabli/wishlistProduct(product_id:year:location:notes:price:quantity:format_ml:onCompletion:onFailure:)``.
     public func toggleWishlist(onCompletion : @escaping (Product) -> () = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         if (isOnWishlist()) {
             Preferabli.main.deleteTag(tag_id: wishlist_tag!.id, onCompletion: onCompletion, onFailure: onFailure)
@@ -208,7 +208,7 @@ extension Variant {
         Preferabli.main.rateProduct(product_id: product.id, year: year, rating: rating, location: location, notes: notes, price: price, quantity: quantity, format_ml: format_ml, onCompletion: onCompletion, onFailure: onFailure)
     }
     
-    /// See ``Preferabli/lttt(product_id:year:collection_id:onCompletion:onFailure:)``.
+    /// See ``Preferabli/lttt(product_id:year:collection_id:include_merchant_links:onCompletion:onFailure:)``.
     public func lttt(collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         Preferabli.main.lttt(product_id: product.id, year: year, collection_id: collection_id, onCompletion: onCompletion, onFailure: onFailure)
     }

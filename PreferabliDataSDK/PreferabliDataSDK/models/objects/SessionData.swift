@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Internal class used to record sessions.
 internal class SessionData : BaseObject {
     
     internal var user_id : NSNumber?

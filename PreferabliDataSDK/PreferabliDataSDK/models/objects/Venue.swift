@@ -167,7 +167,7 @@ public class Venue : BaseObject {
     /// - Returns: the venue's notes about its shipping speed.
     public func getShippingSpeedNote() -> String? {
         for delivery_method in active_delivery_methods{
-            if (delivery_method.shipping_type == "standard_shipping") {
+            if (delivery_method.type == .SHIPPING) {
                 return delivery_method.shipping_speed_note
             }
         }
@@ -179,7 +179,7 @@ public class Venue : BaseObject {
     /// - Returns: the venue's notes about its shipping cost.
     public func getShippingCostNote() -> String? {
         for delivery_method in active_delivery_methods {
-            if (delivery_method.shipping_type == "standard_shipping") {
+            if (delivery_method.type == .SHIPPING) {
                 return delivery_method.shipping_cost_note
             }
         }
@@ -207,7 +207,7 @@ public class Venue : BaseObject {
         return hasLocalDelivery!
     }
     
-    /// Does the venue offer pickup?
+    /// Does the venue offer local pickup?
     /// - Returns: true if the the user can pickup at the venue.
     public func getHasPickup() -> Bool {
         if (hasPickup == nil) {
@@ -380,5 +380,173 @@ public class Venue : BaseObject {
                 return $0.getDistanceInMiles(your_lat: your_lat, your_lon: your_lon)! > $1.getDistanceInMiles(your_lat: your_lat, your_lon: your_lon)!
             }
         }
+    }
+}
+
+/// Represents a location that a ``Venue`` provides a specified delivery method (``ShippingType``).
+public class DeliveryMethod : BaseObject {
+    
+    public var shipping_type: String
+    public var state_abbreviation: String?
+    public var state_display_name: String?
+    public var country: String?
+    public var shipping_cost_note: String?
+    public var shipping_speed_note: String?
+    
+    internal init(map : [String : Any]) {
+        shipping_type = map["shipping_type"] as! String
+        state_abbreviation = map["state_abbreviation"] as? String
+        state_display_name = map["state_display_name"] as? String
+        country = map["country"] as? String
+        shipping_cost_note = map["shipping_cost_note"] as? String
+        shipping_speed_note = map["shipping_speed_note"] as? String
+        
+        super.init(id: map["id"] as? NSNumber ?? NSNumber.init(value: 0))
+    }
+    
+    internal init(method : CoreData_DeliveryMethod) {
+        shipping_type = method.shipping_type
+        state_abbreviation = method.state_abbreviation
+        state_display_name = method.state_display_name
+        country = method.country
+        shipping_cost_note = method.shipping_cost_note
+        shipping_speed_note = method.shipping_speed_note
+        super.init(id: method.id)
+    }
+    
+    /// Shipping Type of this fulfillment method.
+    var type : ShippingType {
+        return ShippingType.getShippingTypeBasedOffDatabaseName(value: shipping_type)
+    }
+}
+
+/// Represents a ``Venue``s open and close times for a given day. Each day of the week has separate corresponding values.
+public class VenueHour : BaseObject {
+    
+    public var weekday: String?
+    public var open_time: String?
+    public var close_time: String?
+    public var is_closed: Bool
+    
+    internal init(map : [String : Any]) {
+        weekday = map["weekday"] as? String
+        open_time = map["open_time"] as? String
+        close_time = map["close_time"] as? String
+        is_closed = map["is_closed"] as! Bool
+        
+        super.init(id: map["id"] as? NSNumber ?? NSNumber.init(value: 0))
+    }
+    
+    internal init(venue_hour : CoreData_VenueHour) {
+        weekday = venue_hour.weekday
+        open_time = venue_hour.open_time
+        close_time = venue_hour.close_time
+        is_closed = venue_hour.is_closed
+        super.init(id: venue_hour.id)
+    }
+    
+    var day_of_week : Weekday {
+        return Weekday.getWeekdayFromString(weekday: weekday)
+    }
+}
+
+/// Represents a fulfillment method for a ``Venue``. Contained within ``DeliveryMethod``.
+public enum ShippingType {
+    case SHIPPING
+    case LOCAL_DELIVERY
+    case PICKUP
+    
+    static internal func getShippingTypeBasedOffDatabaseName(value : String?) -> ShippingType {
+        if (value != nil) {
+            switch value! {
+            case "standard_shipping":
+                return .SHIPPING
+            case "local_delivery":
+                return .LOCAL_DELIVERY
+            case "pickup":
+                return .PICKUP
+            default:
+                return .SHIPPING
+            }
+        }
+        
+        return .SHIPPING;
+    }
+
+    internal func getDatabaseName() -> String {
+        switch self {
+        case .SHIPPING:
+            return "standard_shipping"
+        case .LOCAL_DELIVERY:
+            return "local_delivery"
+        case .PICKUP:
+            return "pickup"
+        }
+    }
+    
+    public func compare(_ other: TagType) -> ComparisonResult {
+        return self.getDatabaseName().caseInsensitiveCompare(other.getDatabaseName())
+    }
+}
+
+/// Represents a day of the week for use within ``VenueHour``.
+public enum Weekday {
+    case MONDAY
+    case TUESDAY
+    case WEDNESDAY
+    case THURSDAY
+    case FRIDAY
+    case SATURDAY
+    case SUNDAY
+    case NONE
+
+    static internal func getWeekdayFromString(weekday : String?) -> Weekday {
+        if (weekday != nil) {
+            switch weekday! {
+            case "monday":
+                return .MONDAY
+            case "tuesday":
+                return .TUESDAY
+            case "wednesday":
+                return .WEDNESDAY
+            case "thursday":
+                return .THURSDAY
+            case "friday":
+                return .FRIDAY
+            case "saturday":
+                return .SATURDAY
+            case "sunday":
+                return .SUNDAY
+            default:
+                return .NONE
+            }
+        }
+        
+        return NONE;
+    }
+    
+    internal func getStringFromWeekday() -> String {
+        switch self {
+        case .MONDAY:
+            return "monday"
+        case .TUESDAY:
+            return "tuesday"
+        case .WEDNESDAY:
+            return "wednesday"
+        case .THURSDAY:
+            return "thursday"
+        case .FRIDAY:
+            return "friday"
+        case .SATURDAY:
+            return "saturday"
+        case .SUNDAY:
+            return "sunday"
+        case .NONE:
+            return "none"
+        }
+    }
+    
+    public func compare(_ other: Weekday) -> ComparisonResult {
+        return self.getStringFromWeekday().caseInsensitiveCompare(other.getStringFromWeekday())
     }
 }

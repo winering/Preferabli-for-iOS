@@ -16,4 +16,4 @@ A ``Product`` can have one or more ``Variant``s. A variant can have one or more 
 - ``Variant``
 - ``Tag``
 - ``TagType``
-- ``RatingType``
+- ``RatingLevel``

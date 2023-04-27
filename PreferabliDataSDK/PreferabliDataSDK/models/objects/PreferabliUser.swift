@@ -8,7 +8,7 @@
 
 import Foundation
 
-/// A logged in Preferabli user.
+/// A logged in Preferabli user. Most SDK installations will never use this.
 public class PreferabliUser : BaseObject {
     
     public var account_level: NSNumber?
@@ -65,7 +65,7 @@ public class PreferabliUser : BaseObject {
     ///   - height: returns an image with the specified height in pixels.
     ///   - quality: returns an image with the specified quality. Scales from 0 - 100.
     /// - Returns: the URL of the requested image.
-    public func getImage(width : CGFloat, height : CGFloat, quality : Int = 80) -> URL? {
+    public func getAvatar(width : CGFloat, height : CGFloat, quality : Int = 80) -> URL? {
         return PreferabliTools.getImageUrl(image: avatar?.path, width: width, height: height, quality: quality)
     }
     

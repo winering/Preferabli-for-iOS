@@ -19,7 +19,7 @@ Written in Swift 5. Requires Minimum Deployment Target of iOS 13.
 ### Keep Learning
 
 - <doc:Products>
-- <doc:Users>
+- <doc:Customers>
 - <doc:Get-Recs>
 - <doc:Where-to-Buy>
 - <doc:Guided-Rec>

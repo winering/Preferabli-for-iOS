@@ -42,7 +42,7 @@ public class Collection : BaseObject {
     public var is_blind: Bool
     public var start_date: Date?
     public var venue_id: NSNumber?
-    public var primary_image: Media?
+    internal var primary_image: Media?
     public var venue: Venue?
     public var versions: [CollectionVersion]
     public var sort_channel_name: String
@@ -99,7 +99,7 @@ public class Collection : BaseObject {
         }
     }
     
-    /// Get the collection image.
+    /// Get the collection's image.
     /// - Parameters:
     ///   - width: returns an image with the specified width in pixels.
     ///   - height: returns an image with the specified height in pixels.
@@ -317,5 +317,25 @@ internal class CollectionTrait : BaseObject {
         order = collection_trait.order
         restrict_to_ring_it = collection_trait.restrict_to_ring_it
         super.init(id: collection_trait.id)
+    }
+}
+
+/// The type of a ``Collection``.
+public enum CollectionType {
+    case EVENT
+    case INVENTORY
+    case CELLAR
+    case OTHER
+    
+    static internal func getCollectionTypeBasedOffCollection(collection : Collection) -> CollectionType {
+        if (collection.is_my_cellar) {
+            return .CELLAR
+        } else if (collection.isEvent()) {
+            return .EVENT
+        } else if (collection.isInventory()) {
+            return .INVENTORY
+        }
+        
+        return .OTHER
     }
 }

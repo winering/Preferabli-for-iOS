@@ -10,6 +10,7 @@
 import Foundation
 import CoreData
 
+/// Internal class used for tracking searches.
 internal class Search {
     
     internal var count: NSNumber

@@ -8,7 +8,7 @@
 
 import Foundation
 
-/// This object will include an array of either ``MerchantProductLink``s (if sorted by price) or ``Venue``s (if sorted by distance).
+/// Container object returned by ``Preferabli/whereToBuy(product_id:fulfill_sort:append_nonconforming_results:lock_to_integration:onCompletion:onFailure:)``. This object will include an array of either ``MerchantProductLink``s (if sorted by price) or ``Venue``s (if sorted by distance).
 public class WhereToBuy {
     
     public var links = Array<MerchantProductLink>()

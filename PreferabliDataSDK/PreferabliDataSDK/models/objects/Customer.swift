@@ -11,7 +11,7 @@ import Foundation
 /// A logged in merchant customer.
 public class Customer : BaseObject {
     
-    public var avatar_url: String?
+    internal var avatar_url: String?
     public var merchant_user_email_address: String?
     public var merchant_user_id: String?
     public var merchant_user_name: String?
@@ -67,5 +67,15 @@ public class Customer : BaseObject {
         }
         
         return ""
+    }
+    
+    /// Get the customer's  avatar.
+    /// - Parameters:
+    ///   - width: returns an image with the specified width in pixels.
+    ///   - height: returns an image with the specified height in pixels.
+    ///   - quality: returns an image with the specified quality. Scales from 0 - 100.
+    /// - Returns: the URL of the requested image.
+    public func getAvatar(width : CGFloat, height : CGFloat, quality : Int = 80) -> URL? {
+        return PreferabliTools.getImageUrl(image: avatar_url, width: width, height: height, quality: quality)
     }
 }
