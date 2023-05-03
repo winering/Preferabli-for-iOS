@@ -293,6 +293,25 @@ class ViewController : UIViewController, UIPickerViewDelegate, UIPickerViewDataS
             self.hideLoadingView()
             self.showSnackBar(message: error.getMessage())
         }
+        
+        Preferabli.main.getGuidedRec { guided_rec in
+            let questions = guided_rec.questions
+            var selected_choice_ids = Array<NSNumber>()
+                for question in questions {
+                    if (question.choices.count > 0) {
+                         // Here I am simply randomizing choices to get results. In the real world, the answers to these questions would come from the user.
+                        selected_choice_ids.append(question.choices.randomElement()!.id)
+                    }
+                }
+                    
+            Preferabli.main.getGuidedRecResults(guided_rec_id: guided_rec.id, selected_choice_ids: selected_choice_ids) { products in
+                // Do what you like with the message & products returned.
+            } onFailure: { error in
+                // Call failed.
+            }
+        } onFailure: { error in
+            // Call failed.
+            }
     }
     
     @IBAction func whereToBuyPressed() {

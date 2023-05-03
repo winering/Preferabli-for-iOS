@@ -216,7 +216,10 @@ extension Variant {
     /// See ``Preferabli/getPreferabliScore(product_id:year:onCompletion:onFailure:)``.
     public func getPreferabliScore(force_refresh : Bool = false, onCompletion : @escaping (PreferenceData) -> ()  = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         if (preference_data == nil || force_refresh) {
-            Preferabli.main.getPreferabliScore(product_id: product.id, year: year, onCompletion: onCompletion, onFailure: onFailure)
+            Preferabli.main.getPreferabliScore(product_id: product.id, year: year, onCompletion: {
+                preference_data in
+                self.preference_data = preference_data
+                onCompletion(preference_data)}, onFailure: onFailure)
         } else {
             onCompletion(preference_data!)
         }
