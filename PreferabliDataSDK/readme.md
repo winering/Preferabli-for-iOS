@@ -2,8 +2,8 @@
 
 ## Overview
 
-This is the repo for our iOS Data SDK. Our customers can license this software for use in their own applications.
+You can use the Preferabli iOS SDK to integrate Preferabli's powerful preference technology into your applications.
 
-## Basic Structure
+Clone this repo to review our demo application.
 
-The library uses [this api](https://github.com/winering/platform-api) to retrieve data. See those docs for data structure of models, etc.
+[Click here for the full documentation, including an installation tutorial.](https://nick-docs.preferabli.com/documentation/preferablidatasdk)
