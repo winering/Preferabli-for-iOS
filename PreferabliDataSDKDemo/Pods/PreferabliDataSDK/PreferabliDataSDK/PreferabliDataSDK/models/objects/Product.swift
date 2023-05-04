@@ -10,7 +10,11 @@ import Foundation
 import CoreData
 import UIKit
 
-/// Represents a product within the Preferabli SDK. A product may have one or more ``Variant``s stored as ``variants``. To see how a product is mapped to your own object(s), see ``Variant/merchant_links``. To see a user's interaction with the product, see ``Variant/tags``.
+/// Represents a product  (e.g., wines, beers, spirits) within the Preferabli SDK. A product may have one or more ``Variant``s stored as ``variants``.  A variant can have one or more ``Tag``s which are used to associate a product with a user's interaction (e.g., rating) or with a particular ``Collection``.
+///
+/// With respect to a ``Customer``, a product return may also include ``PreferenceData`` which identifies the customer's affinity for the product. See ``getPreferabliScore(force_refresh:onCompletion:onFailure:).
+///
+/// To see how a product is mapped to your own object(s), see ``Variant/merchant_links``. To see a user's interaction with the product, see ``Variant/tags``.
 public class Product : BaseObject {
     
     public var brand: String
@@ -344,7 +348,7 @@ extension Product {
     }
     
     /// See ``Preferabli/lttt(product_id:year:collection_id:include_merchant_links:onCompletion:onFailure:)``.
-    public func lttt(collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func lttt(collection_id : NSNumber = Preferabli.PRIMARY_INVENTORY_ID, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         most_recent_variant.lttt(collection_id: collection_id, onCompletion: onCompletion, onFailure: onFailure)
     }
     

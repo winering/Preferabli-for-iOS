@@ -131,12 +131,6 @@ public class Preferabli {
         return PreferabliTools.isCustomerLoggedIn()
     }
     
-    /// Will get you the collection id of your integration's primary inventory.
-    /// - Returns: collection id
-    static internal func getPrimaryInventoryId() -> NSNumber {
-        return NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "PRIMARY_INVENTORY_ID"))
-    }
-    
     /// Get the Powered By Preferabli logo for use in your app.
     /// - Parameter light_background: pass true if you want the version suitable for a light background. Pass false for the dark background version.
     /// - Returns: Powered By Preferabli logo.
@@ -903,7 +897,7 @@ public class Preferabli {
     ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func getGuidedRecResults(guided_rec_id: NSNumber, selected_choice_ids : Array<NSNumber>, price_min : Int? = nil, price_max : Int? = nil, collection_id : NSNumber? = Preferabli.getPrimaryInventoryId(), include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func getGuidedRecResults(guided_rec_id: NSNumber, selected_choice_ids : Array<NSNumber>, price_min : Int? = nil, price_max : Int? = nil, collection_id : NSNumber? = Preferabli.PRIMARY_INVENTORY_ID, include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
             self.getGuidedRecResultsActual(guided_rec_id: guided_rec_id, selected_choice_ids: selected_choice_ids, price_min: price_min, price_max: price_max, collection_id: collection_id, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
         })
@@ -999,7 +993,7 @@ public class Preferabli {
     ///   - collection_id: the id of a specific ``Collection`` that you want to draw results from. Defaults to ``PRIMARY_INVENTORY_ID``.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func lttt(product_id : NSNumber, year : NSNumber = Variant.CURRENT_VARIANT_YEAR, collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func lttt(product_id : NSNumber, year : NSNumber = Variant.CURRENT_VARIANT_YEAR, collection_id : NSNumber = Preferabli.PRIMARY_INVENTORY_ID, include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
             self.ltttActual(product_id: product_id, year: year, collection_id: collection_id, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
         })
@@ -1381,7 +1375,7 @@ public class Preferabli {
     ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
     ///   - onCompletion: returns an optional message as a string along with an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func getRecs(product_category : ProductCategory, product_type : ProductType,  collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), price_min : Int? = nil, price_max : Int? = nil, style_ids : [NSNumber]? = nil, food_ids : [NSNumber]? = nil, include_merchant_links: Bool = true, onCompletion: @escaping (String?, [Product]) -> () = {_,_  in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func getRecs(product_category : ProductCategory, product_type : ProductType,  collection_id : NSNumber = Preferabli.PRIMARY_INVENTORY_ID, price_min : Int? = nil, price_max : Int? = nil, style_ids : [NSNumber]? = nil, food_ids : [NSNumber]? = nil, include_merchant_links: Bool = true, onCompletion: @escaping (String?, [Product]) -> () = {_,_  in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
             self.getRecsActual(product_category: product_category, product_type: product_type, price_min: price_min, price_max: price_max, collection_id: collection_id, style_ids: style_ids, food_ids: food_ids, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
         })

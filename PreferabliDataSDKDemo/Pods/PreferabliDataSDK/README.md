@@ -2,7 +2,7 @@
 
 ## Overview
 
-You can use the Preferabli iOS SDK to integrate Preferabli's powerful preference technology into your applications. Written in Swift 5.0. 
+You can use the Preferabli iOS SDK to integrate Preferabli's powerful preference technology into your applications.
 
 Clone this repo to review our demo application.
 

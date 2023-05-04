@@ -11,7 +11,7 @@ import CoreData
 import UIKit
 
 
-/// Chronicles a user's interaction with a product. Is one of a type ``TagType``.
+/// Chronicles a user's interaction with a ``Product``. Is one of a type ``TagType``.
 public class Tag : BaseObject {
 
      public var collection_id: NSNumber

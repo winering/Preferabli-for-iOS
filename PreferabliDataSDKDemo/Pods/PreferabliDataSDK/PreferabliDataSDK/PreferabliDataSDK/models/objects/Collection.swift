@@ -10,11 +10,13 @@ import Foundation
 import CoreData
 import UIKit
 
-/// A Collection is a selection of ``Product``s, organized into one or more ``CollectionGroup``.  For example, a Collection can represent an inventory for a store or just a subset of Products, such as selection of Products that are currently on sale or a selection of private-label Products.
+/// A Collection is a selection of ``Product``s, organized into one or more ``CollectionGroup``.  For example, a collection can represent an inventory for a store or just a subset of products, such as selection of products that are currently on sale or a selection of private-label products.
 ///
-/// In general, a Collection will be an ``CollectionType/INVENTORY`` or an ``CollectionType/EVENT``.  Events are temporal in nature, such as a tasting events or weekly promotions.  Inventories, whether entire inventories or subsets of an inventory, are meant to change from time to time but are not specifically temporal in nature.
+/// In general, a collection will be an ``CollectionType/INVENTORY`` or an ``CollectionType/EVENT``.  Events are temporal in nature, such as a tasting events or weekly promotions.  Inventories, whether entire inventories or subsets of an inventory, are meant to change from time to time but are not specifically temporal in nature.
 ///
 /// A Collection may also be a ``CollectionType/CELLAR`` type (e.g., a ``Customer``'s personal cellar) or ``CollectionType/OTHER`` type.
+///
+/// Collections are structured as follows: a collection has one or more ``CollectionVersion``s. Each version has one or more ``CollectionGroup``s. And each group contains one or more ``CollectionOrder``s, which link directly to a ``Tag`` and thus by reference a ``Product``.
 public class Collection : BaseObject {
     
     public var channel_id: NSNumber?

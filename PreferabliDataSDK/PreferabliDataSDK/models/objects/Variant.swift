@@ -209,7 +209,7 @@ extension Variant {
     }
     
     /// See ``Preferabli/lttt(product_id:year:collection_id:include_merchant_links:onCompletion:onFailure:)``.
-    public func lttt(collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func lttt(collection_id : NSNumber = Preferabli.PRIMARY_INVENTORY_ID, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         Preferabli.main.lttt(product_id: product.id, year: year, collection_id: collection_id, onCompletion: onCompletion, onFailure: onFailure)
     }
     

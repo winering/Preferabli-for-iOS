@@ -6,22 +6,8 @@
 
 Use this framework to integrate Preferabli's functionalities and powerful taste preference technology into your applications. For a full working example, [download our demo application](https://github.com/winering/Preferabli-for-iOS). 
 
+[Check out our full documentation](https://preferabli.readme.io/docs/).
+
 Written in Swift 5. Requires Minimum Deployment Target of iOS 13.
 
-## Topics
-
-### Essential
-
-- <doc:Installation>
-- <doc:How-to-Use>
-- <doc:Further-Help>
-
-### Keep Learning
-
-- <doc:Products>
-- <doc:Customers>
-- <doc:Get-Recs>
-- <doc:Where-to-Buy>
-- <doc:Guided-Rec>
-- <doc:Collections>
-- <doc:Other>
+If you require any further assistance with the SDK, feel free to reach out to us at [support@preferabli.com](mailto:support@preferabli.com). 

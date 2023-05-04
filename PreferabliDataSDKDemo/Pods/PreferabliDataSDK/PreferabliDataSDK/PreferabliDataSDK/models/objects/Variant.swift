@@ -209,14 +209,17 @@ extension Variant {
     }
     
     /// See ``Preferabli/lttt(product_id:year:collection_id:include_merchant_links:onCompletion:onFailure:)``.
-    public func lttt(collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func lttt(collection_id : NSNumber = Preferabli.PRIMARY_INVENTORY_ID, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         Preferabli.main.lttt(product_id: product.id, year: year, collection_id: collection_id, onCompletion: onCompletion, onFailure: onFailure)
     }
     
     /// See ``Preferabli/getPreferabliScore(product_id:year:onCompletion:onFailure:)``.
     public func getPreferabliScore(force_refresh : Bool = false, onCompletion : @escaping (PreferenceData) -> ()  = {_ in }, onFailure : @escaping (PreferabliException) -> () = {_ in }) {
         if (preference_data == nil || force_refresh) {
-            Preferabli.main.getPreferabliScore(product_id: product.id, year: year, onCompletion: onCompletion, onFailure: onFailure)
+            Preferabli.main.getPreferabliScore(product_id: product.id, year: year, onCompletion: {
+                preference_data in
+                self.preference_data = preference_data
+                onCompletion(preference_data)}, onFailure: onFailure)
         } else {
             onCompletion(preference_data!)
         }

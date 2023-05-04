@@ -119,7 +119,7 @@ public class Preferabli {
         }
     }
     
-    /// Will let you know if a user is logged in or not.
+    /// Will let you know if a Preferabli user is logged in or not. Most SDK installations will never use this.
     /// - Returns: bool
     static public func isPreferabliUserLoggedIn() -> Bool {
         return PreferabliTools.isPreferabliUserLoggedIn()
@@ -133,7 +133,7 @@ public class Preferabli {
     
     /// Will get you the collection id of your integration's primary inventory.
     /// - Returns: collection id
-    static public func getPrimaryInventoryId() -> NSNumber {
+    static internal func getPrimaryInventoryId() -> NSNumber {
         return NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "PRIMARY_INVENTORY_ID"))
     }
     
@@ -288,7 +288,7 @@ public class Preferabli {
         PreferabliTools.getKeyStore().set(Date.init(), forKey: "lastCalledCustomer")
     }
     
-    /// Login an existing Preferabli user.
+    /// Login an existing Preferabli user. Most SDK installations will never use this.
     /// - Parameters:
     ///   - email: user's email address.
     ///   - password: user's password.
@@ -335,7 +335,7 @@ public class Preferabli {
         }
     }
     
-    /// Signup a new Preferabli user.
+    /// Signup a new Preferabli user. Most SDK installations will never use this.
     /// - Parameters:
     ///   - email: user's email address.
     ///   - password: user's password.
@@ -384,7 +384,7 @@ public class Preferabli {
         }
     }
     
-    /// Logout a customer / Preferabli user.
+    /// Logout a customer.
     /// - Parameters:
     ///   - onCompletion: returns if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
@@ -411,7 +411,7 @@ public class Preferabli {
         }
     }
     
-    /// Resets the password of an existing Preferabli user.
+    /// Resets the password of an existing Preferabli user. Most SDK installations will never use this.
     /// - Parameters:
     ///   - email: user's email address.
     ///   - onCompletion: returns if the call was successful. *Returns on the main thread.*
@@ -627,7 +627,7 @@ public class Preferabli {
         }
     }
     
-    /// Get rated products. Customer / Preferabli user must be logged in to run this call.
+    /// Get rated products. Customer must be logged in to run this call.
     /// - Parameters:
     ///   - force_refresh: pass true if you want to force a refresh from the API and wait for the results to return. Otherwise, the call will load locally if available and run a background refresh only if one has not been initiated in the past 5 minutes. Defaults to *false*.
     ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
@@ -665,7 +665,7 @@ public class Preferabli {
         })
     }
     
-    /// Get wishlisted products. Customer / Preferabli user must be logged in to run this call.
+    /// Get wishlisted products. Customer must be logged in to run this call.
     /// - Parameters:
     ///   - force_refresh: pass true if you want to force a refresh from the API and wait for the results to return. Otherwise, the call will load locally if available and run a background refresh only if one has not been initiated in the past 5 minutes. Defaults to *false*.
     ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
@@ -702,7 +702,7 @@ public class Preferabli {
         })
     }
     
-    /// Get purchased products. Customer / Preferabli user must be logged in to run this call.
+    /// Get purchased products. Customer must be logged in to run this call.
     /// - Parameters:
     ///   - force_refresh: pass true if you want to force a refresh from the API and wait for the results to return. Otherwise, the call will load locally if available and run a background refresh only if one has not been initiated in the past 5 minutes. Defaults to *false*.
     ///   - lock_to_integration: pass true if you only want to draw results from your integration. Defaults to *true*.
@@ -903,7 +903,7 @@ public class Preferabli {
     ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func getGuidedRecResults(guided_rec_id: NSNumber, selected_choice_ids : Array<NSNumber>, price_min : Int? = nil, price_max : Int? = nil, collection_id : NSNumber? = Preferabli.getPrimaryInventoryId(), include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func getGuidedRecResults(guided_rec_id: NSNumber, selected_choice_ids : Array<NSNumber>, price_min : Int? = nil, price_max : Int? = nil, collection_id : NSNumber? = Preferabli.PRIMARY_INVENTORY_ID, include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
             self.getGuidedRecResultsActual(guided_rec_id: guided_rec_id, selected_choice_ids: selected_choice_ids, price_min: price_min, price_max: price_max, collection_id: collection_id, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
         })
@@ -999,7 +999,7 @@ public class Preferabli {
     ///   - collection_id: the id of a specific ``Collection`` that you want to draw results from. Defaults to ``PRIMARY_INVENTORY_ID``.
     ///   - onCompletion: returns an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func lttt(product_id : NSNumber, year : NSNumber = Variant.CURRENT_VARIANT_YEAR, collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func lttt(product_id : NSNumber, year : NSNumber = Variant.CURRENT_VARIANT_YEAR, collection_id : NSNumber = Preferabli.PRIMARY_INVENTORY_ID, include_merchant_links: Bool = true, onCompletion: @escaping ([Product]) -> () = {_ in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
             self.ltttActual(product_id: product_id, year: year, collection_id: collection_id, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
         })
@@ -1299,7 +1299,7 @@ public class Preferabli {
         context.mr_saveToPersistentStoreAndWait()
     }
     
-    /// Get a list of foods to choose from to be used in ``getRecs(product_category:product_type:price_min:price_max:collection_id:style_ids:food_ids:include_merchant_links:onCompletion:onFailure:)``.
+    /// Get a list of foods to choose from to be used in ``getRecs(product_category:product_type:collection_id:price_min:price_max:style_ids:food_ids:include_merchant_links:onCompletion:onFailure:)``.
     /// - Parameters:
     ///   - force_refresh: pass true if you want to force a refresh from the API and wait for the results to return. Otherwise, the call will load locally if available and run a background refresh only if one has not been initiated in the past 5 minutes. Defaults to *false*.
     ///   - onCompletion: returns an an array of ``Food`` if the call was successful. *Returns on the main thread.*
@@ -1369,7 +1369,7 @@ public class Preferabli {
         PreferabliTools.getKeyStore().setValue(true, forKey: "hasLoadedFoods")
     }
     
-    /// Get a personalized, preference based recommendation for a customer / Preferabli user.
+    /// Get a personalized, preference based recommendation for a customer.
     /// - Parameters:
     ///   - product_category: pass a ``ProductCategory`` that you would like the results to conform to.
     ///   - product_type: pass a ``ProductType`` that you would like the results to conform to. Pass ``ProductType/OTHER`` if ``ProductCategory`` is not set  to ``ProductCategory/WINE``. If ``ProductCategory/WINE`` is passed, a type of wine *must* be passed here.
@@ -1381,7 +1381,7 @@ public class Preferabli {
     ///   - include_merchant_links: pass true if you want the results to include an array of ``MerchantProductLink`` embedded in ``Variant``. These connect Preferabli products to your own. Passing true requires additional resources and therefore will take longer. Defaults to *true*.
     ///   - onCompletion: returns an optional message as a string along with an array of ``Product`` if the call was successful. *Returns on the main thread.*
     ///   - onFailure: returns ``PreferabliException``  if the call fails. *Returns on the main thread.*
-    public func getRecs(product_category : ProductCategory, product_type : ProductType,  collection_id : NSNumber = Preferabli.getPrimaryInventoryId(), price_min : Int? = nil, price_max : Int? = nil, style_ids : [NSNumber]? = nil, food_ids : [NSNumber]? = nil, include_merchant_links: Bool = true, onCompletion: @escaping (String?, [Product]) -> () = {_,_  in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
+    public func getRecs(product_category : ProductCategory, product_type : ProductType,  collection_id : NSNumber = Preferabli.PRIMARY_INVENTORY_ID, price_min : Int? = nil, price_max : Int? = nil, style_ids : [NSNumber]? = nil, food_ids : [NSNumber]? = nil, include_merchant_links: Bool = true, onCompletion: @escaping (String?, [Product]) -> () = {_,_  in }, onFailure: @escaping (PreferabliException) -> () = {_ in }) {
         PreferabliTools.startNewWorkThread(priority: .veryHigh, {
             self.getRecsActual(product_category: product_category, product_type: product_type, price_min: price_min, price_max: price_max, collection_id: collection_id, style_ids: style_ids, food_ids: food_ids, include_merchant_links: include_merchant_links, onCompletion: onCompletion, onFailure: onFailure)
         })
@@ -1685,7 +1685,7 @@ public class Preferabli {
     }
     
     
-    /// Get a Preferabli user / customer's preference data for a given ``Product``.
+    /// Get a customer's preference data for a given ``Product``.
     /// - Parameters:
     ///   - product_id: id of the starting ``Product``.
     ///   - year: year of the ``Variant`` that you want to get results on. Defaults to ``Variant/CURRENT_VARIANT_YEAR``.

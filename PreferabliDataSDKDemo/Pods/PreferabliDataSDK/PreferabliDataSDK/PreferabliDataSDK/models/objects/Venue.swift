@@ -383,7 +383,7 @@ public class Venue : BaseObject {
     }
 }
 
-/// Represents a location that a ``Venue`` provides a specified delivery method (``ShippingType``).
+/// Indicates that a ``Venue`` provides a specified delivery method (``ShippingType``).
 public class DeliveryMethod : BaseObject {
     
     public var shipping_type: String
