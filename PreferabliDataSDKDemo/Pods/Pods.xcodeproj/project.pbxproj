@@ -299,7 +299,7 @@
 		2DAF02FFE4BE1D6125143FDE80E90131 /* BaseObject.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BaseObject.swift; path = PreferabliDataSDK/PreferabliDataSDK/models/objects/BaseObject.swift; sourceTree = "<group>"; };
 		2E325A461814D253F7B84A960D1DD4FA /* CoreData_Location.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CoreData_Location.swift; path = PreferabliDataSDK/PreferabliDataSDK/models/coredata/CoreData_Location.swift; sourceTree = "<group>"; };
 		30ABAAFBD94E79A75A462E4FB240DE66 /* Mixpanel-swift.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = "Mixpanel-swift.modulemap"; sourceTree = "<group>"; };
-		3106651F608FF9E872964798302D36DE /* Mixpanel-swift */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = "Mixpanel-swift"; path = Mixpanel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3106651F608FF9E872964798302D36DE /* Mixpanel.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Mixpanel.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		326E33C317A3E3CAF448E89541FC5040 /* MagicalRecord+Options.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "MagicalRecord+Options.m"; path = "MagicalRecord/Core/MagicalRecord+Options.m"; sourceTree = "<group>"; };
 		346ABC476C726A80E942934339A8BD89 /* MagicalRecord+iCloud.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "MagicalRecord+iCloud.h"; path = "MagicalRecord/Core/MagicalRecord+iCloud.h"; sourceTree = "<group>"; };
 		3655C3098B30AA6F17199AA945F0DC76 /* CoreData_Media.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CoreData_Media.swift; path = PreferabliDataSDK/PreferabliDataSDK/models/coredata/CoreData_Media.swift; sourceTree = "<group>"; };
@@ -338,7 +338,7 @@
 		5CE35D4DC8AB53ECDF8099BE07D427BF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		5D52D3E7EB7C42EA7710608025DD8D71 /* Location.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Location.swift; path = PreferabliDataSDK/PreferabliDataSDK/models/objects/Location.swift; sourceTree = "<group>"; };
 		5D7382CF70A3C666E578A24B3930BAD0 /* powered_by_dark_bg.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = powered_by_dark_bg.png; path = PreferabliDataSDK/PreferabliDataSDK/assets/powered_by_dark_bg.png; sourceTree = "<group>"; };
-		5D797E9A5C5782CE845840781FA1CC81 /* Alamofire */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Alamofire; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5D797E9A5C5782CE845840781FA1CC81 /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D7FEA3BE111C21F1D6DAD32A4771D68 /* JSONHandler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JSONHandler.swift; path = Sources/JSONHandler.swift; sourceTree = "<group>"; };
 		5DA0462CB59EBF60B21785AED2E5B72E /* MagicalRecord+ErrorHandling.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "MagicalRecord+ErrorHandling.h"; path = "MagicalRecord/Core/MagicalRecord+ErrorHandling.h"; sourceTree = "<group>"; };
 		5ECF7A0245ACC138DF5155901A940B4A /* Pods-PreferabliDataSDKDemo-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-PreferabliDataSDKDemo-dummy.m"; sourceTree = "<group>"; };
@@ -360,14 +360,14 @@
 		7A7551B9DAEB4D745DE2C86EA2B57FEC /* CoreData_UserCollection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CoreData_UserCollection.swift; path = PreferabliDataSDK/PreferabliDataSDK/models/coredata/CoreData_UserCollection.swift; sourceTree = "<group>"; };
 		7C5F92D1B2807BB946596D9EE124E248 /* AFError.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AFError.swift; path = Source/AFError.swift; sourceTree = "<group>"; };
 		7CB443C5691E2A96C528136B319B06F2 /* PreferabliUser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PreferabliUser.swift; path = PreferabliDataSDK/PreferabliDataSDK/models/objects/PreferabliUser.swift; sourceTree = "<group>"; };
-		7D5735447E61EF09D41D693D93E4CD90 /* TTGSnackbar */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = TTGSnackbar; path = TTGSnackbar.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7D5735447E61EF09D41D693D93E4CD90 /* TTGSnackbar.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TTGSnackbar.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E324D5F588B6FD63F942291F26A70C6 /* Logger.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Logger.swift; path = Sources/Logger.swift; sourceTree = "<group>"; };
 		7EBFCE7179ACCF642FDF9D25B5C7C8DA /* MultipartFormData.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MultipartFormData.swift; path = Source/MultipartFormData.swift; sourceTree = "<group>"; };
 		7EE0523FE2B4FD73A5A5C139FAF936FD /* DataResponseExt.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DataResponseExt.swift; path = PreferabliDataSDK/PreferabliDataSDK/tools/ext/DataResponseExt.swift; sourceTree = "<group>"; };
 		80516EE5C6B4D07C454651975ED3DBF2 /* NSManagedObjectContext+MagicalChainSave.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSManagedObjectContext+MagicalChainSave.h"; path = "MagicalRecord/Categories/NSManagedObjectContext/NSManagedObjectContext+MagicalChainSave.h"; sourceTree = "<group>"; };
 		82107D190357F555F3EA5D7BC4CA3097 /* TTGSnackbar.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = TTGSnackbar.release.xcconfig; sourceTree = "<group>"; };
 		8553179163542C28187A66F3CA4E7D7B /* Variant.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Variant.swift; path = PreferabliDataSDK/PreferabliDataSDK/models/objects/Variant.swift; sourceTree = "<group>"; };
-		855EB41CB01EE1DDB4856B91D67EB121 /* SwiftEventBus */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = SwiftEventBus; path = SwiftEventBus.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		855EB41CB01EE1DDB4856B91D67EB121 /* SwiftEventBus.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftEventBus.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		857B1CDC3C89730CF4190305BA83A116 /* CoreData_Product.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CoreData_Product.swift; path = PreferabliDataSDK/PreferabliDataSDK/models/coredata/CoreData_Product.swift; sourceTree = "<group>"; };
 		86A4C886F698FDF633428616D7DFA4F6 /* MagicalRecord-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "MagicalRecord-prefix.pch"; sourceTree = "<group>"; };
 		89892E0F936B530FC10C14E003552C3D /* NSManagedObjectModel+MagicalRecord.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSManagedObjectModel+MagicalRecord.h"; path = "MagicalRecord/Categories/NSManagedObjectModel+MagicalRecord.h"; sourceTree = "<group>"; };
@@ -384,7 +384,7 @@
 		947A8D4E1D12D62EF65A2A41F4AF5FB4 /* SessionMetadata.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SessionMetadata.swift; path = Sources/SessionMetadata.swift; sourceTree = "<group>"; };
 		94FB03D05D67593B8B092FF3CFE6F0B1 /* Alamofire.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Alamofire.swift; path = Source/Alamofire.swift; sourceTree = "<group>"; };
 		9734D8ED784234AF471BBD1F5AEC9ABF /* Tag.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Tag.swift; path = PreferabliDataSDK/PreferabliDataSDK/models/objects/Tag.swift; sourceTree = "<group>"; };
-		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		9D940727FF8FB9C785EB98E56350EF41 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; indentWidth = 2; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; tabWidth = 2; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9E8D4FC052D3E9E81549244B85C19C58 /* Request.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Request.swift; path = Source/Request.swift; sourceTree = "<group>"; };
 		9F570823FC55C980D7E0FBF9ECBEEDD7 /* NSString+MagicalDataImport.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSString+MagicalDataImport.m"; path = "MagicalRecord/Categories/DataImport/NSString+MagicalDataImport.m"; sourceTree = "<group>"; };
 		A017ED75415DAE65CAD0C498BAA01454 /* Pods-PreferabliDataSDKDemo-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-PreferabliDataSDKDemo-acknowledgements.plist"; sourceTree = "<group>"; };
@@ -402,7 +402,7 @@
 		A8D5D013E95F152E2F6CDF476CAD1820 /* NSRelationshipDescription+MagicalDataImport.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "NSRelationshipDescription+MagicalDataImport.m"; path = "MagicalRecord/Categories/DataImport/NSRelationshipDescription+MagicalDataImport.m"; sourceTree = "<group>"; };
 		A8F87881D77C950899F972794EA88A70 /* TTGSnackbar-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "TTGSnackbar-prefix.pch"; sourceTree = "<group>"; };
 		AAFA5700340AC2265653BE1A53A62381 /* FileLogging.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FileLogging.swift; path = Sources/FileLogging.swift; sourceTree = "<group>"; };
-		ABB43848547A86B3409581A1C5B55960 /* MagicalRecord */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = MagicalRecord; path = MagicalRecord.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABB43848547A86B3409581A1C5B55960 /* MagicalRecord.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MagicalRecord.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACAB0ED0AFB5FFB71098CBBE1B20FCCA /* PreferabliDataSDK.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = PreferabliDataSDK.modulemap; sourceTree = "<group>"; };
 		AD68DE9D564FA12920F4CEF08368C397 /* PreferabliDataSDK.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = PreferabliDataSDK.release.xcconfig; sourceTree = "<group>"; };
 		AE72F495F8A048FECBAD9B562E864499 /* MagicalRecordXcode7CompatibilityMacros.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MagicalRecordXcode7CompatibilityMacros.h; path = MagicalRecord/Core/MagicalRecordXcode7CompatibilityMacros.h; sourceTree = "<group>"; };
@@ -425,7 +425,7 @@
 		BA7129EB2C2F853EC82A3EFDF547B01D /* CoreData_Venue.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CoreData_Venue.swift; path = PreferabliDataSDK/PreferabliDataSDK/models/coredata/CoreData_Venue.swift; sourceTree = "<group>"; };
 		BB15A0315F3DA78A6592F196F7CA4381 /* CoreData_CollectionTrait.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CoreData_CollectionTrait.swift; path = PreferabliDataSDK/PreferabliDataSDK/models/coredata/CoreData_CollectionTrait.swift; sourceTree = "<group>"; };
 		BC9E94B63ABCE820443E3CA3EAA39A4C /* NSManagedObjectContext+MagicalSaves.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "NSManagedObjectContext+MagicalSaves.h"; path = "MagicalRecord/Categories/NSManagedObjectContext/NSManagedObjectContext+MagicalSaves.h"; sourceTree = "<group>"; };
-		BD3903F1EA6EA6973BF78417CF9F0290 /* PreferabliDataSDK.docc */ = {isa = PBXFileReference; includeInIndex = 1; name = PreferabliDataSDK.docc; path = PreferabliDataSDK/PreferabliDataSDK/tools/PreferabliDataSDK.docc; sourceTree = "<group>"; };
+		BD3903F1EA6EA6973BF78417CF9F0290 /* PreferabliDataSDK.docc */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.documentationcatalog; name = PreferabliDataSDK.docc; path = PreferabliDataSDK/PreferabliDataSDK/tools/PreferabliDataSDK.docc; sourceTree = "<group>"; };
 		BD69B0FC2E2882ECA2549CAC8F7D5275 /* Mixpanel-swift-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Mixpanel-swift-umbrella.h"; sourceTree = "<group>"; };
 		BE2D32F3F22236D8E5F8D233BC352375 /* powered_by_light_bg.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = powered_by_light_bg.png; path = PreferabliDataSDK/PreferabliDataSDK/assets/powered_by_light_bg.png; sourceTree = "<group>"; };
 		BFFF67649D3667318EE06855C7098C40 /* Response.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Response.swift; path = Source/Response.swift; sourceTree = "<group>"; };
@@ -570,7 +570,6 @@
 				AE14A1AB8E41DC3173FD4EABB94B2D43 /* Complete */,
 				19207C8BC70DDF789185B2A33B196552 /* Support Files */,
 			);
-			name = "Mixpanel-swift";
 			path = "Mixpanel-swift";
 			sourceTree = "<group>";
 		};
@@ -690,7 +689,6 @@
 				630062B5FA6B99FBB8FA264C29BE2AAC /* SwiftEventBus.swift */,
 				39CB39C43910FFC079707520C10945F0 /* Support Files */,
 			);
-			name = SwiftEventBus;
 			path = SwiftEventBus;
 			sourceTree = "<group>";
 		};
@@ -716,7 +714,6 @@
 				155FCF13327216D1CF29A66A4060F190 /* Validation.swift */,
 				B40BCE86169315FF41FB7E9BB0F1937C /* Support Files */,
 			);
-			name = Alamofire;
 			path = Alamofire;
 			sourceTree = "<group>";
 		};
@@ -806,7 +803,6 @@
 				A1BE4FC29898D42FC45115633A493AB7 /* Resources */,
 				936973C9397B09A730B6290939F4E476 /* Support Files */,
 			);
-			name = PreferabliDataSDK;
 			path = PreferabliDataSDK;
 			sourceTree = "<group>";
 		};
@@ -896,13 +892,13 @@
 		B32EBC69AFD72C0AC4F583D1F0292656 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5D797E9A5C5782CE845840781FA1CC81 /* Alamofire */,
-				ABB43848547A86B3409581A1C5B55960 /* MagicalRecord */,
-				3106651F608FF9E872964798302D36DE /* Mixpanel-swift */,
+				5D797E9A5C5782CE845840781FA1CC81 /* Alamofire.framework */,
+				ABB43848547A86B3409581A1C5B55960 /* MagicalRecord.framework */,
+				3106651F608FF9E872964798302D36DE /* Mixpanel.framework */,
 				19766B7EF4D7D990E6884E539271E208 /* Pods-PreferabliDataSDKDemo */,
 				4B54851D21CFCEDA58FC9868F22681E2 /* PreferabliDataSDK */,
-				855EB41CB01EE1DDB4856B91D67EB121 /* SwiftEventBus */,
-				7D5735447E61EF09D41D693D93E4CD90 /* TTGSnackbar */,
+				855EB41CB01EE1DDB4856B91D67EB121 /* SwiftEventBus.framework */,
+				7D5735447E61EF09D41D693D93E4CD90 /* TTGSnackbar.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -947,7 +943,6 @@
 				40BC394C2CE9D2A0AE71DC8821971CBC /* Core */,
 				77B10D6E7689C478FE048B9B6016344C /* Support Files */,
 			);
-			name = MagicalRecord;
 			path = MagicalRecord;
 			sourceTree = "<group>";
 		};
@@ -958,7 +953,6 @@
 				B7AB06523E783F6F09890A01BD065FCB /* TTGSnackbar.swift */,
 				36A815921C74164330FCC41958C9247F /* Support Files */,
 			);
-			name = TTGSnackbar;
 			path = TTGSnackbar;
 			sourceTree = "<group>";
 		};
@@ -1071,7 +1065,7 @@
 			);
 			name = TTGSnackbar;
 			productName = TTGSnackbar;
-			productReference = 7D5735447E61EF09D41D693D93E4CD90 /* TTGSnackbar */;
+			productReference = 7D5735447E61EF09D41D693D93E4CD90 /* TTGSnackbar.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		3ED5D5EE98206C8276DC17292F7EA3DB /* PreferabliDataSDK */ = {
@@ -1135,7 +1129,7 @@
 			);
 			name = SwiftEventBus;
 			productName = SwiftEventBus;
-			productReference = 855EB41CB01EE1DDB4856B91D67EB121 /* SwiftEventBus */;
+			productReference = 855EB41CB01EE1DDB4856B91D67EB121 /* SwiftEventBus.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		BE1E98B0F138484320E4F0E6ED0C79B0 /* MagicalRecord */ = {
@@ -1153,7 +1147,7 @@
 			);
 			name = MagicalRecord;
 			productName = MagicalRecord;
-			productReference = ABB43848547A86B3409581A1C5B55960 /* MagicalRecord */;
+			productReference = ABB43848547A86B3409581A1C5B55960 /* MagicalRecord.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		E1886A99D3887E7B636CFCD67E199412 /* Mixpanel-swift */ = {
@@ -1171,7 +1165,7 @@
 			);
 			name = "Mixpanel-swift";
 			productName = Mixpanel;
-			productReference = 3106651F608FF9E872964798302D36DE /* Mixpanel-swift */;
+			productReference = 3106651F608FF9E872964798302D36DE /* Mixpanel.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		EAAA1AD3A8A1B59AB91319EE40752C6D /* Alamofire */ = {
@@ -1189,7 +1183,7 @@
 			);
 			name = Alamofire;
 			productName = Alamofire;
-			productReference = 5D797E9A5C5782CE845840781FA1CC81 /* Alamofire */;
+			productReference = 5D797E9A5C5782CE845840781FA1CC81 /* Alamofire.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -1579,7 +1573,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/TTGSnackbar/TTGSnackbar-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/TTGSnackbar/TTGSnackbar-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1614,7 +1608,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/Mixpanel-swift/Mixpanel-swift-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/Mixpanel-swift/Mixpanel-swift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1647,7 +1641,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/TTGSnackbar/TTGSnackbar-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/TTGSnackbar/TTGSnackbar-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1717,7 +1711,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/MagicalRecord/MagicalRecord-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/MagicalRecord/MagicalRecord-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1751,7 +1745,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/Alamofire/Alamofire-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/Alamofire/Alamofire-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1787,7 +1781,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/Mixpanel-swift/Mixpanel-swift-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/Mixpanel-swift/Mixpanel-swift-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1961,7 +1955,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/MagicalRecord/MagicalRecord-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/MagicalRecord/MagicalRecord-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2058,7 +2052,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/Alamofire/Alamofire-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/Alamofire/Alamofire-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2092,7 +2086,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/SwiftEventBus/SwiftEventBus-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/SwiftEventBus/SwiftEventBus-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2126,7 +2120,7 @@
 				GCC_PREFIX_HEADER = "Target Support Files/SwiftEventBus/SwiftEventBus-prefix.pch";
 				INFOPLIST_FILE = "Target Support Files/SwiftEventBus/SwiftEventBus-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2229,6 +2223,7 @@
 			children = (
 				CA60132BA2AF585EFD7433B9F7EE8E25 /* WineRing.xcdatamodel */,
 			);
+			currentVersion = CA60132BA2AF585EFD7433B9F7EE8E25 /* WineRing.xcdatamodel */;
 			name = Preferabli.xcdatamodeld;
 			path = PreferabliDataSDK/PreferabliDataSDK/assets/Preferabli.xcdatamodeld;
 			sourceTree = "<group>";
