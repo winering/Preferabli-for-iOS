@@ -131,12 +131,6 @@ public class Preferabli {
         return PreferabliTools.isCustomerLoggedIn()
     }
     
-    /// Will get you the collection id of your integration's primary inventory.
-    /// - Returns: collection id
-    static internal func getPrimaryInventoryId() -> NSNumber {
-        return NSNumber.init(value: PreferabliTools.getKeyStore().integer(forKey: "PRIMARY_INVENTORY_ID"))
-    }
-    
     /// Get the Powered By Preferabli logo for use in your app.
     /// - Parameter light_background: pass true if you want the version suitable for a light background. Pass false for the dark background version.
     /// - Returns: Powered By Preferabli logo.

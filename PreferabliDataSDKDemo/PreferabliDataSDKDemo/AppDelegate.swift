@@ -15,8 +15,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-                
-        Preferabli.initialize(client_interface: "YOUR_CLIENT_INTERFACE_HERE", integration_id: 6301, logging_enabled: true)
+        
+        // Update with your own keys.
+        let YOUR_INTEGRATION_ID_HERE : NSNumber = 12345
+        Preferabli.initialize(client_interface: "YOUR_CLIENT_INTERFACE_HERE", integration_id: YOUR_INTEGRATION_ID_HERE)
         
         return true
     }
